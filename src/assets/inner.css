@@ -1,0 +1,54 @@
+
+/* Internal pages: result-first hierarchy and readable task surfaces. */
+.inner-page .crumb{margin-top:20px;margin-bottom:13px;font-size:.77rem}
+.inner-page .page-top{padding:8px 0 14px}
+.inner-page .page-title{max-width:900px;margin-bottom:15px}
+.inner-page .page-title h1{font-size:clamp(2.15rem,4vw,3.75rem);line-height:1.08;letter-spacing:-.055em;margin:0 0 11px}
+.inner-page .page-title p{max-width:770px;font-size:1rem;color:#54647f;line-height:1.65}
+.inner-page .tool-layout{grid-template-columns:minmax(0,1fr) 300px;gap:19px}
+.inner-page .tool-card{border:1px solid #d9e3f3;box-shadow:0 16px 40px rgba(35,60,100,.085)}
+.inner-page .tool-card .resultbox{background:#edf3ff;border-color:#d5e3ff}
+.inner-page .tool-card .resultbox .big{font-size:clamp(2.1rem,3vw,3rem);letter-spacing:-.06em}
+.inner-page .body-content{margin:22px 0 0}
+.inner-page .body-content .card{padding:29px}
+.inner-page .body-content .card h2{font-size:1.35rem;margin:25px 0 10px}
+.inner-page .body-content .card h2:first-child{margin-top:0}
+.inner-page .body-content .card>p{line-height:1.7;font-size:.92rem}
+.inner-page .aside-stack .mini-card{padding:19px}
+.inner-page .chip{background:#f4f7ff;border:1px solid #e0e8f8;color:#2a4b83;padding:8px 10px}
+.inner-page .chip:hover{background:#e7efff;border-color:#b8ccf4}
+.direct-answer{margin:4px 0 22px;background:linear-gradient(115deg,#112d61,#174bba);border-radius:18px;padding:23px 27px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:22px;box-shadow:0 15px 36px rgba(18,66,154,.12)}
+.direct-answer>div:first-child{min-width:0}
+.answer-eyebrow{color:#c2d9ff;font-weight:800;font-size:.67rem;letter-spacing:.13em}
+.direct-answer p{margin:11px 0 5px;color:#e2ecff;font-size:.95rem}
+.direct-answer strong{display:block;line-height:1.12;font-weight:850;font-size:clamp(2.1rem,4vw,3.25rem);letter-spacing:-.055em;overflow-wrap:anywhere}
+.direct-answer strong small{font-size:.52em;letter-spacing:-.025em;color:#cbdfff;font-weight:750}
+.answer-equation{display:block;font-size:.8rem;margin-top:12px;color:#c9dbf9}
+.answer-actions{display:flex;flex-direction:column;gap:9px;flex-shrink:0;min-width:142px}
+.answer-actions button,.answer-actions a{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:10px;padding:10px 12px;font-size:.83rem;font-weight:760;text-decoration:none;cursor:pointer;white-space:nowrap}
+.answer-actions button{background:#fff;color:#174bad;border:1px solid #fff}
+.answer-actions button:hover{background:#eaf2ff}
+.answer-actions a{background:transparent;border:1px solid #7195d9;color:#fff}
+.answer-actions a:hover{background:#ffffff12;color:#fff}
+.measurement-note{border:1px solid #dce6f6;background:#f5f8ff;padding:20px;border-radius:15px}
+.measurement-note>span{font-size:.64rem;font-weight:850;letter-spacing:.09em;color:#375fbe}
+.measurement-note h3{font-size:1.08rem;margin:10px 0 7px;letter-spacing:-.022em}
+.measurement-note p{font-size:.87rem;line-height:1.65;color:#485d7e;margin:0 0 12px}
+.measurement-note a{color:#174fb4;font-size:.82rem;font-weight:750;text-decoration:none}
+.reference-caption{font-size:.85rem!important;margin:0 0 10px!important;color:#62748e}
+.reference-table{width:100%;table-layout:fixed}
+.reference-table th{font-size:.74rem;text-transform:none;letter-spacing:0}
+.reference-table td{font-size:.89rem;color:#263854;font-weight:670}
+.table-load{display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;padding:8px 0;color:#2054ac;font:inherit;font-weight:750;cursor:pointer;text-align:left}
+.table-load:hover{text-decoration:underline;text-underline-offset:3px}
+.table-load:focus-visible,.answer-actions button:focus-visible,.answer-actions a:focus-visible{outline:3px solid #79a4ff;outline-offset:3px}
+.calc-steps{margin:20px 0;padding:0;list-style:none;counter-reset:calc;display:grid;gap:12px}
+.calc-steps li{counter-increment:calc;display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:start;color:#465a77;line-height:1.55;font-size:.9rem;overflow-wrap:anywhere}
+.calc-steps li:before{content:counter(calc,decimal-leading-zero);background:#eaf1ff;color:#3565b9;border-radius:9px;font-size:.7rem;font-weight:850;padding:7px;text-align:center}
+.inner-related{margin-top:28px;border-top:1px solid #e3e9f4;padding-top:22px}
+.inner-related h2{margin-top:0!important}
+.inner-related .chiplist{margin-top:12px}
+@media(max-width:1000px){.inner-page .tool-layout{grid-template-columns:minmax(0,1fr) 265px}}
+@media(max-width:820px){.inner-page .tool-layout{grid-template-columns:1fr}.inner-page .aside-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}}
+@media(max-width:620px){.inner-page .page-title h1{font-size:clamp(2rem,9vw,2.8rem)}.inner-page .page-title p{font-size:.92rem}.inner-page .body-content .card{padding:20px}.inner-page .aside-stack{grid-template-columns:1fr}.direct-answer{display:block;padding:18px;border-radius:15px;margin:0 0 17px}.direct-answer strong{font-size:clamp(1.95rem,10vw,2.8rem)}.answer-actions{flex-direction:row;margin-top:18px;min-width:0}.answer-actions button,.answer-actions a{flex:1;min-width:0;font-size:.76rem;padding:10px 9px}.reference-scroll{overflow-x:auto}.reference-table{min-width:305px}.inner-page .tool-card .resultbox .big{font-size:clamp(1.48rem,5.2vw,1.9rem)}}
+@media(prefers-reduced-motion:reduce){.table-load,.answer-actions button,.answer-actions a{transition:none!important}}
