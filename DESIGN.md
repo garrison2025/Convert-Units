@@ -1,29 +1,44 @@
-# ExactUnit design system (adapted from Website-Starter-Standard)
+# ExactUnit visual design standard — V3.0
 
-- Product: precision conversion tools; English US market; SEO, direct references and repeat visits.
-- Primary task: user inputs a number, selects compatible units, instantly sees an accurate answer.
-- Mode: **Operate** for calculators, **Read** for standards and legal pages.
-- Visual direction: calm technical editorial; dark petrol hero, warm white/light grey surfaces, cool green primary, minimal iconography; no external font, faux testimonials, decorative images or marketing traps.
-- Behavior: result and input visible in the first screen on desktop and mobile; batch CSV is a separate task-first workspace.
-- No forced animations. Only simple hover transforms/opacity; respects `prefers-reduced-motion`.
+Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Calculator, Linear 2026 UI refresh, Raycast.
 
-## Color tokens
+## Product, outcome and boundaries
+- Product: fast, accurate, browser-local unit converter. Audience: primarily US English organic search visitors.
+- User's primary task: enter a value, choose units, and read the exact result with no account or friction.
+- Page modes: **Operate** (homepage, tool, result and batch pages), **Read** (methodology, privacy and terms), **Navigate** (categories and directories).
+- Visual design must not bury the converter below a promotional hero. The actual working converter remains visible on the desktop homepage and appears directly after the concise opening on mobile.
+- Do not copy third-party brand assets or layouts verbatim. Preserve 37 directional calculators, one universal, 92 validated numeric URLs, full metadata and local computation.
+- No paid APIs, external font requests, image libraries or runtime animations that impair performance.
 
-| Token | Value |
-|---|---|
-| canvas | `#f6f8f8` |
-| surface | `#ffffff` |
-| ink | `#142633` |
-| primary | `#087d72` |
-| muted | `#667781` |
-| border | `#dce6e6` |
-| hero | `#123039` |
-| focus | `#f0af42` |
+## References and applied lessons
+- [Omni Calculator](https://www.omnicalculator.com/conversion): unit selector, instant input-to-output task, category grouping.
+- [Linear — March 2026 interface refresh](https://linear.app/now/behind-the-latest-design-refresh): consistent headers and restrained navigation surfaces, strong foreground content.
+- [Raycast](https://www.raycast.com/): clear promise, task-first interface hierarchy, and expressive but bounded interactions.
 
-## Typography and spacing
+## Site-specific design tokens (src/assets/refresh.css)
+| Token | Value | Purpose |
+|---|---|---|
+| canvas | `#f8f9fc` | light, quiet background |
+| surface | `#ffffff` | content and calculator panels |
+| ink | `#171d2c` | primary text |
+| muted | `#67728a` | secondary UI labels |
+| primary | `#3459e8` | primary actions, result emphasis, selected focus |
+| primary-hover | `#2446c9` | interactive hover |
+| border | `#e5e9f2` | card and section edges |
+| focus | `#ffb649` | keyboard focus state |
 
-System font stack ensures no external downloads; type scale is responsive using `clamp` for the most important headings. Content width 1180px; 40px horizontal margins desktop, 28px total mobile. Repeated grid cards in 3-column desktop / 2-column tablet / single-column mobile. Shared button, field, result, card, and chip components live in `src/assets/site.css`.
+## Components and hierarchy
+1. Header: identifiable wordmark; concise navigation; distinct tool access action.
+2. Homepage hero: conversion benefit headline (no invented performance claims), brief supporting copy, real functioning calculator with prominent result.
+3. Beneath hero: factual verification signals (standards-defined factors, instant local work, privacy), no false reviews or invented traffic stats.
+4. Frequent tools: 6 clearly named tool entry points, then 16 category tiles at four columns on desktop with responsive reduction.
+5. Calculator fields: native labels, large tabular numbers, distinct input vs result, accessible swap control, precision and copying subordinate.
+6. SEO result pages: fixed prerendered answer is readable even if JS fails; live converter and nearby values follow; exact URL and keyword mapping remain unchanged.
+7. Utility cards: hover transforms only, no animated controls before user input. Respect reduced-motion.
+8. Layout: desktop max 1200px, two-column hero and tool details; tablets stack the hero; mobile cards stack without horizontal scrolling.
 
-## Accessibility
-
-Keyboard operable native selects, descriptive labels, navigation skip link, live regions for calculation/error, 3px focus ring, reduced motion support, semantic header/nav/main/footer. Mobile value inputs use decimal numeric keyboard. Contrast targets are built into the palette and should still be retested on actual production device layouts.
+## Technical safeguards
+- Keep original `src/assets/site.css` as structural foundation, layer `src/assets/refresh.css` for visual decisions.
+- Cloudflare `*.pages.dev` remains preview and nonindexable. Official custom domain is activated only by valid `SITE_URL`.
+- Maintain tests for 37 tools, 92 numeric seeds, and SEO HTML. Full interactive visual QA on real mobile devices is an independent gate; GitHub tests do not prove pixel-level appearance.
+- Add future UI improvements to `refresh.css` and update this file when changing tokens.
