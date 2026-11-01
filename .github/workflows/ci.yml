@@ -1,0 +1,20 @@
+name: ExactUnit tests and static SEO audit
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - source.bundle.b64
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test calculation and build all pages
+        run: npm run check
