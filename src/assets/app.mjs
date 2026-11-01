@@ -21,6 +21,31 @@ if(root.id==='universal'){const dimSelect=el('[data-dimension]',root);dimSelect?
 const q=new URLSearchParams(location.search);if(root.id==='universal'&&units[q.get('from')]&&units[q.get('to')]&&units[q.get('from')].dimension===units[q.get('to')].dimension){const f=q.get('from'),t=q.get('to');const choose=el('[data-dimension]',root);if(choose)choose.value=units[f].dimension;setUnits(units[f].dimension,f,t);}if(q.has('value')){const v=q.get('value');if(v&&v.length<60)input.value=v;}
 calculate();}
 all('[data-converter]').forEach(initConverter);
+
+// Static tables can update the calculator directly; no extra indexed URLs are generated.
+document.addEventListener('click', async event => {
+  const row=event.target.closest('[data-load-value]');
+  if(row){
+    const tool=el('[data-converter]'),value=tool&&el('[data-value]',tool);
+    if(value){
+      value.value=row.dataset.loadValue;
+      value.dispatchEvent(new Event('input',{bubbles:true}));
+      tool.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+      value.focus({preventScroll:true});
+    }
+    return;
+  }
+  const copy=event.target.closest('[data-copy-answer]');
+  if(copy){
+    try{
+      await navigator.clipboard.writeText(copy.dataset.answer);
+      const previous=copy.textContent;
+      copy.textContent='✓ Copied';
+      setTimeout(()=>copy.textContent=previous,1700);
+    }catch{copy.textContent='Copy unavailable';}
+  }
+});
+
 const menu=el('[data-menu]');menu?.addEventListener('click',()=>{const nav=el('[data-nav]');const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));});
 // The homepage search is a direct tool finder; keyboard and pointer users have the same links.
 const homeInput=el('[data-home-find]'),homeSuggestions=el('[data-suggestions]');
