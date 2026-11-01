@@ -6,7 +6,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 - **37** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
-- **154** indexable static pages in total (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
+- **154** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
 - Batch converter: on-device multi-line calculations, up to 500 numbers, local CSV/TXT file selection, CSV download and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
@@ -30,10 +30,14 @@ The command runs conversion tests, static builds, and crawlable HTML audits. Sit
 - Build command: `npm run build`
 - Output directory: `dist`
 - Node version: `22`
-- **Build environment variable `SITE_URL`: set to the final publicly reachable production origin**, such as `https://convert-units-bwa.pages.dev` or your custom domain (no trailing slash).
+- **Build variable `SITE_URL`: configure only after binding the official custom domain** (the exact `https://` origin, no trailing slash). Do not use Cloudflare's automatic `*.pages.dev` hostname as the production domain.
 - Optional `ADSENSE_PUBLISHER_ID`: a valid `pub-` followed by 16 digits, after approved AdSense setup. Ads scripts are deliberately NOT auto-enabled; publisher must configure consent management, real ad units and privacy disclosures independently.
 
-The default canonical origin is the verified production Pages URL `https://convert-units-bwa.pages.dev`. If you later connect a custom domain, set `SITE_URL` to its exact HTTPS origin and redeploy. **Never publish a build with a mismatched canonical or sitemap host.**
+**Temporary preview mode:** When `SITE_URL` is missing or points to `*.pages.dev`, the website remains fully functional but automatically emits `noindex`, omits canonical and OG URLs, and generates an empty sitemap. It does not treat Cloudflare's generated hostname as the official site. `robots.txt` allows crawling so search engines can read the `noindex` directive.
+
+**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 154 indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
+
+Do not submit the temporary Pages subdomain or its preview sitemap to Google Search Console.
 
 Cloudflare Pages will serve route folders' `index.html` on clean URLs. `robots.txt`, `sitemap.xml`, `_headers`, and `404.html` are generated at build time. The `dist/` folder is output only, not checked into source.
 
