@@ -1,0 +1,30 @@
+name: Materialize and validate ExactUnit site
+on:
+  push:
+    branches: [main]
+    paths:
+      - source.bundle.b64
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  source-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Restore versioned readable source
+        run: |
+          base64 --decode source.bundle.b64 | tar -xz -C .
+      - name: Validate site
+        run: npm run check
+      - name: Commit validated source files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md DESIGN.md RELEASE-EVIDENCE.md .gitignore package.json src scripts tests research
+          if ! git diff --cached --quiet; then
+            git commit -m "Materialize verified ExactUnit site source and SEO research"
+            git push origin HEAD:main
+          fi
