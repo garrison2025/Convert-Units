@@ -1,9 +1,9 @@
-import {units,convert,formatNumber,formula,dimensionUnits,validateValue} from './engine.mjs';
+import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchFirstCell} from './engine.mjs';
 const el=(s,root=document)=>root.querySelector(s);
 const all=(s,root=document)=>[...root.querySelectorAll(s)];
 const fmt=(x,d=6)=>formatNumber(x,d);
 function options(dimension,active){return dimensionUnits(dimension).map(u=>`<option value="${u.id}" ${u.id===active?'selected':''}>${u.symbol}</option>`).join('');}
-function safeCsv(v){const s=String(v);return /[\r\n,\"]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function safeCsv(v){const raw=String(v);const s=/^[=+@\t\r]/.test(raw)?"'"+raw:raw;return /[\r\n,\"]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function download(filename,text,type='text/csv;charset=utf-8'){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
 const unitsMap={mass:'Weight',length:'Length',volume:'Volume',pressure:'Pressure',temperature:'Temperature',torque:'Torque',time:'Time',speed:'Speed',area:'Area',force:'Force',storage:'Storage',density:'Density',power:'Power',acceleration:'Acceleration',fuel:'Fuel economy',flow:'Flow rate'};
 function initConverter(root){const from=el('[data-from]',root),to=el('[data-to]',root),input=el('[data-value]',root),output=el('[data-output]',root),explain=el('[data-explain]',root),error=el('[data-error]',root),precision=el('[data-precision]',root),detail=el('[data-raw]',root);if(!from||!to||!input)return;
@@ -26,7 +26,10 @@ const batch=el('[data-batch]');if(batch){const dimension=el('[data-batch-dimensi
 function changeDim(){const d=dimension.value;const arr=dimensionUnits(d);from.innerHTML=options(d,arr[0].id);to.innerHTML=options(d,arr[1]?.id??arr[0].id);}
 from.addEventListener('change',()=>{if(units[from.value].dimension!==units[to.value].dimension){to.innerHTML=options(units[from.value].dimension,dimensionUnits(units[from.value].dimension).find(x=>x.id!==from.value)?.id??from.value);}});
 dimension.addEventListener('change',changeDim);changeDim();
-function process(){const lines=values.value.split(/\r?\n/).filter(s=>s.trim());if(!lines.length){out.value='';status.textContent='Enter one number per line.';return;}if(lines.length>500){status.textContent='Maximum 500 rows per batch.';return;}
-const rows=[['Input','From','Result','To','Status']];let ok=0;for(const line of lines){const field=line.split(',')[0].trim();try{const result=convert(field,from.value,to.value);rows.push([field,units[from.value].symbol,fmt(result,9),units[to.value].symbol,'OK']);ok++;}catch(e){rows.push([field,units[from.value].symbol,'',units[to.value].symbol,e.message]);}}
-csv=rows.map(r=>r.map(safeCsv).join(',')).join('\r\n');out.value=rows.slice(1).map(r=>r[0]+' '+r[1]+' → '+(r[2]?r[2]+' '+r[3]:'Error: '+r[4])).join('\n');status.textContent=`Converted ${ok} of ${lines.length} rows. All calculations remain in your browser.`;}
+function process(){const lines=values.value.split(/\r?\n/).filter(s=>s.trim());if(!lines.length){csv='';out.value='';status.textContent='Enter one number per line.';return;}if(lines.length>501){csv='';out.value='';status.textContent='Maximum 500 rows per batch (plus one header).';return;}
+const inputLines=/^(?:value|input|amount|number)$/i.test(parseBatchFirstCell(lines[0]))?lines.slice(1):lines;
+const rows=[['Input','From','Result','To','Status']];let ok=0;for(const line of inputLines){let field='';try{field=parseBatchFirstCell(line);const result=convert(field,from.value,to.value);rows.push([field,units[from.value].symbol,fmt(result,9),units[to.value].symbol,'OK']);ok++;}catch(e){rows.push([field,units[from.value].symbol,'',units[to.value].symbol,e.message]);}}
+csv=rows.map(r=>r.map(safeCsv).join(',')).join('\r\n');out.value=rows.slice(1).map(r=>r[0]+' '+r[1]+' → '+(r[2]?r[2]+' '+r[3]:'Error: '+r[4])).join('\n');status.textContent=`Converted ${ok} of ${inputLines.length} rows. All calculations remain in your browser.`;}
+for(const field of [dimension,from,to,values])field.addEventListener('input',()=>{csv='';});
+el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
 el('[data-process]')?.addEventListener('click',process);el('[data-download]')?.addEventListener('click',()=>{if(!csv)process();if(csv)download('unit-conversions.csv',csv);});el('[data-print]')?.addEventListener('click',()=>window.print());}

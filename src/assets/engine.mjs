@@ -85,7 +85,7 @@ export const units = {
 
 export function validateValue(value){
   const n=typeof value==='number'?value:Number(String(value).trim());
-  if (value==='' || value===null || value===undefined || !Number.isFinite(n) || Math.abs(n)>1e18) throw new RangeError('Enter a valid number between −1e18 and 1e18.');
+  if (value===null || value===undefined || (typeof value==='string'&&!value.trim()) || !Number.isFinite(n) || Math.abs(n)>1e18) throw new RangeError('Enter a valid number between −1e18 and 1e18.');
   return n;
 }
 function toBase(n,id){
@@ -116,7 +116,7 @@ export function convert(value,from,to){
  return result;
 }
 export function formatNumber(value,digits=6){
- const n=validateValue(value); const d=Math.min(12,Math.max(0,Number(digits)||0));
+ const n=Number(value); if(!Number.isFinite(n)||Math.abs(n)>1e24) throw new RangeError('Result cannot be formatted safely.'); const d=Math.min(12,Math.max(0,Number(digits)||0));
  if(n!==0&&(Math.abs(n)<1e-6||Math.abs(n)>=1e13))return n.toExponential(Math.min(d,9)).replace(/\.?0+e/,'e');
  return new Intl.NumberFormat('en-US',{maximumFractionDigits:d,minimumFractionDigits:0,useGrouping:true}).format(n);
 }
@@ -133,3 +133,16 @@ export function formula(from,to){
 }
 export function dimensionUnits(dim){return Object.entries(units).filter(([,u])=>u.dimension===dim).map(([id,u])=>({id,...u}));}
 export function safeValueText(n){return String(n).replace(/,/g,'');}
+
+// Parse a CSV first column without accidentally treating quoted thousands as two cells.
+export function parseBatchFirstCell(line){
+ const s=String(line).replace(/^\uFEFF/,'').trim();
+ let cell;
+ if(s.startsWith('"')){
+  const match=/^"((?:[^"]|"")*)"(?:,|$)/.exec(s);
+  if(!match)throw new RangeError('Malformed quoted CSV cell.');
+  cell=match[1].replace(/""/g,'"').trim();
+ }else cell=s.split(',')[0].trim();
+ if(/^[+-]?\d{1,3}(,\d{3})+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(cell))cell=cell.replaceAll(',','');
+ return cell;
+}

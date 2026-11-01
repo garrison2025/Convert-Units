@@ -7,7 +7,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - **37** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
 - **154** indexable static pages in total (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
-- Batch converter: on-device multi-line calculations, up to 500 numbers, CSV download and print.
+- Batch converter: on-device multi-line calculations, up to 500 numbers, local CSV/TXT file selection, CSV download and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
@@ -30,10 +30,10 @@ The command runs conversion tests, static builds, and crawlable HTML audits. Sit
 - Build command: `npm run build`
 - Output directory: `dist`
 - Node version: `22`
-- **Build environment variable `SITE_URL`: set to the final publicly reachable production origin**, such as `https://your-domain.com` (no trailing slash).
+- **Build environment variable `SITE_URL`: set to the final publicly reachable production origin**, such as `https://convert-units-bwa.pages.dev` or your custom domain (no trailing slash).
 - Optional `ADSENSE_PUBLISHER_ID`: a valid `pub-` followed by 16 digits, after approved AdSense setup. Ads scripts are deliberately NOT auto-enabled; publisher must configure consent management, real ad units and privacy disclosures independently.
 
-For a first preview without `SITE_URL`, the build temporarily uses `https://convert-units.pages.dev` as a fallback canonical base. **Set SITE_URL to the real live origin before allowing indexing.** The site cannot assume the final domain in advance.
+The default canonical origin is the verified production Pages URL `https://convert-units-bwa.pages.dev`. If you later connect a custom domain, set `SITE_URL` to its exact HTTPS origin and redeploy. **Never publish a build with a mismatched canonical or sitemap host.**
 
 Cloudflare Pages will serve route folders' `index.html` on clean URLs. `robots.txt`, `sitemap.xml`, `_headers`, and `404.html` are generated at build time. The `dist/` folder is output only, not checked into source.
 
