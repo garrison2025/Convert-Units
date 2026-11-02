@@ -1,5 +1,8 @@
 # Convert-Units — SEO launch gate and keyword-led pilot
 
+> **Historical V2 pilot — superseded 2026-11-02:** This report describes the former **26 selected numeric / 66 suppressed / 90 sitemap URL** strategy. Current active policy is **15 selected numeric / 77 suppressed / 79 eligible production URLs**, documented in [SEO-PILOT-V3-20261102.md](SEO-PILOT-V3-20261102.md). Do not use the historical figures for current deployment decisions.
+
+
 Updated 2026-11-02. Repository: `garrison2025/Convert-Units`. Official domain **not purchased**.
 
 ## Grounded decision
