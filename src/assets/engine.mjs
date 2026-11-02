@@ -84,8 +84,14 @@ export const units = {
 };
 
 export function validateValue(value){
-  const n=typeof value==='number'?value:Number(String(value).trim());
-  if (value===null || value===undefined || (typeof value==='string'&&!value.trim()) || !Number.isFinite(n) || Math.abs(n)>1e18) throw new RangeError('Enter a valid number between −1e18 and 1e18.');
+  // Accept decimal/scientific measurements only. Number('0x10'), Number(true) and
+  // Number([]) silently produce plausible but incorrect unit-conversion inputs.
+  const decimal=/^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$/;
+  if(typeof value!=='number' && typeof value!=='string')throw new RangeError('Enter a valid number between −1e18 and 1e18.');
+  const source=typeof value==='string'?value.trim():'';
+  if(typeof value==='string'&&!decimal.test(source))throw new RangeError('Enter a valid number between −1e18 and 1e18.');
+  const n=typeof value==='number'?value:Number(source);
+  if(!Number.isFinite(n)||Math.abs(n)>1e18)throw new RangeError('Enter a valid number between −1e18 and 1e18.');
   return n;
 }
 function toBase(n,id){
