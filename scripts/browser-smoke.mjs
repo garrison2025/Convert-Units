@@ -64,6 +64,15 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('45.359'),'live result remains correct when disclosures are open');
      q('[data-reset]').click();
      ok(input.value==='149','secondary reset restores original value');
+     table.open=false;actions.open=false;
+     window.dispatchEvent(new Event('beforeprint'));
+     ok(table.open,'the hidden comparison table must expand for printing');
+     window.dispatchEvent(new Event('afterprint'));
+     ok(!table.open,'after print the previous closed state must be restored');
+     table.open=true;
+     window.dispatchEvent(new Event('beforeprint'));
+     window.dispatchEvent(new Event('afterprint'));
+     ok(table.open,'a previously expanded reference table must remain expanded after print');
      break;
    }
    case 'batch':{
