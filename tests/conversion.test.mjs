@@ -112,6 +112,7 @@ test('exported CSV escapes spreadsheet formulas but preserves real negative numb
  assert.equal(escapeCsvCell('-12.5'),'-12.5');
  assert.equal(escapeCsvCell('-1e-3'),'-1e-3');
  assert.equal(escapeCsvCell('=1+1'),"'=1+1");
+ assert.equal(escapeCsvCell('  =1+1'),"'  =1+1");
  assert.equal(escapeCsvCell('@SUM(1,1)'),"\"'@SUM(1,1)\"");
  assert.equal(escapeCsvCell('-SUM(1,1)'),"\"'-SUM(1,1)\"");
  assert.equal(escapeCsvCell('"1,200"'),'"\"\"1,200\"\""');
