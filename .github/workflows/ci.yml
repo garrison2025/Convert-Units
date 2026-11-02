@@ -31,6 +31,15 @@ jobs:
           path: qa-snapshots/
           if-no-files-found: error
           retention-days: 7
+      - name: Measure Chrome Lighthouse lab performance (not real-user Core Web Vitals)
+        run: node scripts/lighthouse-lab-audit.mjs
+      - name: Upload reproducible Lighthouse raw and summary reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: exactunit-lighthouse-lab
+          path: qa-lighthouse/
+          if-no-files-found: error
+          retention-days: 7
       - name: Guard against accidental indexing when SITE_URL is set without launch approval
         env:
           SITE_URL: https://qa.example.test
