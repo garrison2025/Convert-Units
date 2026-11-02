@@ -235,14 +235,48 @@ function csvSeparator(lines){
   }
   return best;
 }
+/**
+ * Reassemble a CSV/TSV record containing quoted physical newlines.
+ * Physical source line numbers are retained for clear error messages.
+ * A genuinely unterminated quoted record is restored as its original lines
+ * rather than silently swallowing subsequent valid rows. This is a bounded,
+ * best-effort recovery decision for malformed user input.
+ */
+function collectDelimitedRecords(physical,separator){
+  if(!separator)return physical.filter(x=>x.text.trim());
+  const records=[];
+  let pending=null,inside=false,start=0;
+  for(let i=0;i<physical.length;i++){
+    const item=physical[i];
+    if(!pending){
+      if(!item.text.trim())continue;
+      start=i;
+      pending={line:item.line,text:item.text};
+    }else pending.text+='\n'+item.text;
+    for(let pos=0;pos<item.text.length;pos++){
+      if(item.text[pos]!=='"')continue;
+      if(inside&&item.text[pos+1]==='"'){pos++;continue;}
+      inside=!inside;
+    }
+    if(!inside){
+      records.push(pending);
+      pending=null;
+    }
+  }
+  // A broken quote must not consume the rest of an otherwise valid file.
+  if(pending)records.push(...physical.slice(start).filter(x=>x.text.trim()));
+  return records;
+}
+
 export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={}){
   const col=Number(column);
   if(!Number.isInteger(col)||col<1||col>20)throw new RangeError('Choose an input column from 1 to 20.');
   if(!Number.isInteger(maxRows)||maxRows<1)throw new RangeError('Invalid maximum data row count.');
-  const records=String(input??'').replace(/^\uFEFF/,'').split(/\r?\n/).map((text,i)=>({line:i+1,text})).filter(x=>x.text.trim());
+  const physical=String(input??'').replace(/^\uFEFF/,'').split(/\r?\n/).map((text,i)=>({line:i+1,text}));
   const allowed={auto:null,comma:',',tab:'\t',semicolon:';',lines:null};
   if(!Object.hasOwn(allowed,delimiter))throw new RangeError('Unknown file delimiter.');
-  const sep=delimiter==='auto'?csvSeparator(records):allowed[delimiter];
+  const sep=delimiter==='auto'?csvSeparator(physical.filter(x=>x.text.trim())):allowed[delimiter];
+  const records=collectDelimitedRecords(physical,sep);
   // 1,5 and 12,34 can mean decimals in many locales, not two CSV cells.
   // Never silently interpret a numeric-only ambiguous column in auto mode.
   if(delimiter==='auto'&&sep===','&&records.some(({text})=>/^[+-]?\d+,\d{1,2}$/.test(text.trim()))){
