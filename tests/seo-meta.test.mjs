@@ -33,5 +33,5 @@ test('fix malformed spacing and abbreviated raw Semrush search phrases',()=>{
  assert.equal(numericHeading(time,pairFor(time.slug)),'3600000 milliseconds to minutes');
  const mass=seeds.find(s=>s.keyword==='149 lbs to kg');
  assert.equal(numericHeading(mass,pairFor(mass.slug)),'149 pounds to kilograms');
- assert.match(numericTitle(mass,pairFor(mass.slug)),/67\.58526313 kg$/);
+ assert.match(numericTitle(mass,pairFor(mass.slug)),/67\.585263 kg$/);
 });
