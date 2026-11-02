@@ -472,7 +472,7 @@ export function fluidOunceComparison(value,fromUnit){
  const n=Number(value), source=units[fromUnit];
  if(!source||source.dimension!=='volume'||!Number.isFinite(n)||n<0)return null;
  let us,uk;
- try{us=convert(n,fromUnit,'us-fl-oz');uk=convert(n,fromUnit,'imp-fl-oz');}catch{return null;}
+ try{us=fromUnit==='us-fl-oz'?n:convert(n,fromUnit,'us-fl-oz');uk=fromUnit==='imp-fl-oz'?n:convert(n,fromUnit,'imp-fl-oz');}catch{return null;}
  const answer=raw=>{
   const shown=formatNumber(raw,4);
   return {shown,relation:displayRelation(raw,shown)};
