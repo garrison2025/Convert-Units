@@ -112,6 +112,8 @@ const expected=new Set(['/',...pairs.map(x=>x.url),...seeds.map(x=>x.url),
 '/all-converters/','/universal-converter/','/batch-converter/','/methodology/','/about/','/privacy/','/terms/','/contact/','/accessibility/']);
 for(const route of expected)if(!allRoutes.has(route))fail('Required page not generated: '+route);
 for(const route of allRoutes)if(route!=='/404/'&&!expected.has(route))warnings.push('Unplanned extra page: '+route);
+const hostHeaders=fs.readFileSync(path.join(dist,'_headers'),'utf8');
+for(const hostRule of ['https://:project.pages.dev/*','https://:version.:project.pages.dev/*'])if(!hostHeaders.includes(hostRule+'\n  X-Robots-Tag: noindex'))fail('Pages mirror noindex rule missing: '+hostRule);
 const sitemap=fs.readFileSync(path.join(dist,'sitemap.xml'),'utf8');
 const locs=[...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(x=>x[1].replaceAll('&amp;','&'));
 if(info.mode==='production'){
