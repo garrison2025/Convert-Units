@@ -6,7 +6,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 - **37** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
-- **154** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
+- **155** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
 - Batch converter: on-device multi-line calculations, up to 1,000 numbers, local CSV/TXT file selection, CSV download and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
@@ -22,6 +22,8 @@ npm run check
 
 The command runs conversion tests, static builds, internal-link crawling, metadata uniqueness and numeric-page similarity review. Site is generated in `dist/`. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
 
+The site also includes an accessibility statement and runs preview plus synthetic-production SEO checks in CI. Numeric-page similarity warnings require editorial review; a passing build is not AdSense approval.
+
 ## Cloudflare Pages (Git integration)
 
 - GitHub repository: `garrison2025/Convert-Units`
@@ -35,7 +37,7 @@ The command runs conversion tests, static builds, internal-link crawling, metada
 
 **Temporary preview mode:** When `SITE_URL` is missing or points to `*.pages.dev`, the website remains fully functional but automatically emits `noindex`, omits canonical and OG URLs, and generates an empty sitemap. It does not treat Cloudflare's generated hostname as the official site. `robots.txt` allows crawling so search engines can read the `noindex` directive.
 
-**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 154 indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
+**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 155 indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
 
 Do not submit the temporary Pages subdomain or its preview sitemap to Google Search Console.
 
@@ -55,7 +57,8 @@ Publishing many similar numeric pages is not itself proof of usefulness. Keep us
 - `src/data/pairs.json`: 37 verified tool routes
 - `src/data/seeds.json`: 92 approved numeric pages and keyword evidence
 - `scripts/build.mjs`: build HTML, metadata, canonical, sitemap, robots, legal pages
-- `scripts/audit.mjs`: static SEO integrity audit\n- `scripts/deep-audit.mjs`: generated HTML link crawl and content similarity warnings; report at `dist/quality-report.json`
+- `scripts/audit.mjs`: static SEO integrity audit
+- `scripts/release-audit.mjs`: all-page link graph, orphan, numeric result and canonical audit; JSON report in `dist/release-audit-report.json`\n- `scripts/deep-audit.mjs`: generated HTML link crawl and content similarity warnings; report at `dist/quality-report.json`
 - `tests/conversion.test.mjs`: precision, dimensions, and page mapping tests
 - `research/*`: full V2 plan and all uploaded keyword research data
 

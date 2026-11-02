@@ -18,3 +18,7 @@ jobs:
           node-version: '22'
       - name: Test calculation and build all pages
         run: npm run check
+      - name: Validate production canonical, sitemap and full-site links with a synthetic custom origin
+        env:
+          SITE_URL: https://qa.example.test
+        run: npm run build
