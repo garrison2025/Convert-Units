@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {escapeCsvCell} from '../src/assets/engine.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -74,6 +75,35 @@ const report={status:failures.length?'fail':'pass',buildMode:build.mode,
  eligibleNumericPages:indexableNumeric.size,maxStaticLinkDepth:Math.max(...depthEntries.map(x=>x.depth??0)),
  deepest:depthEntries.slice(0,12),orphanEligiblePages:prospectiveMissing,linkedNoindex:linkedNoindex.slice(0,25),
  failures,warnings:warnings.slice(0,50)};
+
+const inventoryFields=['route','pageType','sourceKeyword','title','h1','metaDescription',
+ 'robots','canonical','prospectiveIndexable','depthFromHome','inboundStaticLinks','outboundStaticLinks'];
+const sourceByUrl=new Map(seeds.map(seed=>[seed.url,seed]));
+const incoming=new Map([...allRoutes].map(route=>[route,0]));
+for(const list of edges.values())for(const link of list)if(incoming.has(link.target))incoming.set(link.target,incoming.get(link.target)+1);
+const inventory=[...allRoutes].sort().map(route=>{
+ const html=fs.readFileSync(path.join(dist,route.replace(/^\/+/,''),'index.html'),'utf8');
+ const extract=regex=>regex.exec(html)?.[1]||'';
+ const clean=x=>x.replace(/<[^>]*>/g,'').replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'").trim();
+ const seed=sourceByUrl.get(route);
+ const type=seed?'numeric':pairs.some(p=>p.url===route)?'direction':route.startsWith('/category/')?'category':route==='/404/'?'404':'site';
+ return {route,pageType:type,sourceKeyword:seed?.keyword||'',
+  title:clean(extract(/<title>([\s\S]*?)<\/title>/i)),
+  h1:clean(extract(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)),
+  metaDescription:clean(extract(/<meta name="description" content="([^"]*)"/i)),
+  robots:extract(/<meta name="robots" content="([^"]*)"/i),
+  canonical:extract(/<link rel="canonical" href="([^"]*)"/i),
+  prospectiveIndexable:indexable.has(route)?'yes':'no',
+  depthFromHome:distances.get(route)??'unreachable',
+  inboundStaticLinks:incoming.get(route)??0,
+  outboundStaticLinks:(edges.get(route)||[]).length
+ };
+});
+fs.writeFileSync(path.join(dist,'seo-url-inventory.csv'),[
+ inventoryFields.join(','),
+ ...inventory.map(row=>inventoryFields.map(key=>escapeCsvCell(row[key])).join(','))
+].join('\r\n'));
+
 fs.writeFileSync(path.join(dist,'seo-crawl-audit.json'),JSON.stringify(report,null,2));
 console.log('SEO CRAWL AUDIT:',report.status,'eligible:',report.eligibleForFutureIndex,
  'max depth:',report.maxStaticLinkDepth,'orphans:',prospectiveMissing.length,
