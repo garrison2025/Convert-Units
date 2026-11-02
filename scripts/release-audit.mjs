@@ -8,6 +8,8 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
+const numericPolicy=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-policy.json'),'utf8'));
+const pilot=new Set(numericPolicy.pilotIndexUrls);
 const info=JSON.parse(fs.readFileSync(path.join(dist,'build-info.json'),'utf8'));
 const failures=[], warnings=[];
 const fail=(message)=>failures.push(message);
@@ -22,7 +24,8 @@ const pages=new Map(htmlFiles.map(f=>{
   return [rel?'/'+rel+'/':'/',fs.readFileSync(f,'utf8')];
 }));
 const allRoutes=new Set(pages.keys());
-const canonicalRoutes=new Set([...allRoutes].filter(p=>p!=='/404/'));
+const unindexableNumeric=new Set(seeds.filter(s=>info.numericIndexMode!=='all'&&!pilot.has(s.url)).map(s=>s.url));
+const canonicalRoutes=new Set([...allRoutes].filter(p=>p!=='/404/'&&!unindexableNumeric.has(p)));
 const titleSeen=new Map(), descriptionSeen=new Map(), inbound=new Map([...allRoutes].map(r=>[r,0]));
 const seedPaths=new Set(seeds.map(s=>s.url));
 const bundledStyle=path.join(dist,'assets','styles.css');
@@ -30,7 +33,7 @@ if(!fs.existsSync(bundledStyle)||fs.statSync(bundledStyle).size<10000)fail('Requ
 
 const extract=(html,regex)=>regex.exec(html)?.[1]??'';
 const plain=(html)=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&(?:[a-z]+|#\d+);/gi,' ').replace(/\s+/g,' ').trim();
-assert.equal(pairs.length,37);
+assert.equal(pairs.length,38);
 assert.equal(seeds.length,92);
 if(allRoutes.size!==info.indexablePages+1 && info.mode==='production')fail('Unexpected static HTML count');
 for(const [route,html] of pages){
@@ -48,8 +51,9 @@ for(const [route,html] of pages){
   const og=extract(html,/<meta property="og:url" content="([^"]*)"/i);
   if(info.mode==='production'){
     const expected=new URL(route,info.site).toString();
-    if(route==='/404/'){
-      if(!robots.includes('noindex'))fail('404 page is indexable');
+    if(route==='/404/'||unindexableNumeric.has(route)){
+      if(!robots.includes('noindex'))fail(route+': excluded page is indexable');
+      if(canon||og)fail(route+': excluded page has canonical or og:url');
     }else{
       if(!robots.includes('index,follow'))fail(route+': missing index,follow');
       if(canon!==expected||og!==expected)fail(route+': wrong canonical / og:url');
@@ -138,7 +142,7 @@ for(let i=0;i<numericBodies.length;i++)for(let j=i+1;j<numericBodies.length;j++)
   if(score>=0.95){highSimilarity++;clusters.get(a.slug).highSimilarityPairs++;}
 }
 if(highSimilarity)warnings.push('Content review: '+highSimilarity+'/'+comparable+' same-direction numeric page pairs have >=0.95 normalized-token Jaccard similarity. Inspect usefulness manually; no automatic quality approval.');
-const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),failures,warnings,checkedAt:new Date().toISOString()};
+const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
 fs.writeFileSync(path.join(dist,'release-audit-report.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(failures.length)process.exitCode=1;
