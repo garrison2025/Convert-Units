@@ -6,7 +6,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 - **38** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
-- **155** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
+- **156** public static page routes in total (38 tools plus 92 numeric pages, 16 categories and site pages; 90 are initial production-indexable candidates under the curated policy) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
 - Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, sanitized CSV export and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
@@ -37,7 +37,7 @@ The site also includes an accessibility statement and runs preview plus syntheti
 
 **Temporary preview mode:** When `SITE_URL` is missing or points to `*.pages.dev`, the website remains fully functional but automatically emits `noindex`, omits canonical and OG URLs, and generates an empty sitemap. It does not treat Cloudflare's generated hostname as the official site. `robots.txt` allows crawling so search engines can read the `noindex` directive.
 
-**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 155 indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
+**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 90 curated indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
 
 Do not submit the temporary Pages subdomain or its preview sitemap to Google Search Console.
 
@@ -86,3 +86,7 @@ The approved V2 research contains 37 originally planned tools and 92 keyword-spe
 By default `NUMERIC_INDEX_MODE=curated`: all 92 numeric pages remain available, but only the **26 URLs explicitly listed in** `src/data/numeric-seo-policy.json` are eligible for `index,follow` and inclusion in production sitemap. The remaining 66 have `noindex,follow`, no self-canonical tag and no sitemap entry. This is a conservative pilot to reduce same-template exposure, **not a guarantee that selected pages will rank**. Do not set `NUMERIC_INDEX_MODE=all` without reviewing source intent, duplication and post-launch data. Preview builds remain globally noindexed regardless of this flag.
 
 Google's source guidance on [canonicalization](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) and [scaled content abuse](https://developers.google.com/search/docs/essentials/spam-policies) informed the technical policy. A unique numeric result is not necessarily an independently valuable page. Once an official domain is purchased, set `SITE_URL` to its HTTPS origin, check GSC index coverage and Search Performance by query/page, and revisit the pilot whitelist based on real clicks and usefulness.
+
+Detailed source-backed SEO pilot, 26 selected keywords, indexing rules and real-world validation checklist: [`research/SEO-LAUNCH-PILOT-20261102.md`](research/SEO-LAUNCH-PILOT-20261102.md).
+
+After binding a real domain, configure a Cloudflare Bulk Redirect from the default `*.pages.dev` production host to the official domain when practical. Until then the generated `_headers` blocks indexing on both Pages project aliases and preview hosts, including during synthetic-production builds. Cloudflare reference: https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/
