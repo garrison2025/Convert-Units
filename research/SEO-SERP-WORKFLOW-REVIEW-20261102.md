@@ -21,7 +21,7 @@ We implemented a user-visible enhancement to `/batch-converter/`, a relatively d
 - Keep all successfully parsed **original source columns and their headings**, and append namespaced fields for `ExactUnit line`, `ExactUnit result`, `ExactUnit from`, `ExactUnit to`, and `ExactUnit status`.
 - Preserve original source cells even when the measurement is invalid; report the source line number instead of silently omitting the record.
 - Export numerical results as ungrouped machine-readable decimals (e.g. `-1200`, not `"-1,200"` or a text-prefixed CSV formula). User-provided source cells continue to use CSV formula-injection protection.
-- **Updated implementation:** the CSV tool now supports either a fixed source/target pair or explicit per-row source and target unit columns with strict dimension validation. Embedded-newline quoted CSV fields remain unsupported. No uploads, paid APIs, database or server are introduced.
+- **Updated implementation:** the CSV tool now supports either a fixed source/target pair or explicit per-row source and target unit columns with strict dimension validation. Properly quoted CSV/TSV fields can now include embedded line breaks, preserving their physical source line numbers. No uploads, paid APIs, database or server are introduced.
 - Update visible title, description and guide to communicate what the tool actually does. Add math, header, invalid-row, CSV/TSV and browser regression tests and an SEO content audit gate.
 
 This increases real main-content functionality on a dedicated workflow page, rather than inventing new template-only answer pages.
@@ -41,3 +41,7 @@ Before increasing indexing or committing to a custom domain, obtain an explicitl
 ## Implementation update: optional row-unit columns
 
 The batch tool now implements the key competitor workflow in addition to preserving original columns: each CSV record can include different source and target units, using exact supported symbols or internal unit IDs. A real in-page example lets users try this immediately. Incompatible rows are surfaced as errors without dropping other records. This is a product-function improvement, **not evidence of winning Google rankings**. Public search results still cannot establish real US device-specific keyword clicks for the site.
+
+## Additional source-evidence gate: batch queries
+
+The approved `research/semrush-us-600.tsv` dataset contains 600 historical competitor keyword rows. A text search of every row for `batch`, `csv`, `spreadsheet` and `bulk` finds **zero matches**. This is **absence of evidence in this one competitor export**, not evidence of zero Google search volume and not a green light to invent volume, KD or ranking numbers. Existing public competitor batch-tool pages establish real functionality, not measurable search demand. Research and launch decisions must wait for a more relevant batch-converter competitor's real natural ranking queries and U.S. device-specific Google SERP inspection.
