@@ -7,7 +7,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - **37** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
 - **155** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
-- Batch converter: on-device multi-line calculations, up to 1,000 numbers, local CSV/TXT file selection, CSV download and print.
+- Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, sanitized CSV export and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
@@ -20,7 +20,7 @@ Requires Node 20+.
 npm run check
 ```
 
-The command runs conversion tests, static builds, internal-link crawling, metadata uniqueness and numeric-page similarity review. Site is generated in `dist/`. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
+The command runs conversion and batch CSV tests, static builds, link crawling, metadata uniqueness and numeric-page similarity reviews, plus a dependency-free resource-size budget gate. Site is generated in `dist/`. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
 
 The site also includes an accessibility statement and runs preview plus synthetic-production SEO checks in CI. Numeric-page similarity warnings require editorial review; a passing build is not AdSense approval.
 
@@ -63,3 +63,10 @@ Publishing many similar numeric pages is not itself proof of usefulness. Keep us
 - `research/*`: full V2 plan and all uploaded keyword research data
 
 This project is an independent implementation, not a copy of the competitor's site content or proprietary design.
+
+## Content and performance quality gates (pre-domain)
+
+- A passing build is not a guarantee of Google indexing, AdSense eligibility, visual accessibility, or Core Web Vitals.
+- `npm run audit:performance` measures static CSS, JS and HTML asset sizes and writes `dist/performance-budget-report.json`; its gzip figures are local estimates, not measured production transfer sizes.
+- The 92 approved numeric pages include a useful pre-rendered result, interactive calculator, reference comparisons and display-precision table; their high template similarity still requires editorial review. See [`research/NUMERIC-SEO-QUALITY-REVIEW.md`](research/NUMERIC-SEO-QUALITY-REVIEW.md).
+- In preview mode all pages remain `noindex`. Do **not** buy or connect a domain solely to clear CI checks; genuine real-browser checks can be run when an official domain is available.
