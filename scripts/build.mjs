@@ -11,6 +11,7 @@ const launchPilot=new Set(numericPolicy.pilotIndexUrls);
 if(launchPilot.size!==numericPolicy.pilotIndexUrls.length||![...launchPilot].every(url=>seeds.some(s=>s.url===url)))throw Error('Numeric pilot index policy must contain only unique approved numeric URLs.');
 const numericIndexMode=(process.env.NUMERIC_INDEX_MODE||'curated').trim();
 if(!['curated','all'].includes(numericIndexMode))throw Error('NUMERIC_INDEX_MODE must be curated or all.');
+if(numericIndexMode==='all'&&process.env.NUMERIC_INDEX_CONFIRMATION!=='REVIEWED_ALL_92')throw Error('Enabling all 92 numeric pages for indexing requires NUMERIC_INDEX_CONFIRMATION=REVIEWED_ALL_92. Review SERP intent and page usefulness before changing the default.');
 const numericIndexable=(url)=>numericIndexMode==='all'||launchPilot.has(url);
 const dist=path.join(root,'dist');fs.rmSync(dist,{recursive:true,force:true});fs.mkdirSync(dist,{recursive:true});
 // Only the confirmed custom domain is an indexable production address.
