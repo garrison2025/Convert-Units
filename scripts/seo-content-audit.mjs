@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -160,6 +160,16 @@ for(const pair of pairList){
     errors.push(pair.url+': missing faithful US/UK fluid ounce comparison from the shared engine');
  }else if(html.includes('data-fluid-oz-compare')){
   errors.push(pair.url+': unit-system comparison leaked to unrelated tool');
+ }
+ if(['m-to-ft','ft-to-m'].includes(pair.slug)){
+  const expected=feetInchesReadout(5,pair.from);
+  if(!expected||!html.includes('data-feet-inches')||!html.includes('data-copy-feet-inches')||
+     !html.includes(expected.decimalRelation+' '+expected.decimal)||
+     !html.includes(expected.fractionalRelation+' '+expected.fractional)||
+     !html.includes('fraction rounded to nearest 1/16 in'))
+    errors.push(pair.url+': live-ready SSR feet-and-inches results or rounding guidance missing');
+ }else if(html.includes('data-feet-inches')){
+  errors.push(pair.url+': feet/inches panel on unrelated direction');
  }
  if(units[pair.from].dimension==='temperature'){
   const values=temperatureThreeScaleReadout(20,pair.from);
