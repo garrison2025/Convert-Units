@@ -69,3 +69,33 @@ export function practicalEquivalents(pair,value){
  }
  return '';
 }
+
+/**
+ * Show a value-specific consequence of copying rounded decimal output, not an
+ * unsupported claim about measurement accuracy. Only displayed when the loss
+ * can be distinguished from IEEE-754 arithmetic noise for this input.
+ *
+ * This is only used on the curated 15 numeric indexing candidates. It adds
+ * useful arithmetic without generating additional numeric SEO URLs.
+ */
+export function roundTripPrecisionNote(pair,value){
+ const n=Number(value);
+ if(!Number.isFinite(n))return '';
+ const target=convert(n,pair.from,pair.to);
+ if(!Number.isFinite(target))return '';
+ const rounded=Number(formatNumber(target,2).replaceAll(',',''));
+ if(!Number.isFinite(rounded))return '';
+ const restored=convert(rounded,pair.to,pair.from);
+ if(!Number.isFinite(restored))return '';
+ const delta=Math.abs(restored-n);
+ if(delta<=1e-12*Math.max(1,Math.abs(n)))return '';
+ const first=units[pair.from],second=units[pair.to];
+ return '<section class="roundtrip-panel" data-roundtrip-check>'+
+  '<h2>What two-decimal rounding changes</h2>'+
+  '<p>Rounding '+esc(formatNumber(n,9))+' '+esc(first.symbol)+' to '+
+  '<strong>'+esc(formatNumber(rounded,2))+' '+esc(second.symbol)+'</strong> and converting that rounded answer back gives '+
+  '<strong>'+esc(formatNumber(restored,9))+' '+esc(first.symbol)+'</strong> — a difference of about '+
+  '<strong>'+esc(formatNumber(delta,9))+' '+esc(first.symbol)+'</strong> versus the input.</p>'+
+  '<p class="hint">This shows the effect of rounding the displayed result; it does not estimate the accuracy of the original measurement. Retain more digits for later calculations.</p>'+
+  '</section>';
+}

@@ -8,6 +8,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
 import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
+import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -151,6 +152,12 @@ for(const seed of seeds){
  const expectedRelated=relatedDirectionLinks(pair,pairList);
  for(const match of expectedRelated.matchAll(/<a class="chip" href="([^"]+)"/g))
   if(!html.includes('href="'+match[1]+'"'))errors.push(seed.url+': related conversion path absent '+match[1]);
+ const expectedRoundingPanel=indexedSeed(seed)?roundTripPrecisionNote(pair,seed.value):'';
+ const actualRoundingPanel=html.includes('data-roundtrip-check');
+ if(Boolean(expectedRoundingPanel)!==actualRoundingPanel)
+  errors.push(seed.url+': value-specific rounded reverse-conversion panel is missing or shown when no loss occurs');
+ if(expectedRoundingPanel&&!html.includes(expectedRoundingPanel))
+  errors.push(seed.url+': round-trip error explanation does not match shared engine calculation');
  if(!html.includes('data-precision-table'))errors.push(seed.url+': useful rounding comparison missing');
  if(!html.includes('CONVERSION RESULT'))errors.push(seed.url+': answer-first content missing');
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
