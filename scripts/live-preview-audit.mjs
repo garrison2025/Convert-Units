@@ -148,6 +148,21 @@ const hasV22IntentLinks=allReachable&&
  speedTool.body.includes('data-intent-answers="kmh-to-mph"')&&
  torqueTool.body.includes('data-intent-answers="ft-lbf-to-nm"')&&
  !tool.body.includes('data-intent-answers=');
+const hasV23DirectionReferences=allReachable&&
+ metricFeet.body.includes('data-engineering-source="m"')&&
+ metricFeet.body.includes('5 ft 8 7/8 in')&&
+ reverseFeet.body.includes('data-engineering-source="ft"')&&
+ reverseFeet.body.includes('5.5 ft')&&
+ cmIn.body.includes('data-engineering-source="cm"')&&
+ cmIn.body.includes('2.54 cm')&&
+ inchCm.body.includes('data-engineering-source="in"')&&
+ inchMm.body.includes('data-engineering-source="in"')&&
+ speedTool.body.includes('data-engineering-source="kmh"')&&
+ speedTool.body.includes('100 km/h across four speed units')&&
+ speedReverse.body.includes('data-engineering-source="mph"')&&
+ torqueTool.body.includes('data-engineering-source="ft-lbf"')&&
+ torqueReverse.body.includes('data-engineering-source="nm"')&&
+ torqueReverse.body.includes('73.756215 ft·lbf');
 let buildInfo=null;
 if(deployment.ok){try{buildInfo=JSON.parse(deployment.body);}catch{}}
 const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.buildCommit.toLowerCase():null;
@@ -174,7 +189,7 @@ else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
 else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
-else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds||!hasV17Temperature||!hasV19MixedFeet||!hasV20FourUnitTorque||!hasV21FourUnitSpeed||!hasV22IntentLinks)status='VERIFIED_PREVIOUS_VERSION';
+else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds||!hasV17Temperature||!hasV19MixedFeet||!hasV20FourUnitTorque||!hasV21FourUnitSpeed||!hasV22IntentLinks||!hasV23DirectionReferences)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
@@ -182,7 +197,7 @@ else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,hasV17TemperatureFeatures:hasV17Temperature,hasV19MixedFeetFeatures:hasV19MixedFeet,hasV20FourUnitTorqueFeatures:hasV20FourUnitTorque,hasV21FourUnitSpeedFeatures:hasV21FourUnitSpeed,hasV22IntentLinksFeatures:hasV22IntentLinks,assetStatuses,qaReportExposure,qaReportsNotPublic},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,hasV17TemperatureFeatures:hasV17Temperature,hasV19MixedFeetFeatures:hasV19MixedFeet,hasV20FourUnitTorqueFeatures:hasV20FourUnitTorque,hasV21FourUnitSpeedFeatures:hasV21FourUnitSpeed,hasV22IntentLinksFeatures:hasV22IntentLinks,hasV23DirectionReferencesFeatures:hasV23DirectionReferences,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };
