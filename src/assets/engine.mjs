@@ -183,3 +183,78 @@ export function escapeCsvCell(value){
  const safe=suspicious?"'"+raw:raw;
  return /[\r\n,"]/.test(safe)?'"'+safe.replace(/"/g,'""')+'"':safe;
 }
+
+
+/**
+ * Parse a browser-local CSV/TSV batch while preserving physical row numbers.
+ * Choose a 1-based data column. Malformed CSV rows become individual errors,
+ * not a reason to lose all of the good rows in the file.
+ */
+function splitDelimitedRow(line, delimiter){
+  const fields=[];let field='',inside=false,closed=false,started=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(inside){
+      if(ch==='"' && line[i+1]==='"'){field+='"';i++;continue;}
+      if(ch==='"'){inside=false;closed=true;continue;}
+      field+=ch;continue;
+    }
+    if(ch===delimiter){
+      fields.push(field.trim());field='';started=false;closed=false;continue;
+    }
+    if(ch==='"'){
+      if(started||closed)throw new RangeError('Unexpected quote in CSV field.');
+      if(field.trim())throw new RangeError('Unexpected quote in CSV field.');
+      field='';inside=true;started=true;continue;
+    }
+    if(closed){
+      if(/\s/.test(ch))continue;
+      throw new RangeError('Unexpected text after quoted CSV field.');
+    }
+    field+=ch;
+    if(!/\s/.test(ch))started=true;
+  }
+  if(inside)throw new RangeError('Unclosed CSV quoted field.');
+  fields.push(field.trim());
+  return fields;
+}
+function csvSeparator(lines){
+  const sample=lines.slice(0,Math.min(8,lines.length));
+  const choices=['\t',';',','];
+  let best=null,highest=0;
+  for(const separator of choices){
+    let count=0;
+    for(const {text} of sample){
+      // An unquoted, standalone thousands-grouped value is ambiguous with CSV.
+      // Prefer treating it as a number; users can explicitly select comma CSV.
+      if(separator===',' && /^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(text.trim()))continue;
+      try{count+=Math.max(0,splitDelimitedRow(text,separator).length-1);}
+      catch{/* Invalid sample rows should not crash delimiter detection. */}
+    }
+    if(count>highest){best=separator;highest=count;}
+  }
+  return best;
+}
+export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={}){
+  const col=Number(column);
+  if(!Number.isInteger(col)||col<1||col>20)throw new RangeError('Choose an input column from 1 to 20.');
+  if(!Number.isInteger(maxRows)||maxRows<1)throw new RangeError('Invalid maximum data row count.');
+  const records=String(input??'').replace(/^\uFEFF/,'').split(/\r?\n/).map((text,i)=>({line:i+1,text})).filter(x=>x.text.trim());
+  const allowed={auto:null,comma:',',tab:'\t',semicolon:';',lines:null};
+  if(!Object.hasOwn(allowed,delimiter))throw new RangeError('Unknown file delimiter.');
+  const sep=delimiter==='auto'?csvSeparator(records):allowed[delimiter];
+  const rows=records.map(({line,text})=>{
+    try{
+      const cells=splitDelimitedRow(text,sep);
+      if(col>cells.length)throw new RangeError('Column '+col+' is missing on this row.');
+      let value=cells[col-1];
+      if(/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value))value=value.replaceAll(',','');
+      return {line,value,error:null};
+    }catch(e){return {line,value:'',error:e.message};}
+  });
+  const headerTokens=/^(?:value|input|amount|number|quantity|weight|mass|length|temperature|distance)$/i;
+  const headerSkipped=Boolean(rows[0]&&!rows[0].error&&headerTokens.test(rows[0].value));
+  if(headerSkipped)rows.shift();
+  if(rows.length>maxRows)throw new RangeError('Maximum '+maxRows+' data rows per batch.');
+  return {rows,delimiter:sep===','?'comma':sep==='\t'?'tab':sep===';'?'semicolon':'lines',headerSkipped};
+}
