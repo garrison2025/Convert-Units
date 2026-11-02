@@ -316,3 +316,34 @@ test('quoted TSV multi-line cells and a 1000-logical-record limit survive physic
  assert.match(broken.rows[1].error,/Unclosed CSV quoted field/);
  assert.equal(broken.rows[2].value,'25');
 });
+
+
+test('unit alias parser refuses knot vs kilonewton ambiguity instead of silent force/speed errors',()=>{
+ assert.throws(()=>resolveUnitLabel('kn'),/Ambiguous unit "kn".*knot.*kN/);
+ assert.throws(()=>resolveUnitLabel('KN'),/Ambiguous unit "KN".*knot.*kN/);
+ assert.equal(resolveUnitLabel('kN'),'kn');
+ assert.equal(resolveUnitLabel('knot'),'knot');
+ assert.equal(resolveUnitLabel('Knots'),'knot');
+ assert.equal(resolveUnitLabel('Kilonewtons'),'kn');
+ assert.equal(resolveUnitLabel('lb'),'lbs');
+ assert.equal(resolveUnitLabel('lbs'),'lbs');
+ assert.equal(resolveUnitLabel('°C'),'celsius');
+});
+
+test('ambiguous kn rows fail individually; explicit speed and force units still work',()=>{
+ const table=parseBatchTable('value,from,to\n10,kn,mph\n10,knot,mph\n10,kN,N\n20,kg,lb',
+   {column:1,delimiter:'comma'});
+ const result=convertBatchToCsv(table,'kg','lbs',{fromColumn:2,toColumn:3});
+ assert.equal(result.converted,3);
+ assert.deepEqual(result.invalid,[2]);
+ assert.equal(result.rows[0].from,'kn');
+ assert.equal(result.rows[0].to,'mph');
+ assert.match(result.rows[0].status,/Ambiguous/);
+ assert.equal(result.rows[1].from,'kn');
+ assert.equal(result.rows[1].to,'mph');
+ assert.equal(result.rows[1].status,'OK');
+ assert.equal(result.rows[2].from,'kN');
+ assert.equal(result.rows[2].to,'N');
+ assert.equal(result.rows[2].status,'OK');
+ assert.match(result.csv,/10,kN,N,4,10000,kN,N,OK/);
+});
