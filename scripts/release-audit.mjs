@@ -76,6 +76,7 @@ for(const [route,html] of pages){
   for(const match of html.matchAll(/<(?:script|link)\b[^>]*?(?:src|href)="(\/assets\/[^"]+)"/gi)){
     if(!fs.existsSync(path.join(dist,match[1].slice(1))))fail(route+': missing asset '+match[1]);
   }
+  if(html.includes('data-converter')&&!html.includes('data-print-converter'))fail(route+': converter missing print-table control');
   if(html.includes('data-converter')&&!html.includes('data-multi-results'))fail(route+': live converter missing same-value multi-unit table');
   if(html.includes('data-multi-results')&&!html.includes('Other unit equivalents'))fail(route+': multi-unit comparison is not labeled');
   if(seedPaths.has(route)){
