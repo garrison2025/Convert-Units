@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -144,6 +144,16 @@ for(const pair of pairList){
  }else if(html.includes('data-fluid-oz-compare')){
   errors.push(pair.url+': unit-system comparison leaked to unrelated tool');
  }
+ if(units[pair.from].dimension==='temperature'){
+  const values=temperatureThreeScaleReadout(5,pair.from);
+  if(!values||!html.includes('data-temperature-triple')||
+     !html.includes('data-copy-temperature')||
+     !html.includes('Temperature differences use a different rule:')||
+     values.some(x=>!html.includes(x.relation+' '+x.shown+' '+x.symbol)))
+    errors.push(pair.url+': source-calculated temperature scale or difference warning missing');
+ }else if(html.includes('data-temperature-triple')){
+  errors.push(pair.url+': temperature panel leaked into non-temperature conversion');
+ }
  if(units[pair.from].dimension==='pressure'){
   const rows=pressureFourUnitComparison(5,pair.from);
   if(!html.includes('data-pressure-summary')||!html.includes('data-copy-pressure')||
@@ -209,6 +219,12 @@ for(const seed of seeds){
      !html.includes(calc.us.relation+' '+calc.us.shown)||
      !html.includes(calc.uk.relation+' '+calc.uk.shown))
    errors.push(seed.url+': 355 mL US and UK fluid ounce first-load comparison inaccurate');
+ }
+ if(pair.slug==='celsius-to-fahrenheit'){
+  const values=temperatureThreeScaleReadout(seed.value,'celsius');
+  if(!values||!html.includes('data-temperature-triple')||
+     values.some(x=>!html.includes(x.relation+' '+x.shown+' '+x.symbol)))
+    errors.push(seed.url+': calculated Celsius Fahrenheit Kelvin values absent');
  }
  if(pair.slug==='kg-to-lbs'){
   const expected=kgToPoundsOunces(seed.value);
