@@ -73,7 +73,18 @@ for(const seed of seeds){
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
 }
 checkMarkup('/',false);
-checkMarkup('/batch-converter/',true);
+const batchHtml=checkMarkup('/batch-converter/',true);
+for(const feature of [
+ 'Batch unit converter for CSV and spreadsheets',
+ 'data-batch-column','data-batch-delimiter','data-batch-file',
+ 'The export preserves the original spreadsheet columns',
+ 'single source/target unit pair',
+ 'no uploads'
+])if(!batchHtml.includes(feature))errors.push('/batch-converter/: stated feature or interface missing: '+feature);
+const appSource=fs.readFileSync(path.join(root,'src/assets/app.mjs'),'utf8');
+if(!/convertBatchToCsv\(table,from\.value,to\.value\)/.test(appSource))
+ errors.push('Browser script must use tested source-preserving batch conversion, not a second CSV implementation.');
+
 checkMarkup('/universal-converter/',true);
 const result={
  status:errors.length?'failed':'passed',
