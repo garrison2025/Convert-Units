@@ -23,3 +23,6 @@
 .page-top .page-title p{line-height:1.65}
 @media(max-width:620px){.suggestions{top:calc(100% + 7px);padding:6px;border-radius:12px}.suggestions-heading{font-size:.59rem;padding:7px 9px}.suggestion{padding:12px 10px}.suggestion-name{font-size:.82rem}.suggestion-meta{font-size:.7rem}.value-presets{gap:5px}.value-presets .preset{padding:4px 9px;min-height:32px}.hero-search-row input{min-width:0}.hero-search-row button{min-width:93px}.search-empty{padding:19px}}
 @media(prefers-reduced-motion:reduce){.value-presets .preset{transition:none}}
+
+/* Respect the HTML hidden state even when tiles/results use author display:grid/flex. */
+[hidden]:not([hidden="until-found"]){display:none!important}
