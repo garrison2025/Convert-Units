@@ -243,16 +243,31 @@ export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={
   const allowed={auto:null,comma:',',tab:'\t',semicolon:';',lines:null};
   if(!Object.hasOwn(allowed,delimiter))throw new RangeError('Unknown file delimiter.');
   const sep=delimiter==='auto'?csvSeparator(records):allowed[delimiter];
+  // 1,5 and 12,34 can mean decimals in many locales, not two CSV cells.
+  // Never silently interpret a numeric-only ambiguous column in auto mode.
+  if(delimiter==='auto'&&sep===','&&records.some(({text})=>/^[+-]?\\d+,\\d{1,2}$/.test(text.trim()))){
+    throw new RangeError('Ambiguous comma-separated numbers. For CSV columns, explicitly select Comma (,). For decimal values, replace the decimal comma with a dot (1.5).');
+  }
+  const headerTokens=/^(?:value|input|amount|number|quantity|weight|mass|length|temperature|distance)$/i;
+  let expectedColumns=null;
+  if(sep){
+    // When the selected CSV header is recognizable, every data record should
+    // have the same number of columns, rather than silently losing fields.
+    try{
+      const firstCells=splitDelimitedRow(records[0]?.text??'',sep);
+      if(headerTokens.test(firstCells[col-1]??''))expectedColumns=firstCells.length;
+    }catch{/* Broken header reported as its own line error. */}
+  }
   const rows=records.map(({line,text})=>{
     try{
       const cells=splitDelimitedRow(text,sep);
+      if(expectedColumns!==null&&cells.length!==expectedColumns)throw new RangeError('Expected '+expectedColumns+' CSV columns, found '+cells.length+'.');
       if(col>cells.length)throw new RangeError('Column '+col+' is missing on this row.');
       let value=cells[col-1];
       if(/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value))value=value.replaceAll(',','');
       return {line,value,error:null};
     }catch(e){return {line,value:'',error:e.message};}
   });
-  const headerTokens=/^(?:value|input|amount|number|quantity|weight|mass|length|temperature|distance)$/i;
   const headerSkipped=Boolean(rows[0]&&!rows[0].error&&headerTokens.test(rows[0].value));
   if(headerSkipped)rows.shift();
   if(rows.length>maxRows)throw new RangeError('Maximum '+maxRows+' data rows per batch.');
