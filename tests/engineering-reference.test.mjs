@@ -23,33 +23,67 @@ test('torque adds genuine inch-pound and kilogram-force-meter units without mass
  assert.throws(()=>convert(5,'lbs','in-lbf'),/same physical dimension/);
 });
 
-test('length ruler reference uses international-inch exact fractions',()=>{
- const html=engineeringReference(pair('in-to-cm'));
- assert.match(html,/data-engineering-reference="length"/);
- assert.match(html,/1\/16 in/);
- assert.match(html,/1\.5875 mm/);
- assert.match(html,/2\.54 cm/);
+test('inch ruler source reference preserves exact international fractions',()=>{
+ const inch=engineeringReference(pair('in-to-cm'));
+ const mm=engineeringReference(pair('in-to-mm'));
+ for(const html of [inch,mm]){
+  assert.match(html,/data-engineering-reference="length"/);
+  assert.match(html,/data-engineering-source="in"/);
+  assert.match(html,/1\/16 in/);
+  assert.match(html,/1\.5875 mm/);
+  assert.match(html,/2\.54 cm/);
+ }
  near(convert(17.7,'in','cm'),44.958);
- assert.match(directionExplanation(pair('m-to-ft'),pairs),/Fractional inches to metric lengths/);
 });
 
-test('speed engineering reference covers road, nautical and SI without Mach assumptions',()=>{
- const html=directionExplanation(pair('kmh-to-mph'),pairs);
- assert.match(html,/data-engineering-reference="speed"/);
- assert.match(html,/60 mph/);
- assert.match(html,/96\.56064 km\/h/);
- assert.match(html,/26\.8224 m\/s/);
- assert.match(html,/Knots/);
+test('metric and imperial length references actually follow page source unit',()=>{
+ const meters=engineeringReference(pair('m-to-ft'));
+ assert.match(meters,/data-engineering-source="m"/);
+ assert.match(meters,/Meters to feet and fractional inches/);
+ assert.match(meters,/1\.75 m/);
+ assert.match(meters,/5 ft 8 7\/8 in/);
+ assert.doesNotMatch(meters,/Fractional inches to metric lengths/);
+ const feet=engineeringReference(pair('ft-to-m'));
+ assert.match(feet,/data-engineering-source="ft"/);
+ assert.match(feet,/Feet to meters and centimeters/);
+ assert.match(feet,/5\.5 ft/);
+ assert.match(feet,/1\.6764 m/);
+ const cm=engineeringReference(pair('cm-to-in'));
+ assert.match(cm,/data-engineering-source="cm"/);
+ assert.match(cm,/Centimeters to decimal and fractional inches/);
+ assert.match(cm,/2\.54 cm/);
+ assert.match(cm,/1 in/);
+ assert.notEqual(meters,feet);
+ assert.notEqual(feet,cm);
+});
+
+test('speed engineering reference follows km/h versus mph page direction',()=>{
+ const metric=engineeringReference(pair('kmh-to-mph'));
+ assert.match(metric,/data-engineering-source="kmh"/);
+ assert.match(metric,/100 km\/h across four speed units/);
+ assert.match(metric,/62\.137119 mph/);
+ const imperial=engineeringReference(pair('mph-to-kmh'));
+ assert.match(imperial,/data-engineering-source="mph"/);
+ assert.match(imperial,/60 mph across four speed units/);
+ assert.match(imperial,/96\.56064 km\/h/);
+ assert.match(imperial,/26\.8224 m\/s/);
+ assert.match(imperial,/Knots/);
+ assert.notEqual(metric,imperial);
  near(convert(330,'kmh','mph'),205.05249343832044);
 });
 
-test('torque engineering reference is a cross-check, not a tightening recommendation',()=>{
- const html=directionExplanation(pair('ft-lbf-to-nm'),pairs);
- assert.match(html,/data-engineering-reference="torque"/);
- assert.match(html,/100 ft·lbf/);
- assert.match(html,/1,200 in·lbf/);
- assert.match(html,/kgf·m/);
- assert.match(html,/manufacturer specification/);
+test('torque references use the right source and never imply tightening specifications',()=>{
+ const imperial=engineeringReference(pair('ft-lbf-to-nm'));
+ assert.match(imperial,/data-engineering-reference="torque"/);
+ assert.match(imperial,/100 foot-pound-force in other torque units/);
+ assert.match(imperial,/1,200 in·lbf/);
+ assert.match(imperial,/manufacturer specification/);
+ const metric=engineeringReference(pair('nm-to-ft-lbf'));
+ assert.match(metric,/data-engineering-source="nm"/);
+ assert.match(metric,/100 newton-meters in other torque units/);
+ assert.match(metric,/73\.756215 ft·lbf/);
+ assert.match(metric,/manufacturer specification/);
+ assert.notEqual(metric,imperial);
  assert.equal(formatNumber(convert(100,'ft-lbf','nm'),6),'135.581795');
 });
 
