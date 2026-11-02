@@ -18,3 +18,7 @@ jobs:
           node-version: '22'
       - name: Test calculation and build all pages
         run: npm run check
+      - name: Exercise production canonical and sitemap gates against a synthetic origin
+        env:
+          SITE_URL: https://qa.example.test
+        run: npm run build && npm run audit:seo
