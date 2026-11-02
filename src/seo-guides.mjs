@@ -123,3 +123,28 @@ export function directionExplanation(pair,allPairs){
    '<p class="hint">Reference: <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST conversion factors</a>. Calculation and display rounding are separate. <a href="/methodology/">See how we calculate</a>.</p>'+
    '</section>';
 }
+
+/**
+ * Helpful, crawlable routes for someone exploring an exact numeric answer.
+ * Only links to existing directional tools; excludes numeric sibling URLs
+ * (which remain conservatively noindex by default). Prioritizes the reverse
+ * pair, then other choices sharing an input or output unit.
+ */
+export function relatedDirectionLinks(pair,allPairs){
+ const from=units[pair.from],to=units[pair.to];
+ if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Invalid related direction');
+ const rank=x=>x.from===pair.to&&x.to===pair.from?0:
+  x.from===pair.from?1:x.to===pair.to?2:
+  x.from===pair.to||x.to===pair.from?3:4;
+ const choices=allPairs.filter(x=>x.slug!==pair.slug&&
+  units[x.from]?.dimension===from.dimension&&units[x.to]?.dimension===from.dimension)
+  .sort((a,b)=>rank(a)-rank(b)||a.slug.localeCompare(b.slug)).slice(0,4);
+ return '<section class="mini-card related-direction-links" aria-label="Related unit conversion tools">'+
+   '<h3>Other conversions in '+esc(dimensions[from.dimension].label.toLowerCase())+'</h3>'+
+   '<p>Use a different direction or unit with a complete interactive calculator.</p>'+
+   '<div class="chiplist">'+
+   choices.map(x=>'<a class="chip" href="'+esc(x.url)+'">'+
+    esc(units[x.from].name)+' to '+esc(units[x.to].name)+'</a>').join('')+
+   '</div><a class="related-directory" href="/category/'+esc(from.dimension)+'/">All '+
+   esc(dimensions[from.dimension].label.toLowerCase())+' conversions</a></section>';
+}
