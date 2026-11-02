@@ -22,6 +22,12 @@ jobs:
         run: |
           command -v google-chrome || command -v chromium
           node scripts/browser-smoke.mjs
+      - name: Guard against accidental indexing when SITE_URL is set without launch approval
+        env:
+          SITE_URL: https://qa.example.test
+        run: |
+          node scripts/build.mjs
+          node --input-type=module -e 'import fs from "node:fs"; const b=JSON.parse(fs.readFileSync("dist/build-info.json")); const h=fs.readFileSync("dist/index.html","utf8"); const m=fs.readFileSync("dist/sitemap.xml","utf8"); const headers=fs.readFileSync("dist/_headers","utf8"); if(b.mode!=="preview"||b.site!==null||b.indexablePages!==0||b.publicationApproved||b.publicationReason!=="awaiting-public-indexing-approval"||!h.includes("noindex,follow")||h.includes("rel=\"canonical\"")||m.includes("<loc>")||!headers.includes("X-Robots-Tag: noindex, nofollow"))throw Error("SITE_URL unexpectedly enabled indexing"); console.log("Launch guard: custom SITE_URL alone remains noindex");'
       - name: Validate production canonical, sitemap and full-site links with a synthetic custom origin
         env:
           SITE_URL: https://qa.example.test
