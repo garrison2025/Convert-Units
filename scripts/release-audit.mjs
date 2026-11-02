@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
-import {convert, formatNumber, units} from '../src/assets/engine.mjs';
+import {convert, formatNumber, units, displayRelation} from '../src/assets/engine.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -106,7 +106,7 @@ for(const [route,html] of pages){
     const pair=pairs.find(p=>p.slug===s.slug)||(s.slug==='seconds-to-hours'?{from:'seconds',to:'hours'}:null);
     if(!pair){fail(route+': no conversion pair');continue;}
     const expected=formatNumber(convert(s.value,pair.from,pair.to),9);
-    const expectedAnswer=s.valueText+' '+units[pair.from].symbol+' = '+expected+' '+units[pair.to].symbol;
+    const expectedAnswer=s.valueText+' '+units[pair.from].symbol+' '+displayRelation(convert(s.value,pair.from,pair.to),expected)+' '+expected+' '+units[pair.to].symbol;
     const visible=plain(extract(html,/<main id="main">([\s\S]*?)<\/main>/i));
     if(!visible.includes(expected)||!visible.includes(s.valueText))fail(route+': prerendered numerical result missing');
     if(!html.includes('data-copy-answer')||!html.includes('data-load-value'))fail(route+': missing value interaction');
