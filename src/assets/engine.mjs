@@ -301,7 +301,9 @@ export function convertBatchToCsv(table,fromUnit,toUnit){
     if(row.error)message=row.error;
     else{
       try{
-        result=formatNumber(convert(row.value,fromUnit,toUnit),9);
+        // CSV output must use machine-readable decimal values, not the UI's
+        // thousands grouping (which can also misclassify negative CSV values).
+        result=formatNumber(convert(row.value,fromUnit,toUnit),9).replaceAll(',','');
         converted++;
       }catch(e){message=e.message;}
     }
