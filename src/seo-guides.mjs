@@ -3,7 +3,7 @@
  * Not SEO filler: content is based on the actual dimension and its units.
  * No invented medical advice, use cases, rankings or author credentials.
  */
-import {units,dimensions,convert,formatNumber,formula} from './assets/engine.mjs';
+import {units,dimensions,convert,formatNumber,formula,displayRelation} from './assets/engine.mjs';
 
 const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 
@@ -113,8 +113,8 @@ export function directionExplanation(pair,allPairs){
  // and the SEO's server-prerendered answer use the same tested engine.
  return '<section class="card conversion-guide" aria-label="Conversion formula and verification">'+
    '<h2>Verify '+esc(from.symbol)+' to '+esc(to.symbol)+'</h2>'+
-   '<p>Using the stated definitions, <strong>1 '+esc(from.symbol)+' = '+pretty(one)+' '+esc(to.symbol)+
-   '</strong> and <strong>10 '+esc(from.symbol)+' = '+pretty(ten)+' '+esc(to.symbol)+'</strong>. '+
+   '<p>Using the stated definitions, <strong>1 '+esc(from.symbol)+' '+displayRelation(one,formatNumber(one,9))+' '+pretty(one)+' '+esc(to.symbol)+
+   '</strong> and <strong>10 '+esc(from.symbol)+' '+displayRelation(ten,formatNumber(ten,9))+' '+pretty(ten)+' '+esc(to.symbol)+'</strong>. '+
    'The live converter accepts your own value; the table provides additional check points.</p>'+
    '<h3>Conversion method</h3><p>'+esc(formula(pair.from,pair.to))+'</p>'+
    '<h3>'+esc(item.title)+'</h3><p>'+esc(item.advice)+'</p>'+
