@@ -18,7 +18,7 @@ Updated: 2026-11-02
 - GitHub Actions workflow: `.github/workflows/ci.yml`.
 - `npm run check` executes the Node unit test suite, static build, cross-link/metadata audit, deep audit, and release audit. The CI workflow additionally builds with `SITE_URL=https://qa.example.test` to verify custom-domain canonical/og:url/sitemap paths.
 - `scripts/release-audit.mjs` verifies required routes, internal inbound links and orphans, unique titles/descriptions, canonical and sitemap, all 92 prerendered answer copies, and the live equivalent/print affordances.
-- Latest verified passing code CI: https://github.com/garrison2025/Convert-Units/actions/runs/41366205618 (commit `3a5f621e0cbdd0ff486080ae335f8edebab2c9a2`).
+- Earlier passing baseline CI: https://github.com/garrison2025/Convert-Units/actions/runs/41366205618. Newest verification is documented below.
 - Report outputs in built `dist/`: `quality-report.json`, `release-audit-report.json`, `build-info.json`.
 - The comparison signal for same-direction near-identical numeric pages remains **editorial review only**, not a claim of compliance or AdSense eligibility.
 
@@ -62,3 +62,15 @@ Scope: **source code, unit data, test suite and generated-page audits only**. Th
 - Reproducible local command: `npm run check`, which now runs tests and the complete build-time audit.
 - CI on main builds both preview and synthetic official-domain modes; check the latest workflow at https://github.com/garrison2025/Convert-Units/actions .
 - Scripts: `scripts/audit.mjs`, `scripts/deep-audit.mjs`, `scripts/release-audit.mjs`. Reports are emitted under `dist/`.
+
+## 2026-11-02 — completed local optimization pass (no domain needed)
+
+- Implemented independent, testable CSV/TSV/semicolon input parser with user-selected input columns 1–20, original line numbers, invalid-row preservation, optional recognized headers and support for quoted thousands values. Browser input and export use the pure calculation engine; data stays local.
+- Added 92 static value-specific rounding comparisons at up to 2, 4, 6 and 9 decimal places; explicitly distinguish display rounding from input measurement accuracy.
+- Improved keyboard and navigation behavior: Up/Down suggestions, Escape/outside-close mobile menu and reliable hidden filtered cards.
+- Made the CI performance gate mandatory: 70 KiB raw CSS, 55 KiB raw JS, 32 KiB locally gzip-compressed CSS+JS, 90 KiB largest HTML page and 65 KiB homepage HTML. Report: `dist/performance-budget-report.json`. This is not actual Lighthouse, CLS, LCP or INP testing.
+- Example verified production-mode static budgets from run 41368546320: 48,091 bytes CSS; 29,645 bytes JS; 22,265 bytes combined individual gzip; homepage HTML 28,422 bytes; 0 failures. Some sizes may change after subsequent commits.
+- New tests cover CSV/TSV parsing, source row and error handling, 92 rounding tables and browser-module import wiring. Preview and synthetic-production builds retain all expected pages, canonical and noindex distinctions.
+- **SEO outstanding risk:** 1,646 / 1,646 comparable same-direction numeric page pairs were above the 0.95 normalized-token similarity threshold (build run 41368965006). The similarity report now includes per-direction clusters. See `research/NUMERIC-SEO-QUALITY-REVIEW.md`. This is an editorial warning, not proof of a Google penalty or a completed content audit.
+- Real-browser UX, mobile overflow, Core Web Vitals, custom domain, real GSC and AdSense reviews remain intentionally unverified until appropriate testing is possible. User has not bought the official domain. Do not infer an official site address from the temporary Cloudflare `pages.dev` preview.
+
