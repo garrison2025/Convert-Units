@@ -171,3 +171,24 @@ test('browser entry script imports the same tested CSV batch implementation it i
  assert.match(source,/data-batch-column/);
  assert.match(source,/data-batch-delimiter/);
 });
+
+
+test('auto CSV does not silently truncate decimal-comma values',()=>{
+ for(const input of ['1,5\n2,5','Value\n1,5\n2,5','12,34\n56,78']){
+  assert.throws(()=>parseBatchTable(input),/Ambiguous comma-separated numbers/);
+ }
+ const explicit=parseBatchTable('1,5\n2,5',{delimiter:'comma',column:2});
+ assert.deepEqual(explicit.rows.map(r=>r.value),['5','5']);
+ const thousand=parseBatchTable('1,200\n2,500');
+ assert.deepEqual(thousand.rows.map(r=>r.value),['1200','2500']);
+});
+test('CSV with a recognized value header rejects ragged rows rather than mis-converting truncated cells',()=>{
+ const tab=parseBatchTable('name,value,note\nshirt,149,ok\nbag,1,5\nhat,126,ok',{column:2,delimiter:'comma'});
+ assert.equal(tab.headerSkipped,true);
+ assert.equal(tab.rows[0].value,'149');
+ assert.equal(tab.rows[1].value,'1'); // The file has three valid CSV columns; column 2 is explicitly selected.
+ assert.equal(tab.rows[2].value,'126');
+ const ragged=parseBatchTable('name,value\nshirt,149,unexpected\ncap,126',{column:2,delimiter:'comma'});
+ assert.match(ragged.rows[0].error,/Expected 2 CSV columns, found 3/);
+ assert.equal(ragged.rows[1].value,'126');
+});
