@@ -62,3 +62,10 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - The 375px mobile batch view moves source/target selection into one row, exposes the source textarea within the first phone frame, and retains native accessible CSV-options disclosure.
 - Result values on the 320px homepage no longer split the numeric digits across two lines; the narrow target selector moves above the answer. Existing 375px layout stays two-column.
 - A successful Chromium workflow is a build/functional/automated-layout gate, not a replacement for real-user/device testing or independent Cloudflare live deployment verification.
+
+## V6 homepage first-view and live-deployment evidence (2026-11-02)
+- The homepage has no redundant self-referencing 'Home' breadcrumb; category, tool, and numeric pages retain their meaningful breadcrumb path.
+- The 320px mobile hero uses concise, accurate language (precise rather than falsely promising mathematically exact displayed decimals) and keeps the result plus the primary copy control within the recorded 870px local Chromium first screen.
+- `scripts/live-preview-audit.mjs` checks the **public Cloudflare Pages preview** over HTTPS via GitHub Actions; a successful local build is never interpreted as proof of deployment. The report records HTTP status, noindex protection, supported feature versions and a validated non-secret commit marker when available.
+- `research/BRAND-DOMAIN-REVIEW-20261102.md` documents already-active ExactUnit-name competitors. The developer label remains provisional pending actual owner brand/domain selection; do not imply trademark clearance.
+- Before moving to a verified custom-domain launch, rerun domain/brand checks, the official-domain SEO release gate and actual production UX/SEO checks. The `pages.dev` preview remains noindex.
