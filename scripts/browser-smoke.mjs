@@ -92,7 +92,7 @@ async function smokeScenario(SCENARIO){
      break;
    }
    case 'mobile':{
-     for(const width of [320,375,768]){
+     for(const width of [320,375,768,900,1024]){
        const iframe=document.createElement('iframe');
        iframe.style.width=width+'px';iframe.style.height='800px';iframe.style.border='0';
        iframe.src=location.pathname;
