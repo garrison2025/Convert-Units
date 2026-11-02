@@ -70,3 +70,11 @@ This project is an independent implementation, not a copy of the competitor's si
 - `npm run audit:performance` measures static CSS, JS and HTML asset sizes and writes `dist/performance-budget-report.json`; its gzip figures are local estimates, not measured production transfer sizes.
 - The 92 approved numeric pages include a useful pre-rendered result, interactive calculator, reference comparisons and display-precision table; their high template similarity still requires editorial review. See [`research/NUMERIC-SEO-QUALITY-REVIEW.md`](research/NUMERIC-SEO-QUALITY-REVIEW.md).
 - In preview mode all pages remain `noindex`. Do **not** buy or connect a domain solely to clear CI checks; genuine real-browser checks can be run when an official domain is available.
+
+## Local real-browser and evidence audits
+
+The main-branch GitHub Actions workflow automatically builds the site, checks 33 Node tests, then launches local headless Chromium. The smoke suite checks real calculator inputs and errors, CSV parsing, reset, suggested tools, numeric reference interactions, and responsive horizontal overflow at 320, 375 and 768 CSS pixels. No custom domain is required for these checks. To run the browser smoke suite manually on a machine with Chrome installed, first run `npm run build`, then `node scripts/browser-smoke.mjs`.
+
+Every CI run also produces the offline `dist/keyword-evidence-review.csv` and `dist/keyword-evidence-review.json` files from the approved V2 dataset. The GitHub Actions run has a 7-day `exactunit-quality-reports` download containing these files plus the build SEO/performance reports. A raw competitor rank of 0 is explicitly tagged as unverified. Do not mistake competitor estimates for this site's traffic or assume 92 similar pages are automatically useful/indexable.
+
+Browser smoke checks are not measurements of live Cloudflare performance, Lighthouse scores, accessibility certification or Google indexing. The temporary `*.pages.dev` preview remains noindexed until a real domain is chosen.
