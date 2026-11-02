@@ -145,7 +145,7 @@ for(const pair of pairList){
   errors.push(pair.url+': unit-system comparison leaked to unrelated tool');
  }
  if(units[pair.from].dimension==='temperature'){
-  const values=temperatureThreeScaleReadout(5,pair.from);
+  const values=temperatureThreeScaleReadout(20,pair.from);
   if(!values||!html.includes('data-temperature-triple')||
      !html.includes('data-copy-temperature')||
      !html.includes('Temperature differences use a different rule:')||
