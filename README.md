@@ -7,7 +7,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - **38** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
 - **156** public static page routes in total (38 tools plus 92 numeric pages, 16 categories and site pages; 79 are initial production-indexable candidates under the curated policy) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
-- Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, sanitized CSV export and print.
+- Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, **original input columns and recognized headers preserved in CSV export**, numeric machine-readable output, sanitized source cells and print. One unit pair per batch.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
@@ -108,3 +108,9 @@ Source keywords remain unchanged in research data; human-readable SEO page title
 ## 2026-11-02 V3 — one indexed numeric answer per direction
 
 The active policy now selects only **15 representative numeric answers**, one per conversion direction, using original competitor keyword evidence and not invented traffic forecasts. The other **77** numeric answers remain functional but are not part of the future production sitemap. Total eligible production URLs under the default policy: **79**. Automated review prevents two values in the same direction from being indexed in the curated mode. See [active V3 SEO rollout document](research/SEO-PILOT-V3-20261102.md) for all 15 examples and the 11 formerly selected values now excluded. The 26/66/90 figures in earlier dated reports describe the previous experiment, not the active release configuration.
+
+## CSV batch workflow and Google SEO research
+
+The real batch converter at `/batch-converter/` keeps source columns, labels and valid/invalid lines when exporting, adds namespaced result, source unit, target unit and row status fields, and exports ungrouped numeric results for reuse in Excel/Google Sheets. Uploaded CSV/TXT files and pasted rows stay inside the browser; no account or API is needed. Delimiters are comma, tab or semicolon, with optional manual selection; select a **single unit pair** for each batch. Row-specific different units, arbitrary decimal-comma parsing and quoted multiline CSV records are not currently promised. Error rows retain their source values and line numbers.
+
+See [the public competitor SERP and batch-workflow review](research/SEO-SERP-WORKFLOW-REVIEW-20261102.md). This is a **source-based public-page spot-check**, not a fixed-region Google US top-ten audit or verified search demand forecast. The 15 indexable numeric candidates / 77 suppressed numeric URLs and 79 production-sitemap candidates are **unchanged** by this feature release.
