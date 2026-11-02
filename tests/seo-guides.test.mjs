@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {dimensions,units,convert,formatNumber} from '../src/assets/engine.mjs';
-import {categoryExplanation,directionExplanation} from '../src/seo-guides.mjs';
+import {categoryExplanation,directionExplanation,relatedDirectionLinks} from '../src/seo-guides.mjs';
 
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url),'utf8'));
 
@@ -48,4 +48,24 @@ test('clarify non-linear temperature and reciprocal fuel caveats',()=>{
  assert.match(density,/cannot be converted to milliliters without knowing/);
  const storage=categoryExplanation('storage');
  assert.match(storage,/1,073,741,824/);
+});
+
+test('numeric pages expose useful, strictly eligible converter choices instead of self-links or noindex number siblings',()=>{
+ for(const p of pairs){
+  const markup=relatedDirectionLinks(p,pairs);
+  assert.match(markup,/related-direction-links/);
+  assert.match(markup,/Other conversions in /);
+  assert.ok(!markup.includes('href="'+p.url+'"'),p.slug+' should not link to the already shown parent');
+  assert.ok(markup.includes('href="/category/'+units[p.from].dimension+'/'),'directory fallback');
+  const links=[...markup.matchAll(/<a class="chip" href="([^"]+)"/g)].map(m=>m[1]);
+  assert.equal(links.length,new Set(links).size,'duplicate internal link');
+  assert.ok(links.length<=4,'avoid navigation bloat');
+  for(const url of links){
+   const related=pairs.find(x=>x.url===url);
+   assert.ok(related,p.slug+' references non-existent or numeric noindex URL '+url);
+   assert.equal(units[related.from].dimension,units[p.from].dimension,'must share dimension');
+  }
+  const reverse=pairs.find(x=>x.from===p.to&&x.to===p.from);
+  if(reverse)assert.equal(links[0],reverse.url,p.slug+' reverse link should be first');
+ }
 });
