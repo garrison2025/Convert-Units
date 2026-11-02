@@ -297,3 +297,18 @@
 .mass-imperial strong{font-variant-numeric:tabular-nums;font-size:1.02rem;color:#244471;overflow-wrap:anywhere}
 .mass-imperial small{font-size:.72rem;line-height:1.5;color:#647692}
 @media(max-width:400px){.mass-imperial{padding:11px 12px}.mass-imperial span,.mass-imperial strong{width:100%}}
+
+/* V17: responsive °C/°F/K answers. */
+.temperature-triple{margin:10px 0 14px;padding:12px;background:#f7faff;border:1px solid #dae6f8;border-radius:11px}
+.temperature-triple[hidden]{display:none!important}
+.temperature-triple h3{margin:0 0 10px;font-size:1rem;color:#24436d}
+.temperature-scale-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.temperature-scale-values p{margin:0;padding:10px;background:#fff;border:1px solid #e2e9f5;border-radius:9px;min-width:0}
+.temperature-scale-values span{display:block;font-size:.78rem;color:#647593}
+.temperature-scale-values strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere;color:#244675}
+.temperature-copy{margin:10px 0 4px;padding:8px 11px;border:1px solid #c9d7ed;border-radius:8px;background:#fff;color:#2653aa;cursor:pointer}
+.temperature-copy:focus-visible{outline:2px solid #2853c4;outline-offset:3px}
+.temperature-triple .temperature-interval-note{margin:5px 0 7px;color:#405979;font-size:.79rem;line-height:1.6}
+.temperature-triple small{display:block;color:#687890;font-size:.73rem;line-height:1.55}
+.temperature-triple small a{text-decoration:underline;color:#2653b0}
+@media(max-width:520px){.temperature-scale-values{grid-template-columns:1fr}}
