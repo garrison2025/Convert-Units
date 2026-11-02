@@ -77,3 +77,7 @@ Google official references:
 - Titles: https://developers.google.com/search/docs/appearance/title-link
 - Cloudflare Pages host-specific robots headers: https://developers.cloudflare.com/pages/configuration/headers/
 - Google Search Console indexing: https://support.google.com/webmasters/answer/7440203
+
+## Similarity result after the pilot — still unresolved
+
+Verified by GitHub Actions run 41372934999: across all 92 numeric pages the token-normalized similarity alert remains **1,646/1,646** comparable same-direction pairs, while among the **26 index-eligible pilot numeric pages**, it flags **17/17** comparable same-direction pairs at the 0.95 threshold. The metric normalizes numeric values and is sensitive to shared templates; it is not Google's own duplicate-content measure. Nevertheless, these results are a material editorial risk. Reducing sitemap volume does **not** itself create independently useful content. Leave the pilot conservative until real US SERP and content usefulness review; consolidate page groups when a pair-tool page sufficiently satisfies the same search intent. Do not invent unique prose merely to lower similarity.
