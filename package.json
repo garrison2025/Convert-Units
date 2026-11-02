@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm test && node scripts/build.mjs && node scripts/audit.mjs && node scripts/deep-audit.mjs && node scripts/release-audit.mjs && node scripts/performance-audit.mjs && node scripts/keyword-audit.mjs && node scripts/seo-editorial-gate.mjs && node scripts/seo-content-audit.mjs && node scripts/seo-crawl-audit.mjs",
+    "build": "npm test && node scripts/build.mjs && node scripts/audit.mjs && node scripts/deep-audit.mjs && node scripts/release-audit.mjs && node scripts/performance-audit.mjs && node scripts/keyword-audit.mjs && node scripts/seo-editorial-gate.mjs && node scripts/seo-content-audit.mjs && node scripts/seo-crawl-audit.mjs && node scripts/segregate-qa-reports.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "npm run build",
     "dev": "npm run build && npx --yes serve dist",
