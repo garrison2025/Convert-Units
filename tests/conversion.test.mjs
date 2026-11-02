@@ -98,3 +98,11 @@ test('malformed first CSV row is processed as an error row, never a batch crash'
  assert.deepEqual(parseBatchLines('\uFEFFvalue,result\r\n149\r\n126'),['149','126']);
  assert.throws(()=>parseBatchLines('1\n2\n3',2),/Maximum 2 data rows/);
 });
+
+
+test('nonzero microscopic inputs are rejected rather than rounded down to zero',()=>{
+ for(const x of ['1e-400','-1e-400','0.0001e-999']){
+  assert.throws(()=>convert(x,'kg','g'),/below supported numerical precision/);
+ }
+ assert.equal(convert('0e-400','kg','g'),0);
+});
