@@ -50,6 +50,9 @@ jobs:
           path: |
             dist/keyword-evidence-review.csv
             dist/keyword-evidence-review.json
+            dist/seo-editorial-review.csv
+            dist/seo-editorial-review.json
+            dist/seo-source-landing-review.csv
             dist/seo-content-audit.json
             dist/seo-crawl-audit.json
             dist/seo-url-inventory.csv
