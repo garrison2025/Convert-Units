@@ -103,7 +103,7 @@ if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSugg
   document.addEventListener('pointerdown',e=>{if(!homeSuggestions.contains(e.target)&&e.target!==homeInput)close();});
 }
 const search=el('[data-filter]');if(search){const requested=new URLSearchParams(location.search).get('q');if(requested&&requested.length<=80)search.value=requested;const targets=all('[data-filter-item]');search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();const tokens=q.split(/\s+/).filter(Boolean);let n=0;for(const node of targets){const text=(node.dataset.search||node.textContent).toLowerCase();const ok=tokens.every(token=>text.includes(token));node.hidden=!ok;if(ok)n++;}const status=el('[data-filter-status]');if(status)status.textContent=`Showing ${n} matching tools`;const empty=el('[data-filter-empty]');if(empty)empty.hidden=n!==0;});el('[data-clear-filter]')?.addEventListener('click',()=>{search.value='';search.dispatchEvent(new Event('input'));search.focus();});if(search.value)search.dispatchEvent(new Event('input'));}
-const batch=el('[data-batch]');if(batch){const dimension=el('[data-batch-dimension]'),from=el('[data-batch-from]'),to=el('[data-batch-to]'),values=el('[data-batch-input]'),column=el('[data-batch-column]'),separator=el('[data-batch-delimiter]'),out=el('[data-batch-result]'),status=el('[data-batch-status]');let csv='';
+const batch=el('[data-batch]');if(batch){const dimension=el('[data-batch-dimension]'),from=el('[data-batch-from]'),to=el('[data-batch-to]'),values=el('[data-batch-input]'),column=el('[data-batch-column]'),separator=el('[data-batch-delimiter]'),rowFromColumn=el('[data-batch-from-column]'),rowToColumn=el('[data-batch-to-column]'),out=el('[data-batch-result]'),status=el('[data-batch-status]');let csv='';
 function changeDim(){const d=dimension.value;const arr=dimensionUnits(d);from.innerHTML=options(d,d==='mass'?'lbs':arr[0].id);to.innerHTML=options(d,d==='mass'?'kg':arr[1]?.id??arr[0].id);}
 from.addEventListener('change',()=>{if(units[from.value].dimension!==units[to.value].dimension){to.innerHTML=options(units[from.value].dimension,dimensionUnits(units[from.value].dimension).find(x=>x.id!==from.value)?.id??from.value);}});
 dimension.addEventListener('change',changeDim);changeDim();
@@ -112,14 +112,18 @@ function process(){
  try{
   table=parseBatchTable(values.value,{column:Number(column.value),delimiter:separator.value});
   if(!table.rows.length){csv='';out.value='';status.textContent='Enter at least one numeric data row.';return;}
-  batchResult=convertBatchToCsv(table,from.value,to.value);
+  const fromText=rowFromColumn.value.trim(),toText=rowToColumn.value.trim();
+  batchResult=convertBatchToCsv(table,from.value,to.value,{
+   fromColumn:fromText?Number(fromText):null,
+   toColumn:toText?Number(toText):null
+  });
  }catch(e){csv='';out.value='';status.textContent=e.message;return;}
  csv=batchResult.csv;
  out.value=batchResult.rows.map(row=>'Line '+row.line+': '+row.input+' '+row.from+' → '+(row.result?row.result+' '+row.to:'Error: '+row.status)).join('\n');
  const skipped=table.headerSkipped?' Original column headings preserved.':'';
  const invalid=batchResult.invalid.length?' Invalid rows: '+batchResult.invalid.slice(0,12).join(', ')+(batchResult.invalid.length>12?'…':'')+'.':'';
- status.textContent='Converted '+batchResult.converted+' of '+table.rows.length+' rows ('+table.delimiter+' input). Preserved '+batchResult.preservedColumns+' input column'+(batchResult.preservedColumns===1?'':'s')+'.'+skipped+invalid+' All calculations stayed in your browser.';
+ status.textContent='Converted '+batchResult.converted+' of '+table.rows.length+' rows ('+table.delimiter+' input). Preserved '+batchResult.preservedColumns+' input column'+(batchResult.preservedColumns===1?'':'s')+'.'+(rowFromColumn.value||rowToColumn.value?' Used each row’s source/target units.':' Applied the selected unit pair.')+skipped+invalid+' All calculations stayed in your browser.';
 }
-for(const field of [dimension,from,to,values,column,separator])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
+for(const field of [dimension,from,to,values,column,separator,rowFromColumn,rowToColumn])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
 el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
 el('[data-process]')?.addEventListener('click',process);el('[data-download]')?.addEventListener('click',()=>{if(!csv)process();if(csv)download('unit-conversions.csv',csv);});el('[data-print]')?.addEventListener('click',()=>window.print());}
