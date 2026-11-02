@@ -265,11 +265,53 @@ export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={
       if(col>cells.length)throw new RangeError('Column '+col+' is missing on this row.');
       let value=cells[col-1];
       if(/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value))value=value.replaceAll(',','');
-      return {line,value,error:null};
-    }catch(e){return {line,value:'',error:e.message};}
+      return {line,value,error:null,cells,raw:text};
+    }catch(e){return {line,value:'',error:e.message,cells:[],raw:text};}
   });
   const headerSkipped=Boolean(rows[0]&&!rows[0].error&&headerTokens.test(rows[0].value));
+  const headerCells=headerSkipped?rows[0].cells.slice():null;
   if(headerSkipped)rows.shift();
   if(rows.length>maxRows)throw new RangeError('Maximum '+maxRows+' data rows per batch.');
-  return {rows,delimiter:sep===','?'comma':sep==='\t'?'tab':sep===';'?'semicolon':'lines',headerSkipped};
+  return {rows,delimiter:sep===','?'comma':sep==='\t'?'tab':sep===';'?'semicolon':'lines',headerSkipped,headerCells};
+}
+
+
+/**
+ * Preserve imported source columns while appending actual conversion outputs.
+ * No network, persistence or paid API. The source header is retained unchanged
+ * (CSV output adds namespaced columns to avoid clobbering e.g. "result").
+ * An unparseable row is kept verbatim in its first source cell, never lost.
+ */
+export function convertBatchToCsv(table,fromUnit,toUnit){
+  if(!table||!Array.isArray(table.rows))throw new TypeError('A parsed batch table is required.');
+  if(!units[fromUnit]||!units[toUnit]||units[fromUnit].dimension!==units[toUnit].dimension){
+    throw new RangeError('Choose two compatible units.');
+  }
+  const sourceColumns=Math.max(1,table.headerCells?.length||0,...table.rows.map(row=>row.cells?.length||0));
+  const headers=table.headerCells
+    ?Array.from({length:sourceColumns},(_,i)=>table.headerCells[i]||'Column '+(i+1))
+    :Array.from({length:sourceColumns},(_,i)=>'Column '+(i+1));
+  const suffix=['ExactUnit line','ExactUnit result','ExactUnit from','ExactUnit to','ExactUnit status'];
+  const csvRows=[[...headers,...suffix]];
+  const results=[];
+  let converted=0;
+  for(const row of table.rows){
+    let result='',message='OK';
+    if(row.error)message=row.error;
+    else{
+      try{
+        result=formatNumber(convert(row.value,fromUnit,toUnit),9);
+        converted++;
+      }catch(e){message=e.message;}
+    }
+    const source=row.cells?.length?row.cells.slice():[row.raw||''];
+    while(source.length<sourceColumns)source.push('');
+    csvRows.push([...source,String(row.line),result,units[fromUnit].symbol,units[toUnit].symbol,message]);
+    results.push({line:row.line,input:row.value,result,from:units[fromUnit].symbol,to:units[toUnit].symbol,status:message});
+  }
+  return {
+    csv:csvRows.map(cells=>cells.map(escapeCsvCell).join(',')).join('\r\n'),
+    rows:results,converted,invalid:results.filter(x=>x.status!=='OK').map(x=>x.line),
+    preservedColumns:sourceColumns,headerPreserved:Boolean(table.headerCells)
+  };
 }
