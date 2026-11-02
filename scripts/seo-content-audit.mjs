@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
+import {units} from '../src/assets/engine.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -22,6 +23,27 @@ const decode=s=>s.replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&
 const getTitle=html=>decode(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]||'');
 const indexedSeed=s=>info.numericIndexMode==='all'||pilot.has(s.url);
 
+const pairByUrl=new Map(pairList.map(p=>[p.url,p]));
+const seedByUrl=new Map(seeds.map(s=>[s.url,s]));
+const schemaStats={webPages:0,breadcrumbs:0,webApplications:0,webSites:0,
+ softwareRichResultEligibility:'not claimed: Google's software-app rich results require authentic review or aggregateRating in addition to the app name and offer price'};
+function expectedBreadcrumbRoutes(route){
+ if(route==='/')return [];
+ const pair=pairByUrl.get(route);
+ const seed=seedByUrl.get(route);
+ if(pair){
+  // Exact dimension of the source unit is the directory breadcrumb.
+  return ['/', '/category/'+units[pair.from].dimension+'/',route];
+ }
+ if(seed){
+  const parent=pairList.find(p=>p.slug===seed.slug);
+  if(!parent){errors.push(route+': missing parent for breadcrumb schema');return [];}
+  return ['/', '/category/'+units[parent.from].dimension+'/',parent.url,route];
+ }
+ return ['/',route];
+}
+
+
 function checkMarkup(route,expectedApp=false){
  const html=read(route);
  const jsonBlocks=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(x=>{
@@ -36,9 +58,56 @@ function checkMarkup(route,expectedApp=false){
   if(!meta(html,'robots').includes('index,follow'))errors.push(route+': indexable route robots mismatch');
   const page=jsonBlocks.find(x=>x['@type']==='WebPage');
   if(!page||page.url!==new URL(route,info.site).href)errors.push(route+': WebPage schema or URL incorrect');
+  if(page){
+   schemaStats.webPages++;
+   if(page['@context']!=='https://schema.org'||page.name!==getTitle(html)||page.description!==decode(meta(html,'description')))
+    errors.push(route+': WebPage schema title/description does not match visible meta data');
+  }
+  const headCanonical=html.match(/<link rel="canonical" href="([^"]+)"/g)||[];
+  if(headCanonical.length!==1)errors.push(route+': expected exactly one self-referencing canonical link');
+  const expectedUrl=new URL(route,info.site).href;
+  if(!headCanonical[0]?.includes('href="'+expectedUrl+'"'))errors.push(route+': canonical link differs from WebPage URL');
+  for(const [property,expected] of [['og:title',getTitle(html)],['og:description',decode(meta(html,'description'))],['og:url',expectedUrl]]){
+   const found=html.match(new RegExp('<meta property="'+property+'" content="([^"]*)"', 'i'))?.[1];
+   if(decode(found||'')!==expected)errors.push(route+': '+property+' disagrees with page metadata');
+  }
+  const routeChain=expectedBreadcrumbRoutes(route);
+  const breadcrumbs=jsonBlocks.filter(x=>x['@type']==='BreadcrumbList');
+  if(route==='/'){
+   if(breadcrumbs.length)errors.push(route+': homepage should not use redundant BreadcrumbList');
+  }else{
+   if(breadcrumbs.length!==1)errors.push(route+': expected one BreadcrumbList');
+   else{
+    schemaStats.breadcrumbs++;
+    const items=breadcrumbs[0].itemListElement||[];
+    const values=items.map(i=>i.item);
+    const expected=routeChain.map(u=>new URL(u,info.site).href);
+    if(JSON.stringify(values)!==JSON.stringify(expected))
+     errors.push(route+': BreadcrumbList URLs disagree with actual category and tool hierarchy');
+    if(items.length!==expected.length||items.some((x,i)=>x.position!==i+1||!x.name))
+     errors.push(route+': BreadcrumbList missing sequential position or label');
+    const breadcrumbNav=html.match(/<nav class="crumb" aria-label="Breadcrumb">([\s\S]*?)<\/nav>/i)?.[1]||'';
+    if(!breadcrumbNav)errors.push(route+': visible breadcrumb navigation missing');
+    for(const ancestor of routeChain.slice(0,-1)){
+     if(!breadcrumbNav.includes('href="'+ancestor+'"'))
+      errors.push(route+': JSON-LD breadcrumb ancestor missing from visible navigation: '+ancestor);
+    }
+   }
+  }
+  const sites=jsonBlocks.filter(x=>x['@type']==='WebSite');
+  if(route==='/'){
+   if(sites.length!==1||sites[0].url!==expectedUrl||sites[0].name!=='ExactUnit')
+    errors.push(route+': home WebSite schema missing or inaccurate');
+   else schemaStats.webSites++;
+  }else if(sites.length)errors.push(route+': homepage WebSite schema leaked onto an inner page');
   if(expectedApp){
    const app=jsonBlocks.find(x=>x['@type']==='WebApplication');
    if(!app||app.applicationCategory!=='UtilitiesApplication'||app.offers?.price!=='0')errors.push(route+': honest free WebApplication schema absent');
+   else{
+    schemaStats.webApplications++;
+    if(app.url!==expectedUrl||app.name!==getTitle(html)||app['@context']!=='https://schema.org')
+     errors.push(route+': WebApplication schema URL/name inconsistent with actual page');
+   }
   }
   if(jsonBlocks.some(x=>x.aggregateRating||x.review))errors.push(route+': fabricated review/ratings schema prohibited');
  }
@@ -94,6 +163,7 @@ const result={
  disclaimer:'Server-rendered HTML correctness only; Google indexation, SERP ranking and Core Web Vitals remain unverified.',
  mode:info.mode, pairPages:pairList.length,categoryPages:16,numericPages:seeds.length,
  numericEligibleForIndex:seeds.filter(indexedSeed).length,
+ schemaStats,
  errors,warnings
 };
 fs.writeFileSync(path.join(dist,'seo-content-audit.json'),JSON.stringify(result,null,2));
