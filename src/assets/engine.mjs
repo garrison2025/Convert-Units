@@ -369,12 +369,14 @@ export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColum
     let result='',message='OK';
     // In mixed mode keep raw row labels even if validation fails; never
     // misreport the default page selector as the source of a failed row.
-    let sourceUnit=mixed?String(row.cells?.[Number(fromColumn)-1]??'').trim():fromUnit;
-    let targetUnit=mixed?String(row.cells?.[Number(toColumn)-1]??'').trim():toUnit;
+    const rawFrom=mixed?String(row.cells?.[Number(fromColumn)-1]??'').trim():fromUnit;
+    const rawTo=mixed?String(row.cells?.[Number(toColumn)-1]??'').trim():toUnit;
+    let sourceUnit=rawFrom,targetUnit=rawTo,resolved=!mixed;
     if(mixed){
       try{
-        sourceUnit=resolveUnitLabel(sourceUnit);
-        targetUnit=resolveUnitLabel(targetUnit);
+        sourceUnit=resolveUnitLabel(rawFrom);
+        targetUnit=resolveUnitLabel(rawTo);
+        resolved=true;
       }catch(e){message=e.message;}
     }
     if(row.error)message=row.error;
@@ -389,8 +391,10 @@ export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColum
     }
     const source=row.cells?.length?row.cells.slice():[row.raw||''];
     while(source.length<sourceColumns)source.push('');
-    const fromLabel=units[sourceUnit]?.symbol??String(sourceUnit??'');
-    const toLabel=units[targetUnit]?.symbol??String(targetUnit??'');
+    // On an invalid unit label show EXACTLY what the user entered. The
+    // ambiguous "kn" must not be re-rendered as kilonewton's "kN".
+    const fromLabel=resolved?units[sourceUnit].symbol:rawFrom;
+    const toLabel=resolved?units[targetUnit].symbol:rawTo;
     csvRows.push([...source,String(row.line),result,fromLabel,toLabel,message]);
     results.push({line:row.line,input:row.value,result,from:fromLabel,to:toLabel,status:message});
   }
