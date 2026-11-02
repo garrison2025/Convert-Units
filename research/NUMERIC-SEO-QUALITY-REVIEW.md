@@ -24,7 +24,7 @@ Approved numeric URLs by direction:
 | Other one-value directions | 8 | Verify unit semantics and evidence-backed demand |
 | **Total** | **92** | **Do not equate generated URLs with verified content quality** |
 
-The current 92 approved static pages remain in the build and were **not** automatically set to `noindex`. This preserves the approved V2 scope while making editorial risk explicit. Pages on `*.pages.dev` remain `noindex` regardless.
+All 92 approved static pages remain available, but the **curated launch policy** now makes only 26 source-backed numeric pages eligible for production indexing. The remaining 66 render `noindex,follow` and do not enter the production sitemap; this is a reversible launch pilot, not a penalty or keyword-value determination. On `*.pages.dev`, every page stays `noindex` regardless of the site build's mode.
 
 ## Editorial release decision
 
@@ -50,6 +50,6 @@ Each build exports `dist/keyword-evidence-review.csv` and `dist/keyword-evidence
 
 The source keyword `1.8 kilograms in pounds` has a raw competitor rank value of **0**. A zero ranking is not a valid organic position. The report preserves the raw 0 and represents the observed rank as **unverified**, not as rank #0 or rank #1.
 
-The audit reports 15 directional clusters, with the `lbs-to-kg` (56 pages) and `kg-to-lbs` (14 pages) groups requiring highest-priority editorial scrutiny. All approved pages stay present and functional; the program does not autonomously change their indexing status or invent prose to disguise duplication.
+The audit reports 15 directional clusters, with the `lbs-to-kg` (56 pages) and `kg-to-lbs` (14 pages) groups requiring highest-priority editorial scrutiny. All approved pages stay present and functional; a documented 26-URL pilot allowlist now controls production indexability. Switching from `curated` to `all` requires an explicit environment change and human review. No prose is invented to disguise duplication.
 
-Before purchasing a domain, use the downloadable review CSV to mark **keep, consolidate or noindex-review** for each page based on search intent, evidence and distinct user utility. Do not automatically index every number simply because a competitor ranked for its keyword. The preview is globally noindexed until a confirmed custom-domain build.
+Before purchasing a domain, use the downloadable review CSV and `research/SEO-LAUNCH-PILOT-20261102.md` to mark **keep, consolidate or noindex-review** for each page based on search intent, evidence and distinct user utility. Do not automatically index every number simply because a competitor ranked for its keyword. The preview is globally noindexed until a confirmed custom-domain build.
