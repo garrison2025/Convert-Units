@@ -4,7 +4,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 ## Delivered
 
-- **37** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
+- **38** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
 - **155** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
 - Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, sanitized CSV export and print.
@@ -54,7 +54,7 @@ Publishing many similar numeric pages is not itself proof of usefulness. Keep us
 - `src/assets/engine.mjs`: deterministic units and numerical conversions
 - `src/assets/app.mjs`: interactive and CSV functionality
 - `src/assets/site.css`: design system, responsive layouts, reduced-motion support
-- `src/data/pairs.json`: 37 verified tool routes
+- `src/data/pairs.json`: 38 verified tool routes
 - `src/data/seeds.json`: 92 approved numeric pages and keyword evidence
 - `scripts/build.mjs`: build HTML, metadata, canonical, sitemap, robots, legal pages
 - `scripts/audit.mjs`: static SEO integrity audit
@@ -78,3 +78,11 @@ The main-branch GitHub Actions workflow automatically builds the site, checks 33
 Every CI run also produces the offline `dist/keyword-evidence-review.csv` and `dist/keyword-evidence-review.json` files from the approved V2 dataset. The GitHub Actions run has a 7-day `exactunit-quality-reports` download containing these files plus the build SEO/performance reports. A raw competitor rank of 0 is explicitly tagged as unverified. Do not mistake competitor estimates for this site's traffic or assume 92 similar pages are automatically useful/indexable.
 
 Browser smoke checks are not measurements of live Cloudflare performance, Lighthouse scores, accessibility certification or Google indexing. The temporary `*.pages.dev` preview remains noindexed until a real domain is chosen.
+
+## Curated search-index launch (before purchasing a domain)
+
+The approved V2 research contains 37 originally planned tools and 92 keyword-specific results. A missing parent tool for the already-approved `seconds-to-hours/14400/` query has been added, so there are now **38 tools**. Source demand should not be confused with traffic to this site.
+
+By default `NUMERIC_INDEX_MODE=curated`: all 92 numeric pages remain available, but only the **26 URLs explicitly listed in** `src/data/numeric-seo-policy.json` are eligible for `index,follow` and inclusion in production sitemap. The remaining 66 have `noindex,follow`, no self-canonical tag and no sitemap entry. This is a conservative pilot to reduce same-template exposure, **not a guarantee that selected pages will rank**. Do not set `NUMERIC_INDEX_MODE=all` without reviewing source intent, duplication and post-launch data. Preview builds remain globally noindexed regardless of this flag.
+
+Google's source guidance on [canonicalization](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) and [scaled content abuse](https://developers.google.com/search/docs/essentials/spam-policies) informed the technical policy. A unique numeric result is not necessarily an independently valuable page. Once an official domain is purchased, set `SITE_URL` to its HTTPS origin, check GSC index coverage and Search Performance by query/page, and revisit the pilot whitelist based on real clicks and usefulness.
