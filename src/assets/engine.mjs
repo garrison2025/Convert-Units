@@ -36,6 +36,7 @@ export const units = {
  ml:{name:'Milliliters',symbol:'mL',dimension:'volume',factor:0.001},
  l:{name:'Liters',symbol:'L',dimension:'volume',factor:1},
  'us-fl-oz':{name:'US fluid ounces',symbol:'US fl oz',dimension:'volume',factor:3.785411784/128},
+ 'imp-fl-oz':{name:'UK (imperial) fluid ounces',symbol:'UK fl oz',dimension:'volume',factor:4.54609/160},
  'us-gal':{name:'US gallons',symbol:'US gal',dimension:'volume',factor:3.785411784},
  'imp-gal':{name:'Imperial gallons',symbol:'imp gal',dimension:'volume',factor:4.54609},
  'us-cup':{name:'US cups',symbol:'US cup',dimension:'volume',factor:3.785411784/16},
@@ -459,4 +460,22 @@ export function elapsedDurationReadout(value,fromUnit){
   sec||ms?String(sec)+(ms?'.'+String(ms).padStart(3,'0'):'')+' s':null
  ].filter(Boolean).join(' ')||'0 s';
  return {clock,parts,approximate:!exact};
+}
+
+
+/**
+ * Clarify the two different fluid-ounce conventions on existing mL / US fl oz
+ * tools without creating speculative UK-fluid-ounce SEO routes. The imperial
+ * definition uses the exact 4.54609 L imperial gallon divided by 160.
+ */
+export function fluidOunceComparison(value,fromUnit){
+ const n=Number(value), source=units[fromUnit];
+ if(!source||source.dimension!=='volume'||!Number.isFinite(n)||n<0)return null;
+ let us,uk;
+ try{us=convert(n,fromUnit,'us-fl-oz');uk=convert(n,fromUnit,'imp-fl-oz');}catch{return null;}
+ const answer=raw=>{
+  const shown=formatNumber(raw,4);
+  return {shown,relation:displayRelation(raw,shown)};
+ };
+ return {us:answer(us),uk:answer(uk)};
 }
