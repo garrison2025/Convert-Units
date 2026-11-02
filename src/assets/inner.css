@@ -132,7 +132,7 @@
 .batch-advanced-body .hint{line-height:1.65}
 .batch-submit{margin-top:18px;display:flex;justify-content:flex-start}
 .batch-submit .btn{min-height:46px;min-width:172px;font-size:.9rem}
-.batch-page [data-batch-input]{min-height:195px}
+.batch-page [data-batch-input]{min-height:155px;height:165px}
 @media(max-width:650px){
  .batch-page [data-batch]{padding:19px 16px}
  .batch-page .page-title h1{font-size:clamp(2rem,8.2vw,2.65rem)}
