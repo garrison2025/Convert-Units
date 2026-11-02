@@ -52,6 +52,22 @@ const q=new URLSearchParams(location.search);if(root.id==='universal'&&units[q.g
 calculate();}
 all('[data-converter]').forEach(initConverter);
 
+// Printing must expose native <details> content: a folded comparison table
+// otherwise disappears from browser print output. Restore the prior UI state.
+const printableDetails=all('.multi-unit-panel');
+window.addEventListener('beforeprint',()=>{
+ for(const section of printableDetails){
+  if(!section.open){section.open=true;section.dataset.printWasClosed='true';}
+ }
+});
+window.addEventListener('afterprint',()=>{
+ for(const section of printableDetails){
+  if(section.dataset.printWasClosed==='true'){
+   section.open=false;delete section.dataset.printWasClosed;
+  }
+ }
+});
+
 // Static tables can update the calculator directly; no extra indexed URLs are generated.
 document.addEventListener('click', async event => {
   const row=event.target.closest('[data-load-value]');
