@@ -25,7 +25,7 @@ test('108kPa to psi has source-calculated six-place results and roundtrip identi
   assert.equal(item.shown,formatNumber(raw,6));
   assert.equal(item.relation,displayRelation(raw,item.shown));
  }
- assert.equal(rows.find(x=>x.unit==='psi').shown,'15.664075');
+ assert.equal(rows.find(x=>x.unit==='psi').shown,'15.664076');
  const fromPsi=pressureFourUnitComparison(42,'psi');
  assert.equal(fromPsi.find(x=>x.unit==='psi').relation,'=');
  assert.equal(fromPsi.find(x=>x.unit==='psi').shown,'42');
