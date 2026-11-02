@@ -40,6 +40,8 @@ async function smokeScenario(SCENARIO){
      ok(output.includes('Line 3:')&&output.includes('Error:'),'bad row preserved with line number');
      ok(output.includes('Line 4: 126 lb'),'good data after invalid row still converts');
      ok(q('[data-batch-status]').textContent.includes('Converted 2 of 3'),'accurate batch summary');
+     ok(q('[data-batch-status]').textContent.includes('Preserved 2 input columns'),'output must keep the original imported columns');
+     ok(q('[data-batch-status]').textContent.includes('Original column headings preserved'),'CSV header must be retained');
      q('[data-batch-column]').value='1';
      q('[data-batch-column]').dispatchEvent(new Event('input',{bubbles:true}));
      ok(q('[data-batch-result]').value==='','stale results must be cleared');
