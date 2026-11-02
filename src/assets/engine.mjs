@@ -259,14 +259,15 @@ export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={
     }catch{/* Broken header reported as its own line error. */}
   }
   const rows=records.map(({line,text})=>{
+    let cells=[];
     try{
-      const cells=splitDelimitedRow(text,sep);
+      cells=splitDelimitedRow(text,sep);
       if(expectedColumns!==null&&cells.length!==expectedColumns)throw new RangeError('Expected '+expectedColumns+' CSV columns, found '+cells.length+'.');
       if(col>cells.length)throw new RangeError('Column '+col+' is missing on this row.');
       let value=cells[col-1];
       if(/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value))value=value.replaceAll(',','');
       return {line,value,error:null,cells,raw:text};
-    }catch(e){return {line,value:'',error:e.message,cells:[],raw:text};}
+    }catch(e){return {line,value:'',error:e.message,cells,raw:text};}
   });
   const headerSkipped=Boolean(rows[0]&&!rows[0].error&&headerTokens.test(rows[0].value));
   const headerCells=headerSkipped?rows[0].cells.slice():null;
