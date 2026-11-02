@@ -24,9 +24,9 @@ test('all 92 numeric queries are tied to a functioning pair, and no value URLs o
  }
  assert.equal(routes.size,38);
 });
-test('curated pilot has 26 approved URLs, no duplicates, and no unverified rank zero',()=>{
+test('curated pilot has 15 source-backed value pages, no duplicates, and no invalid rank zero',()=>{
  const urls=policy.pilotIndexUrls;
- assert.equal(urls.length,26);
+ assert.equal(urls.length,15);
  assert.equal(new Set(urls).size,urls.length);
  assert.equal(policy.manualDecisionRequiredBeforeLaunch,true);
  for(const url of urls){
@@ -35,7 +35,7 @@ test('curated pilot has 26 approved URLs, no duplicates, and no unverified rank 
   assert.ok(seed.rank>0,'Missing ranking evidence '+url);
   assert.ok(seed.volumeUS>0&&seed.trafficEstimate>=0,'No original source demand '+url);
  }
- assert.equal(seeds.length-urls.length,66);
+ assert.equal(seeds.length-urls.length,77);
  assert.ok(!urls.includes('/convert/kg-to-lbs/1.8/'),'Source rank zero is unverified');
 });
 test('top mass clusters are capped rather than mechanically indexing every number',()=>{
@@ -43,7 +43,7 @@ test('top mass clusters are capped rather than mechanically indexing every numbe
   const all=seeds.filter(s=>s.slug===slug);
   const chosen=all.filter(s=>policy.pilotIndexUrls.includes(s.url));
   assert.equal(all.length,total);
-  assert.equal(chosen.length,4);
+  assert.equal(chosen.length,1);
  }
 });
 
@@ -55,4 +55,20 @@ test('all 92 numeric pages require an explicit human indexing override',()=>{
  assert.throws(()=>resolveNumericIndexMode('all','yes'),/REVIEWED_ALL_92/);
  assert.equal(resolveNumericIndexMode('all','REVIEWED_ALL_92'),'all');
  assert.throws(()=>resolveNumericIndexMode('sitemap-everything'),/curated or all/);
+});
+
+
+test('default numeric SEO pilot contains at most one specific answer per conversion direction',()=>{
+ const count=new Map();
+ for(const url of policy.pilotIndexUrls){
+  const item=seeds.find(s=>s.url===url);
+  count.set(item.slug,(count.get(item.slug)||0)+1);
+  const observed=seeds.filter(s=>s.slug===item.slug&&s.rank>0);
+  const maxTraffic=Math.max(...observed.map(s=>s.trafficEstimate));
+  assert.equal(item.trafficEstimate,maxTraffic,'Selected numeric result should lead source traffic estimates for '+item.slug);
+ }
+ assert.equal(count.size,15);
+ for(const [direction,n] of count)assert.equal(n,1,direction+' has overlapping indexable numeric answer pages');
+ assert.equal(policy.version,2);
+ assert.equal(policy.strategy,'one-numeric-value-per-direction-launch');
 });
