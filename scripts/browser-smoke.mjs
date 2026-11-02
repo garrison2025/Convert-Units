@@ -81,6 +81,21 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-batch-status]').textContent.includes('two different'),'partial column selection must fail clearly');
      break;
    }
+   case 'batch-alias':{
+     const value=q('[data-batch-input]');
+     q('[data-batch-column]').value='1';
+     q('[data-batch-delimiter]').value='comma';
+     q('[data-batch-from-column]').value='2';
+     q('[data-batch-to-column]').value='3';
+     value.value='value,from,to\n10,kn,mph\n10,knot,mph\n10,kN,N';
+     q('[data-process]').click();
+     const output=q('[data-batch-result]').value;
+     ok(output.includes('Line 2: 10 kn → Error: Ambiguous'),'kn must not be silently treated as kilonewtons');
+     ok(output.includes('Line 3: 10 kn →')&&!output.includes('Line 3: 10 kn → Error:'),'explicit knots must convert as speed');
+     ok(output.includes('Line 4: 10 kN → 10000 N'),'explicit kN must convert as force');
+     ok(q('[data-batch-status]').textContent.includes('Converted 2 of 3'),'unsafe unit ambiguity rejected as one row error');
+     break;
+   }
    case 'universal':{
      const dimension=q('[data-dimension]');
      dimension.value='temperature';dimension.dispatchEvent(new Event('change',{bubbles:true}));
@@ -154,6 +169,7 @@ async function smokeScenario(SCENARIO){
 const suites=[
  {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'batch-multiline',url:'/batch-converter/'},
+ {name:'batch-alias',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
