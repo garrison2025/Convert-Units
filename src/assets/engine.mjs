@@ -91,6 +91,8 @@ export function validateValue(value){
   const source=typeof value==='string'?value.trim():'';
   if(typeof value==='string'&&!decimal.test(source))throw new RangeError('Enter a valid number between −1e18 and 1e18.');
   const n=typeof value==='number'?value:Number(source);
+  // Very small nonzero decimals can underflow to zero in IEEE-754 (e.g. 1e-400).
+  if(typeof value==='string' && n===0 && /[1-9]/.test(source.split(/[eE]/)[0]))throw new RangeError('Value is below supported numerical precision.');
   if(!Number.isFinite(n)||Math.abs(n)>1e18)throw new RangeError('Enter a valid number between −1e18 and 1e18.');
   return n;
 }
