@@ -347,3 +347,23 @@ test('ambiguous kn rows fail individually; explicit speed and force units still 
  assert.equal(result.rows[2].status,'OK');
  assert.match(result.csv,/10,kN,N,4,10000,kN,N,OK/);
 });
+
+
+test('all defined unit symbols and names either resolve uniquely or explicitly reject ambiguous labels',()=>{
+ const index=new Map();
+ for(const [id,unit] of Object.entries(units)){
+   for(const label of [id,unit.symbol,unit.name]){
+     if(!index.has(label))index.set(label,new Set());
+     index.get(label).add(id);
+   }
+ }
+ for(const [label,ids] of index){
+   if(ids.size===1){
+     assert.equal(resolveUnitLabel(label),[...ids][0],'Misresolved exact label '+label);
+   }else{
+     assert.throws(()=>resolveUnitLabel(label),/Ambiguous unit/,'Silent collision for '+label);
+   }
+ }
+ assert.ok(index.get('kn')?.has('knot')&&index.get('kn')?.has('kn'),
+   'Track historically ambiguous knots/kilonewton collision');
+});
