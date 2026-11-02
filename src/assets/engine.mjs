@@ -51,6 +51,8 @@ export const units = {
  atm:{name:'Standard atmospheres',symbol:'atm',dimension:'pressure',factor:101325},
  pa:{name:'Pascals',symbol:'Pa',dimension:'pressure',factor:1},
  'ft-lbf':{name:'Pound-force feet',symbol:'ft·lbf',dimension:'torque',factor:1.3558179483314004},
+ 'in-lbf':{name:'Pound-force inches',symbol:'in·lbf',dimension:'torque',factor:1.3558179483314004/12},
+ 'kgf-m':{name:'Kilogram-force meters',symbol:'kgf·m',dimension:'torque',factor:9.80665},
  nm:{name:'Newton-meters',symbol:'N·m',dimension:'torque',factor:1},
  minutes:{name:'Minutes',symbol:'min',dimension:'time',factor:60},
  seconds:{name:'Seconds',symbol:'s',dimension:'time',factor:1},
