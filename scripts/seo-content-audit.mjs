@@ -9,7 +9,7 @@ import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
 import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,speedFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
-import {relatedDirectionLinks,rankedRelatedDirections} from '../src/seo-guides.mjs';
+import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from '../src/seo-guides.mjs';
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
@@ -144,18 +144,38 @@ for(const pair of pairList){
  }
  const dimension=units[pair.from].dimension;
  if(['length','speed','torque'].includes(dimension)){
+  const reference=engineeringReference(pair);
   if(!html.includes('data-engineering-reference="'+dimension+'"')||
-    !html.includes('class="number-table reference-table"'))
-   errors.push(pair.url+': source-derived engineering reference table missing');
-  if(dimension==='length'&&(!html.includes('1/16 in')||!html.includes('1.5875 mm')||
-    !html.includes('2.54 cm')))
-   errors.push(pair.url+': exact fractional-inch reference missing or wrong');
-  if(dimension==='speed'&&(!html.includes('60 mph')||!html.includes('96.56064 km/h')||
-    !html.includes('26.8224 m/s')||!html.includes('kn')))
-   errors.push(pair.url+': four-unit speed reference missing or wrong');
-  if(dimension==='torque'&&(!html.includes('100 ft·lbf')||!html.includes('1,200 in·lbf')||
-    !html.includes('kgf·m')||!html.includes('manufacturer specification')))
-   errors.push(pair.url+': engineering torque reference inaccurate or incomplete');
+      !html.includes('data-engineering-source="'+pair.from+'"')||
+      !html.includes('class="number-table reference-table"')||
+      !html.includes(reference))
+   errors.push(pair.url+': missing or non-source-specific, inaccurate engineering reference');
+  if(pair.slug==='m-to-ft'&&(!html.includes('Meters to feet and fractional inches')||
+      !html.includes('5 ft 8 7/8 in')))
+   errors.push(pair.url+': metric-to-imperial source example missing');
+  if(pair.slug==='ft-to-m'&&(!html.includes('Feet to meters and centimeters')||
+      !html.includes('5.5 ft')||!html.includes('1.6764 m')))
+   errors.push(pair.url+': imperial-to-metric source examples missing');
+  if(pair.slug==='cm-to-in'&&(!html.includes('Centimeters to decimal and fractional inches')||
+      !html.includes('2.54 cm')||!html.includes('1 in')))
+   errors.push(pair.url+': centimeters-to-inch ruler reference missing');
+  if(['in-to-cm','in-to-mm'].includes(pair.slug)&&
+      (!html.includes('1/16 in')||!html.includes('1.5875 mm')||!html.includes('2.54 cm')))
+   errors.push(pair.url+': fractional international-inch exact values missing');
+  if(pair.slug==='kmh-to-mph'&&(!html.includes('100 km/h across four speed units')||
+      !html.includes('62.137119 mph')))
+   errors.push(pair.url+': kmh source reference missing');
+  if(pair.slug==='mph-to-kmh'&&(!html.includes('60 mph across four speed units')||
+      !html.includes('96.56064 km/h')||!html.includes('26.8224 m/s')))
+   errors.push(pair.url+': mph source reference missing');
+  if(pair.slug==='ft-lbf-to-nm'&&(!html.includes('100 foot-pound-force in other torque units')||
+      !html.includes('1,200 in·lbf')))
+   errors.push(pair.url+': source foot-pound-force reference missing');
+  if(pair.slug==='nm-to-ft-lbf'&&(!html.includes('100 newton-meters in other torque units')||
+      !html.includes('73.756215 ft·lbf')))
+   errors.push(pair.url+': source newton-meter reference missing');
+  if(dimension==='torque'&&!html.includes('manufacturer specification'))
+   errors.push(pair.url+': source-specific torque engineering safety guidance missing');
  }else if(html.includes('data-engineering-reference=')){
   errors.push(pair.url+': engineering reference leaked onto unrelated tool');
  }
