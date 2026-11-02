@@ -134,18 +134,21 @@ const numericBodies=seeds.map(s=>{
   return {slug:s.slug,url:s.url,tokens:new Set(text.match(/[a-z°/]+/g)||[])};
 });
 const clusters=new Map(seeds.map(s=>s.slug).filter((slug,i,arr)=>arr.indexOf(slug)===i).map(slug=>[slug,{slug,numberPages:seeds.filter(s=>s.slug===slug).length,comparedPairs:0,highSimilarityPairs:0}]));
-let highSimilarity=0,comparable=0;
+let highSimilarity=0,comparable=0,pilotHighSimilarity=0,pilotComparable=0;
 for(let i=0;i<numericBodies.length;i++)for(let j=i+1;j<numericBodies.length;j++){
   const a=numericBodies[i],b=numericBodies[j];
   if(a.slug!==b.slug)continue;
   comparable++;
+  const bothPilot=canonicalRoutes.has(a.url)&&canonicalRoutes.has(b.url);
+  if(bothPilot)pilotComparable++;
   clusters.get(a.slug).comparedPairs++;
   const common=[...a.tokens].filter(x=>b.tokens.has(x)).length;
   const score=common/(a.tokens.size+b.tokens.size-common||1);
-  if(score>=0.95){highSimilarity++;clusters.get(a.slug).highSimilarityPairs++;}
+  if(score>=0.95){highSimilarity++;if(bothPilot)pilotHighSimilarity++;clusters.get(a.slug).highSimilarityPairs++;}
 }
-if(highSimilarity)warnings.push('Content review: '+highSimilarity+'/'+comparable+' same-direction numeric page pairs have >=0.95 normalized-token Jaccard similarity. Inspect usefulness manually; no automatic quality approval.');
-const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
+if(highSimilarity)warnings.push('Content review across all 92 numeric pages: '+highSimilarity+'/'+comparable+' same-direction page pairs are >=0.95 similar.');
+if(pilotHighSimilarity)warnings.push('Production indexable numeric pilot review: '+pilotHighSimilarity+'/'+pilotComparable+' comparable page pairs are >=0.95 similar; this is not a quality approval.');
+const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,pilotHighSimilarityPairs:pilotHighSimilarity,pilotSimilarityPairsCompared:pilotComparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
 fs.writeFileSync(path.join(dist,'release-audit-report.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(failures.length)process.exitCode=1;
