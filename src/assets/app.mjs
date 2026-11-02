@@ -75,7 +75,12 @@ document.addEventListener('click', async event => {
   }
 });
 
-const menu=el('[data-menu]');menu?.addEventListener('click',()=>{const nav=el('[data-nav]');const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));});
+const menu=el('[data-menu]'),siteNav=el('[data-nav]');
+function setMenuOpen(open){if(!menu||!siteNav)return;siteNav.classList.toggle('open',open);menu.setAttribute('aria-expanded',String(open));}
+menu?.addEventListener('click',()=>setMenuOpen(!siteNav?.classList.contains('open')));
+siteNav?.addEventListener('click',event=>{if(event.target.closest('a'))setMenuOpen(false);});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&siteNav?.classList.contains('open')){setMenuOpen(false);menu.focus();}});
+document.addEventListener('pointerdown',event=>{if(siteNav?.classList.contains('open')&&!siteNav.contains(event.target)&&!menu.contains(event.target))setMenuOpen(false);});
 // The homepage search is a direct tool finder; keyboard and pointer users have the same links.
 const homeInput=el('[data-home-find]'),homeSuggestions=el('[data-suggestions]');
 if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSuggestions),empty=el('[data-suggest-empty]',homeSuggestions);let hits=[];
@@ -84,7 +89,17 @@ if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSugg
   homeInput.addEventListener('input',update);
   homeInput.addEventListener('focus',update);
   homeInput.addEventListener('keydown',e=>{if(e.key==='Escape'){close();}if(e.key==='ArrowDown'&&hits.length){e.preventDefault();hits[0].focus();}});
-  homeSuggestions.addEventListener('keydown',e=>{if(e.key==='Escape'){close();homeInput.focus();}});
+  homeSuggestions.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){close();homeInput.focus();return;}
+    if((e.key==='ArrowDown'||e.key==='ArrowUp')&&hits.length){
+      const position=hits.indexOf(document.activeElement);
+      if(position<0)return;
+      e.preventDefault();
+      const next=position+(e.key==='ArrowDown'?1:-1);
+      if(next<0){homeInput.focus();return;}
+      hits[next%hits.length].focus();
+    }
+  });
   document.addEventListener('pointerdown',e=>{if(!homeSuggestions.contains(e.target)&&e.target!==homeInput)close();});
 }
 const search=el('[data-filter]');if(search){const requested=new URLSearchParams(location.search).get('q');if(requested&&requested.length<=80)search.value=requested;const targets=all('[data-filter-item]');search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();const tokens=q.split(/\s+/).filter(Boolean);let n=0;for(const node of targets){const text=(node.dataset.search||node.textContent).toLowerCase();const ok=tokens.every(token=>text.includes(token));node.hidden=!ok;if(ok)n++;}const status=el('[data-filter-status]');if(status)status.textContent=`Showing ${n} matching tools`;const empty=el('[data-filter-empty]');if(empty)empty.hidden=n!==0;});el('[data-clear-filter]')?.addEventListener('click',()=>{search.value='';search.dispatchEvent(new Event('input'));search.focus();});if(search.value)search.dispatchEvent(new Event('input'));}
