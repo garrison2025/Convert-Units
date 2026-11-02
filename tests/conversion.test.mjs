@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,parseBatchTable,escapeCsvCell}from'../src/assets/engine.mjs';
+import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,parseBatchTable,convertBatchToCsv,escapeCsvCell}from'../src/assets/engine.mjs';
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,38);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,38);});
@@ -155,7 +155,7 @@ test('auto delimiter does not truncate standalone thousands-grouped measurements
 });
 
 test('batch limits, header and tabular input validation',()=>{
- assert.deepEqual(parseBatchTable(''),{rows:[],delimiter:'lines',headerSkipped:false});
+ assert.deepEqual(parseBatchTable(''),{rows:[],delimiter:'lines',headerSkipped:false,headerCells:null});
  assert.throws(()=>parseBatchTable('3',{column:21}),/Choose an input column/);
  assert.throws(()=>parseBatchTable('3',{column:0}),/Choose an input column/);
  assert.throws(()=>parseBatchTable('3',{delimiter:'pipe'}),/Unknown file delimiter/);
@@ -191,4 +191,48 @@ test('CSV with a recognized value header rejects ragged rows rather than mis-con
  const ragged=parseBatchTable('name,value\nshirt,149,unexpected\ncap,126',{column:2,delimiter:'comma'});
  assert.match(ragged.rows[0].error,/Expected 2 CSV columns, found 3/);
  assert.equal(ragged.rows[1].value,'126');
+});
+
+
+test('spreadsheet CSV export preserves original columns, headers, quoted commas and real results',()=>{
+ const table=parseBatchTable('item,value,notes\nshirt,"1,200","red, heavy"\nbag,149,ok',{column:2});
+ assert.equal(table.headerSkipped,true);
+ assert.deepEqual(table.headerCells,['item','value','notes']);
+ const result=convertBatchToCsv(table,'lbs','kg');
+ assert.equal(result.converted,2);
+ assert.deepEqual(result.invalid,[]);
+ assert.equal(result.preservedColumns,3);
+ assert.equal(result.headerPreserved,true);
+ const lines=result.csv.split('\r\n');
+ assert.equal(lines.length,3);
+ assert.equal(lines[0],'item,value,notes,ExactUnit line,ExactUnit result,ExactUnit from,ExactUnit to,ExactUnit status');
+ assert.match(lines[1],/^shirt,"1,200","red, heavy",2,544\.310844,lb,kg,OK$/);
+ assert.match(lines[2],/^bag,149,ok,3,67\.58526313,lb,kg,OK$/);
+});
+
+test('CSV export keeps malformed input rows and continues converting subsequent valid rows',()=>{
+ const table=parseBatchTable('name,value,note\nshirt,149,ok\nbag,not-a-number,=HYPERLINK()\ncap,126,ok\ntruncated,125',{column:2,delimiter:'comma'});
+ assert.equal(table.headerSkipped,true);
+ const result=convertBatchToCsv(table,'lbs','kg');
+ assert.equal(result.converted,2);
+ assert.deepEqual(result.invalid,[3,5]);
+ const lines=result.csv.split('\r\n');
+ assert.match(lines[1],/^shirt,149,ok,2,67\.58526313,lb,kg,OK$/);
+ assert.ok(lines[2].includes("'=HYPERLINK()"),'Formula-like user cells must be escaped when exporting');
+ assert.ok(lines[2].includes('not-a-number'),'The source value must survive failed conversion');
+ assert.ok(lines[4].startsWith('truncated,125,,5,'));
+ assert.ok(lines[4].includes('Expected 3 CSV columns'));
+});
+
+test('CSV output retains TSV source columns and names missing headings for headerless inputs',()=>{
+ const tab=parseBatchTable('sku\tvalue\tref\nx\t2.5\tAB\nz\t-1.2\tCD',{column:2,delimiter:'tab'});
+ const converted=convertBatchToCsv(tab,'kg','g');
+ assert.equal(converted.preservedColumns,3);
+ assert.match(converted.csv,/sku,value,ref,ExactUnit line/);
+ assert.match(converted.csv,/x,2\.5,AB,2,2500,kg,g,OK/);
+ const plain=convertBatchToCsv(parseBatchTable('149\n126'),'lbs','kg');
+ assert.equal(plain.preservedColumns,1);
+ assert.match(plain.csv,/^Column 1,ExactUnit line,ExactUnit result/);
+ assert.match(plain.csv,/149,1,67\.58526313,lb,kg,OK/);
+ assert.throws(()=>convertBatchToCsv(tab,'lbs','seconds'),/compatible units/);
 });
