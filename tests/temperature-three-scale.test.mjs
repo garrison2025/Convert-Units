@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {convert,temperatureThreeScaleReadout,units} from '../src/assets/engine.mjs';
+import {convert,temperatureThreeScaleReadout,units,displayRelation,formatNumber} from '../src/assets/engine.mjs';
 const find=(rows,id)=>rows.find(x=>x.unit===id);
 test('36.6 °C and 37.9 °C results are accurate without binary float phantom rounding',()=>{
  const a=temperatureThreeScaleReadout(36.6,'celsius');
@@ -11,6 +11,14 @@ test('36.6 °C and 37.9 °C results are accurate without binary float phantom ro
  assert.ok(a.every(x=>x.relation==='='));
  assert.ok(b.every(x=>x.relation==='='));
  assert.equal(find(b,'kelvin').symbol,'K');
+});
+test('main answer and the second scale panel use the same honest exactness relation',()=>{
+ const raw=convert(37.9,'celsius','fahrenheit');
+ assert.equal(formatNumber(raw,6),'100.22');
+ assert.equal(displayRelation(raw,'100.22'),'=');
+ assert.equal(displayRelation(convert(36.6,'celsius','fahrenheit'),'97.88'),'=');
+ assert.equal(displayRelation(convert(37.9,'celsius','fahrenheit'),'100.2'),'≈');
+ assert.equal(displayRelation(convert(1,'kg','lbs'),formatNumber(convert(1,'kg','lbs'),2)),'≈');
 });
 test('scale validation and source identity stay correct on reverse Fahrenheit and Kelvin inputs',()=>{
  const f=temperatureThreeScaleReadout(32,'fahrenheit');
