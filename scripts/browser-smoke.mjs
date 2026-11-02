@@ -15,7 +15,7 @@ const chrome=process.env.CHROME_BIN||
   ['google-chrome','chromium','chromium-browser'].find(cmd=>spawnSync('which',[cmd]).status===0);
 if(!chrome)throw new Error('Chrome/Chromium required for browser checks; no silent skip');
 
-function smokeScenario(SCENARIO){
+async function smokeScenario(SCENARIO){
   function ok(test,message){if(!test)throw new Error(message);}
   const q=s=>document.querySelector(s);
   switch(SCENARIO){
@@ -73,15 +73,36 @@ function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('kg'),'live calculator gives converted answer');
      break;
    }
+   case 'mobile':{
+     for(const width of [320,375,768]){
+       const iframe=document.createElement('iframe');
+       iframe.style.width=width+'px';iframe.style.height='800px';iframe.style.border='0';
+       iframe.src=location.pathname;
+       document.body.append(iframe);
+       await new Promise((resolve,reject)=>{
+         iframe.addEventListener('load',resolve,{once:true});
+         iframe.addEventListener('error',()=>reject(new Error('Responsive iframe failed to load')),{once:true});
+       });
+       const doc=iframe.contentDocument;
+       const measured=doc.documentElement.clientWidth;
+       const extra=doc.documentElement.scrollWidth-measured;
+       ok(Math.abs(measured-width)<=2,'Expected viewport '+width+'px, observed '+measured);
+       ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname);
+       iframe.remove();
+     }
+     break;
+   }
    default:throw new Error('Unknown smoke scenario');
   }
 }
 const suites=[
  {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},
- {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'}
+ {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
+ {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
+ {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'}
 ];
 function injection(name){
- const code='import("/assets/app.mjs").then(()=>{let result="PASS";try{('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
+ const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
  return '<script type="module">'+code+'</script>';
 }
 const server=http.createServer((req,res)=>{
