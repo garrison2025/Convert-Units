@@ -35,7 +35,8 @@ const extract=(html,regex)=>regex.exec(html)?.[1]??'';
 const plain=(html)=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&(?:[a-z]+|#\d+);/gi,' ').replace(/\s+/g,' ').trim();
 assert.equal(pairs.length,38);
 assert.equal(seeds.length,92);
-if(allRoutes.size!==info.indexablePages+1 && info.mode==='production')fail('Unexpected static HTML count');
+if(info.mode==='production'&&info.indexablePages!==canonicalRoutes.size)fail('Indexable page count differs from curated sitemap candidates');
+if(allRoutes.size!==pairs.length+seeds.length+27)fail('Unexpected static route count; verify 16 categories, 38 directions, 92 numeric pages and information pages');
 for(const [route,html] of pages){
   const title=extract(html,/<title>([\s\S]*?)<\/title>/i);
   const desc=extract(html,/<meta name="description" content="([^"]*)"/i);
