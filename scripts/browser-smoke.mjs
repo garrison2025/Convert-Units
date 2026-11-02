@@ -84,9 +84,10 @@ async function smokeScenario(SCENARIO){
          iframe.addEventListener('error',()=>reject(new Error('Responsive iframe failed to load')),{once:true});
        });
        const doc=iframe.contentDocument;
-       const measured=doc.documentElement.clientWidth;
-       const extra=doc.documentElement.scrollWidth-measured;
-       ok(Math.abs(measured-width)<=2,'Expected viewport '+width+'px, observed '+measured);
+       const measured=iframe.contentWindow.innerWidth;
+       const visible=doc.documentElement.clientWidth;
+       const extra=doc.documentElement.scrollWidth-visible;
+       ok(Math.abs(measured-width)<=2,'Expected iframe viewport '+width+'px, observed '+measured);
        ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname);
        iframe.remove();
      }
