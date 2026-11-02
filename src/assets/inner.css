@@ -274,3 +274,18 @@
 .fluid-oz-readout small{display:block;margin-top:9px;line-height:1.55;font-size:.72rem;color:#637493}
 .fluid-oz-readout a{color:#2853bb;text-decoration:underline;text-underline-offset:2px}
 @media(max-width:520px){.fluid-oz-values{grid-template-columns:1fr}.fluid-oz-readout{padding:11px 12px}}
+
+/* V15: four compact pressure units below the primary conversion/copy actions. */
+.pressure-multi{margin:10px 0 14px;padding:14px 15px;border:1px solid #d9e6f5;background:#f7faff;border-radius:12px}
+.pressure-multi[hidden]{display:none!important}
+.pressure-multi h3{margin:0 0 11px;font-size:.98rem;color:#23406e}
+.pressure-units{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pressure-units p{margin:0;padding:9px 11px;border:1px solid #e1e8f4;border-radius:9px;background:#fff;min-width:0;display:flex;flex-direction:column;gap:4px}
+.pressure-units span{font-size:.75rem;font-weight:700;color:#64769a}
+.pressure-units strong{font-size:.92rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;color:#244675}
+.pressure-copy{display:inline-flex;margin:10px 0 6px;padding:8px 11px;border:1px solid #c8d6ed;background:#fff;border-radius:8px;color:#2652ad;font-size:.79rem;font-weight:740;cursor:pointer}
+.pressure-copy:focus-visible{outline:2px solid #2755c0;outline-offset:3px}
+.pressure-multi .pressure-context{margin:4px 0 8px;font-size:.77rem;line-height:1.6;color:#485d79}
+.pressure-multi small{font-size:.72rem;line-height:1.55;color:#687891}
+.pressure-multi a{color:#2555b6;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:380px){.pressure-multi{padding:11px 12px}.pressure-units{grid-template-columns:1fr}}

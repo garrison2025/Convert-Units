@@ -479,3 +479,23 @@ export function fluidOunceComparison(value,fromUnit){
  };
  return {us:answer(us),uk:answer(uk)};
 }
+
+
+/**
+ * Readable four-unit pressure comparison, with no implicit atmospheric offset.
+ * The original reading remains gauge, absolute or a pressure DIFFERENCE
+ * exactly as provided by the user; this utility changes only units.
+ * We avoid an unnecessary unit round trip for the identity cell.
+ */
+export function pressureFourUnitComparison(value,fromUnit){
+ const n=Number(value),source=units[fromUnit];
+ if(!source||source.dimension!=='pressure'||!Number.isFinite(n))return null;
+ const targets=['kpa','psi','bar','atm'];
+ try{
+  return targets.map(id=>{
+   const raw=id===fromUnit?n:convert(n,fromUnit,id);
+   const shown=formatNumber(raw,6);
+   return {unit:id,symbol:units[id].symbol,shown,relation:displayRelation(raw,shown)};
+  });
+ }catch{return null;}
+}

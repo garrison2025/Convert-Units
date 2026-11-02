@@ -238,6 +238,41 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('kg'),'live calculator gives converted answer');
      break;
    }
+   case 'pressure-50':{
+     const input=q('[data-converter] [data-value]'),panel=q('[data-pressure-summary]');
+     const kpa=q('[data-pressure-unit="kpa"]'),psi=q('[data-pressure-unit="psi"]'),
+       bar=q('[data-pressure-unit="bar"]'),atm=q('[data-pressure-unit="atm"]');
+     ok(panel&&!panel.hidden&&kpa&&psi&&bar&&atm,'all four pressure readings should be visible in SSR');
+     ok(kpa.textContent==='= 50 kPa','50kPa must preserve exact input');
+     ok(psi.textContent==='≈ 7.251887 psi','50 kPa to psi is rounded honestly');
+     ok(bar.textContent==='= 0.5 bar','50 kPa equals exactly 0.5 bar');
+     ok(atm.textContent==='≈ 0.493462 atm','50 kPa to atm is rounded honestly');
+     ok(panel.textContent.includes('Gauge vs absolute'),'gauge/absolute reference context must be clear');
+     let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>written=value}});
+     q('[data-copy-pressure]').click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written.includes('Pressure unit conversion: 50 kPa')&&
+       written.includes('atm: ≈ 0.493462'),'copy should include actual input and four units');
+     ok(written.includes('\n')&&written.includes('Reference unchanged'),
+       'copy must keep line separation and explicitly preserve gauge vs absolute reference');
+     input.value='101.325';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(atm.textContent==='= 1 atm','standard atmosphere should be exactly 101.325 kPa');
+     q('[data-swap]').click();input.value='1';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(atm.textContent==='= 1 atm','after swapping to atm, the original value remains exact');
+     ok(kpa.textContent==='= 101.325 kPa','swapped values must recompute from the new source unit');
+     input.value='-0.5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(!panel.hidden&&atm.textContent==='= -0.5 atm','signed gauge/pressure-difference values are valid as unit changes');
+     break;
+   }
+   case 'pressure-108':{
+     const input=q('[data-value]'),psi=q('[data-pressure-unit="psi"]');
+     ok(psi.textContent==='≈ 15.664076 psi','108 kPa pre-rendered numeric query must show correct psi value');
+     input.value='0';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(psi.textContent==='= 0 psi','zero should stay exact');
+     input.value='abc';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-pressure-summary]').hidden,'invalid numeric input must not leave stale pressure reading');
+     break;
+   }
    case 'fluid-ounce-us-uk':{
      const source=q('[data-converter] [data-value]');
      const panel=q('[data-fluid-oz-compare]'),us=q('[data-fluid-us]'),uk=q('[data-fluid-uk]');
@@ -339,11 +374,12 @@ const suites=[
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
  {name:'time-duration',url:'/convert/minutes-to-hours/'},{name:'time-milliseconds',url:'/convert/milliseconds-to-seconds/'},
  {name:'fluid-ounce-us-uk',url:'/convert/ml-to-us-fl-oz/355/'},
+ {name:'pressure-50',url:'/convert/kpa-to-atm/50/'},{name:'pressure-108',url:'/convert/kpa-to-psi/108/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
