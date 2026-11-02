@@ -3,7 +3,7 @@ const el=(s,root=document)=>root.querySelector(s);
 const all=(s,root=document)=>[...root.querySelectorAll(s)];
 const fmt=(x,d=6)=>formatNumber(x,d);
 function options(dimension,active){return dimensionUnits(dimension).map(u=>`<option value="${u.id}" ${u.id===active?'selected':''}>${u.symbol}</option>`).join('');}
-function safeCsv(v){const raw=String(v);const s=/^[=+@\t\r]/.test(raw)?"'"+raw:raw;return /[\r\n,\"]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function safeCsv(v){const raw=String(v);const s=/^[=+@\t\r]/.test(raw)||(/^\s*-/.test(raw)&&!/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw.trim()))?"'"+raw:raw;return /[\r\n,\"]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function download(filename,text,type='text/csv;charset=utf-8'){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
 const unitsMap={mass:'Weight',length:'Length',volume:'Volume',pressure:'Pressure',temperature:'Temperature',torque:'Torque',time:'Time',speed:'Speed',area:'Area',force:'Force',storage:'Storage',density:'Density',power:'Power',acceleration:'Acceleration',fuel:'Fuel economy',flow:'Flow rate'};
 function initConverter(root){const from=el('[data-from]',root),to=el('[data-to]',root),input=el('[data-value]',root),output=el('[data-output]',root),explain=el('[data-explain]',root),error=el('[data-error]',root),precision=el('[data-precision]',root),detail=el('[data-raw]',root),multi=el('[data-multi-results]',root);if(!from||!to||!input)return;
