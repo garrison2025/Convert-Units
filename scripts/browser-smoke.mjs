@@ -45,8 +45,8 @@ async function smokeScenario(SCENARIO){
      ok(feedback.textContent.includes('without units'),'copy announcement must describe unit-free value');
      q('[data-copy]').click();
      await new Promise(resolve=>setTimeout(resolve,0));
-     ok(written.startsWith('150 lb = ')&&written.endsWith(' kg'),
-       'existing full-expression copy remains available');
+     ok(written==='150 lb = 68.04 kg',
+       'full-expression copy must match the selected visible decimal precision');
      break;
    }
    case 'progressive':{
@@ -73,6 +73,29 @@ async function smokeScenario(SCENARIO){
      window.dispatchEvent(new Event('beforeprint'));
      window.dispatchEvent(new Event('afterprint'));
      ok(table.open,'a previously expanded reference table must remain expanded after print');
+     break;
+   }
+   case 'direction':{
+     const heading=q('[data-direction-label]'),input=q('[data-value]');
+     ok(heading.textContent.includes('Pounds')&&heading.textContent.includes('Kilograms'),'direction heading starts with the selected pair');
+     q('[data-swap]').click();
+     ok(heading.textContent.includes('Kilograms → Pounds'),'swap must also update the visible conversion heading');
+     ok(q('[data-from]').value==='kg'&&q('[data-to]').value==='lbs','unit controls match swapped direction');
+     input.value='100';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('220.462'),'swapped conversion remains accurate');
+     q('[data-reset]').click();
+     ok(heading.textContent.includes('Pounds → Kilograms'),'reset returns heading and controls to original direction');
+     break;
+   }
+   case 'batch-visual':{
+     const advanced=q('[data-batch-advanced]'),input=q('[data-batch-input]'),output=q('[data-batch-result]');
+     ok(advanced?.tagName==='DETAILS'&&!advanced.open,'CSV advanced settings should begin collapsed');
+     ok(input.value.includes('149')&&output.value.includes('Line 1: 149 lb'),'first-load example output should be real and visible');
+     ok(q('[data-process]')?.closest('.batch-submit'),'convert button stays beside input, not below results');
+     const inputTop=input.getBoundingClientRect().top;
+     ok(inputTop<780,'the batch input should appear within a normal desktop working viewport: '+inputTop);
+     advanced.querySelector('summary').click();
+     ok(advanced.open&&q('[data-batch-from-column]'),'advanced unit-column controls stay reachable');
      break;
    }
    case 'batch':{
@@ -213,6 +236,21 @@ async function smokeScenario(SCENARIO){
          ok(doc.querySelector('.hero .tool-more-actions')&&!doc.querySelector('.hero .tool-more-actions').open,
            'mobile calculator keeps extended controls folded');
        }
+       if(width<=375&&(location.pathname==='/'||location.pathname==='/convert/lbs-to-kg/')){
+         const numeric=doc.querySelector('[data-output-number]');
+         ok(Boolean(numeric),'conversion result needs a separate numeric span');
+         const range=doc.createRange();
+         range.selectNodeContents(numeric);
+         ok(range.getClientRects().length===1,'Result digits must not wrap within the number at '+width+'px on '+location.pathname);
+         if(width<=320){
+           const target=doc.querySelector('[data-to]').getBoundingClientRect();
+           const answer=doc.querySelector('.resultbox').getBoundingClientRect();
+           ok(target.bottom<=answer.top+2,'320px result must get full width under the target unit selector');
+           const presets=[...doc.querySelectorAll('.hero .value-presets .preset')];
+           if(presets.length)ok(Math.max(...presets.map(p=>p.getBoundingClientRect().top))-Math.min(...presets.map(p=>p.getBoundingClientRect().top))<4,
+             '320px homepage quick-value presets should not spill into a second row');
+         }
+       }
        iframe.remove();
      }
      break;
@@ -221,7 +259,7 @@ async function smokeScenario(SCENARIO){
   }
 }
 const suites=[
- {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'progressive',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
+ {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'direction',url:'/'},{name:'progressive',url:'/'},{name:'batch-visual',url:'/batch-converter/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'batch-multiline',url:'/batch-converter/'},
  {name:'batch-alias',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
