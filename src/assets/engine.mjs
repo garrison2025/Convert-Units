@@ -499,3 +499,24 @@ export function pressureFourUnitComparison(value,fromUnit){
   });
  }catch{return null;}
 }
+
+
+/**
+ * Alternative to decimal pounds: whole pounds plus tenths of one mass ounce.
+ * Round the TOTAL tenth-ounces before splitting, so boundary cases carry to
+ * the next pound rather than showing 16.0 ounces. This is mass, not US/UK
+ * fluid volume. Uses the same exact international pound definition.
+ */
+export function kgToPoundsOunces(valueKg){
+ const kg=Number(valueKg);
+ if(!Number.isFinite(kg)||kg<0||kg>1e12)return null;
+ let decimalPounds;
+ try{decimalPounds=convert(kg,'kg','lbs');}catch{return null;}
+ const totalTenths=Math.round(decimalPounds*160);
+ if(!Number.isSafeInteger(totalTenths))return null;
+ const pounds=Math.floor(totalTenths/160),ounces=(totalTenths%160)/10;
+ const shownPounds=pounds+ounces/16;
+ const relation=displayRelation(decimalPounds,formatNumber(shownPounds,12));
+ const label=formatNumber(pounds,0)+' lb '+formatNumber(ounces,1)+' oz';
+ return {pounds,ounces,relation,label};
+}

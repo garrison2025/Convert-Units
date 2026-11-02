@@ -289,3 +289,11 @@
 .pressure-multi small{font-size:.72rem;line-height:1.55;color:#687891}
 .pressure-multi a{color:#2555b6;text-decoration:underline;text-underline-offset:2px}
 @media(max-width:380px){.pressure-multi{padding:11px 12px}.pressure-units{grid-template-columns:1fr}}
+
+/* V16: source-calculated kilograms to pounds + mass ounces, after copy actions. */
+.mass-imperial{margin:10px 0 13px;padding:12px 14px;background:#f6f9ff;border:1px solid #dbe5f6;border-radius:11px;display:flex;gap:5px 11px;align-items:baseline;flex-wrap:wrap}
+.mass-imperial[hidden]{display:none!important}
+.mass-imperial span{font-size:.82rem;color:#536887;font-weight:650}
+.mass-imperial strong{font-variant-numeric:tabular-nums;font-size:1.02rem;color:#244471;overflow-wrap:anywhere}
+.mass-imperial small{font-size:.72rem;line-height:1.5;color:#647692}
+@media(max-width:400px){.mass-imperial{padding:11px 12px}.mass-imperial span,.mass-imperial strong{width:100%}}

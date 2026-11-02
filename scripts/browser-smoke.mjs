@@ -238,6 +238,26 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('kg'),'live calculator gives converted answer');
      break;
    }
+   case 'kg-to-lbs-mixed':{
+     const input=q('[data-value]'),result=q('[data-lb-oz-result]'),panel=q('[data-lb-oz-readout]');
+     ok(panel&&!panel.hidden&&result,'SSR mass-ounces readout must be accessible');
+     ok(result.textContent==='≈ 529 lb 1.8 oz','240 kg result should use rounded mass ounces, not fluid ounces');
+     input.value='54';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(result.textContent==='≈ 119 lb 0.8 oz','54kg should update live to whole pounds + tenths of a mass ounce');
+     input.value='2.5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(result.textContent==='≈ 5 lb 8.2 oz','2.5kg result should preserve useful ounces');
+     const copy=q('[data-copy]');let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async v=>written=v}});
+     copy.click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written.includes('2.5 kg ≈ ')&&written.includes(' lb'),'main decimal result copy remains available');
+     q('[data-swap]').click();
+     ok(panel.hidden,'auxiliary lb+oz reading is inappropriate on reverse pounds to kg direction');
+     q('[data-swap]').click();
+     ok(!panel.hidden,'auxiliary lb+oz reading should return when direction restored');
+     input.value='-5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'negative physical mass must not show nonsensical mixed unit output');
+     break;
+   }
    case 'pressure-50':{
      const input=q('[data-converter] [data-value]'),panel=q('[data-pressure-summary]');
      const kpa=q('[data-pressure-unit="kpa"]'),psi=q('[data-pressure-unit="psi"]'),
@@ -374,12 +394,13 @@ const suites=[
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
  {name:'time-duration',url:'/convert/minutes-to-hours/'},{name:'time-milliseconds',url:'/convert/milliseconds-to-seconds/'},
  {name:'fluid-ounce-us-uk',url:'/convert/ml-to-us-fl-oz/355/'},
+ {name:'kg-to-lbs-mixed',url:'/convert/kg-to-lbs/240/'},
  {name:'pressure-50',url:'/convert/kpa-to-atm/50/'},{name:'pressure-108',url:'/convert/kpa-to-psi/108/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
