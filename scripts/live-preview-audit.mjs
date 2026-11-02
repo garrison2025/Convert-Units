@@ -70,6 +70,11 @@ const hasV10SEO=allReachable&&
  massCategory.body.includes('1 lb = 0.45359237 kg')&&
  massCategory.body.includes('Convert pounds, kilograms, ounces and grams')&&
  temperatureCategory.body.includes('20 °C = 68 °F');
+const hasV12SEO=allReachable&&
+ home.body.includes('data-mixed-kg-result')&&
+ home.body.includes('≈ 67 kg 585 g')&&
+ tool.body.includes('data-mixed-kg-result')&&
+ tool.body.includes('Rounded to the nearest gram');
 let buildInfo=null;
 if(deployment.ok){try{buildInfo=JSON.parse(deployment.body);}catch{}}
 const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.buildCommit.toLowerCase():null;
@@ -96,7 +101,7 @@ else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
 else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
-else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO)status='VERIFIED_PREVIOUS_VERSION';
+else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
@@ -104,7 +109,7 @@ else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,assetStatuses,qaReportExposure,qaReportsNotPublic},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };

@@ -411,3 +411,19 @@ export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColum
     preservedColumns:sourceColumns,headerPreserved:Boolean(table.headerCells)
   };
 }
+
+/**
+ * Mixed kilogram/gram notation for a pounds→kilograms result, rounded to the
+ * nearest whole gram. This is a presentation, NOT a different conversion
+ * factor, and is not claimed to preserve fractional gram measurement accuracy.
+ */
+export function kgAndWholeGrams(valueKg){
+ const n=Number(valueKg);
+ if(!Number.isFinite(n)||n<0||n>1e12)throw new RangeError('A nonnegative finite kilogram result is required.');
+ // Split the rounded total grams, so values such as 1.9998 kg display 2 kg
+ // 0 g rather than the invalid 1 kg 1000 g.
+ const total=Math.round(n*1000);
+ const kilograms=Math.floor(total/1000);
+ const grams=total%1000;
+ return {kilograms,grams,label:formatNumber(kilograms,0)+' kg '+grams+' g'};
+}

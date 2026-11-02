@@ -24,6 +24,11 @@ async function smokeScenario(SCENARIO){
      input.value='150';input.dispatchEvent(new Event('input',{bubbles:true}));
      ok(q('[data-converter] [data-output]').textContent.includes('68.038856'),'150 lb should equal 68.038856 kg');
      ok(!q('.crumb'),'homepage should not waste space on a self-referential Home breadcrumb');
+     const mixed=q('[data-mixed-kg]'),combined=q('[data-mixed-kg-result]');
+     ok(Boolean(mixed&&!mixed.hidden&&combined),'homepage must display the compound mass answer');
+     ok(combined.textContent.includes('68 kg 39 g'),'150 lb rounds to 68 kilograms and 39 grams');
+     input.value='149';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(combined.textContent.includes('67 kg 585 g'),'compound mass answer must update as source value changes');
      const finder=q('[data-home-find]');
      finder.value='pounds';finder.dispatchEvent(new Event('input',{bubbles:true}));
      ok(!q('[data-suggestions]').hidden,'search suggestions should open');
@@ -46,8 +51,12 @@ async function smokeScenario(SCENARIO){
      ok(feedback.textContent.includes('without units'),'copy announcement must describe unit-free value');
      q('[data-copy]').click();
      await new Promise(resolve=>setTimeout(resolve,0));
-     ok(written==='150 lb = 68.04 kg',
-       'full-expression copy must match the selected visible decimal precision');
+     ok(written==='150 lb ≈ 68.04 kg',
+       'full-expression copy must signal approximate displayed result');
+     precision.value='9';precision.dispatchEvent(new Event('change',{bubbles:true}));
+     input.value='1';input.dispatchEvent(new Event('input',{bubbles:true}));
+     q('[data-copy]').click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written==='1 lb = 0.45359237 kg','exact factor must retain the equals sign');
      break;
    }
    case 'progressive':{
@@ -82,6 +91,7 @@ async function smokeScenario(SCENARIO){
      q('[data-swap]').click();
      ok(heading.textContent.includes('Kilograms → Pounds'),'swap must also update the visible conversion heading');
      ok(q('[data-from]').value==='kg'&&q('[data-to]').value==='lbs','unit controls match swapped direction');
+     ok(q('[data-mixed-kg]')?.hidden,'kg+g notation must hide when converter direction is reversed');
      input.value='100';input.dispatchEvent(new Event('input',{bubbles:true}));
      ok(q('[data-output]').textContent.includes('220.462'),'swapped conversion remains accurate');
      q('[data-reset]').click();
