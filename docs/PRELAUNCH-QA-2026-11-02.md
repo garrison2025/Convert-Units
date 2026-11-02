@@ -5,12 +5,16 @@
 Repository: https://github.com/garrison2025/Convert-Units
 
 ### Verified by GitHub Actions
-- Workflow: https://github.com/garrison2025/Convert-Units/actions/runs/41365326665
-- Node test suites: 16 passed, 0 failed on commit af170de.
+- Workflow: https://github.com/garrison2025/Convert-Units/actions/runs/41365698714
+- Node test suites: 17 passed, 0 failed on commit 78a6c01.
 - Static preview: 156 generated HTML routes including 404; zero indexable routes.
 - Synthetic production origin: 155 indexable routes; canonical/OG/sitemap consistency passed.
 - All internal anchors and their target routes, orphan-page detection, local assets and 92 prerendered numeric answers: zero errors in release audit.
-- Existing deep audit: zero errors, 74 editorial/content similarity warnings.
+- Existing deep audit: zero errors, 72 editorial/content similarity warnings.
+
+### Actual content enhancement
+- All numeric result pages now include on-page conversion values for additional compatible units where available, calculated from the unrounded input. This adds practical value but does not prove editorial uniqueness.
+- Precise reciprocal factors (e.g. seconds to hours) are shown as exact division rules rather than misleadingly rounded multipliers.
 
 ### Major unsolved editorial risk
 - Normalized-token overlap is >=95% for **1646 of 1646** same-direction numerical-page comparisons.
