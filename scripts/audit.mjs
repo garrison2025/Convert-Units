@@ -22,5 +22,7 @@ const robots=fs.readFileSync(new URL('robots.txt',root),'utf8');if(build.mode===
  assert.equal(build.indexablePages,0,'Preview pages must not be indexable');
  assert.ok(fs.readFileSync(new URL('_headers',root),'utf8').includes('X-Robots-Tag: noindex'),'Preview missing noindex response header');
 }
+const headers=fs.readFileSync(new URL('_headers',root),'utf8');
+for(const hostRule of ['https://:project.pages.dev/*','https://:version.:project.pages.dev/*'])assert.ok(headers.includes(hostRule+'\n  X-Robots-Tag: noindex'),'Preview host indexing guard missing: '+hostRule);
 assert.equal((xml.match(/<loc>/g)||[]).length,build.indexablePages);
 assert.ok(fs.existsSync(new URL('404.html',root)));console.log('AUDIT PASS:',count,'routes checked; indexable:',build.indexablePages);
