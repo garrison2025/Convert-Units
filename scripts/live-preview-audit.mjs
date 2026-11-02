@@ -92,6 +92,12 @@ const hasV14Ounces=allReachable&&
  fluid355.body.includes('≈ 12.004 US fl oz')&&
  fluid355.body.includes('≈ 12.4943 UK fl oz')&&
  !tool.body.includes('data-fluid-oz-compare');
+const hasV16MixedPounds=allReachable&&
+ reverseTool.body.includes('data-lb-oz-readout')&&
+ reverseTool.body.includes('whole pounds + ounces')&&
+ numeric.body.includes('data-lb-oz-result')&&
+ numeric.body.includes('≈ 529 lb 1.8 oz')&&
+ !tool.body.includes('data-lb-oz-readout');
 const hasV15Pressure=allReachable&&
  pressureTool.body.includes('data-pressure-summary')&&
  pressureTool.body.includes('Gauge vs absolute: these are unit changes only.')&&
@@ -127,7 +133,7 @@ else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
 else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
-else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure)status='VERIFIED_PREVIOUS_VERSION';
+else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
@@ -135,7 +141,7 @@ else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,assetStatuses,qaReportExposure,qaReportsNotPublic},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };
