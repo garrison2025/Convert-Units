@@ -11,3 +11,21 @@ export function answerBanner(p,valueText,result){const from=units[p.from],to=uni
 export function referenceValues(p,current=null){const dim=units[p.from].dimension;const vs=current===null?(dim==='fuel'?[10,20,30,40,50]:dim==='temperature'?[-40,0,20,37,100]:[1,2,5,10,25,50,100]):[current-2,current-1,current,current+1,current+2].filter(v=>Number.isFinite(v)&&(dim==='temperature'||v>=0)).map(v=>Math.round(v*1e6)/1e6);const rows=[...new Set(vs)].filter(v=>{try{return Number.isFinite(convert(v,p.from,p.to));}catch{return false;}}).map(v=>`<tr><td><button class="table-load" type="button" data-load-value="${esc(v)}">${esc(formatNumber(v,6))} ${esc(units[p.from].symbol)} ↗</button></td><td>${esc(formatNumber(convert(v,p.from,p.to),7))} ${esc(units[p.to].symbol)}</td></tr>`).join('');return `<p class="reference-caption">Choose a value below to try it in the live converter.</p><div class="reference-scroll"><table class="number-table reference-table"><thead><tr><th>${esc(units[p.from].name)}</th><th>${esc(units[p.to].name)}</th></tr></thead><tbody>${rows}</tbody></table></div>`;};
 
 export function calculationDetails(p,v,result){return `<ol class="calc-steps"><li>Start with <strong>${esc(v)} ${esc(units[p.from].symbol)}</strong>.</li><li>${esc(formula(p.from,p.to))}</li><li>Result: <strong>${esc(result)} ${esc(units[p.to].symbol)}</strong>. Adjust decimal precision in the calculator.</li></ol>`;};
+
+/**
+ * A useful precision reference on approved numeric landing pages.
+ * This reuses a single unrounded calculation; the display format changes only.
+ * The table makes no claim about the precision of the original measurement.
+ */
+export function precisionComparison(pair,value){
+ const target=convert(value,pair.from,pair.to);
+ const sourceUnit=units[pair.from],targetUnit=units[pair.to];
+ const rows=[2,4,6,9].map(d=>'<tr><th scope="row">'+d+' decimal places</th><td>'+esc(formatNumber(target,d))+' '+esc(targetUnit.symbol)+'</td></tr>').join('');
+ return '<h2>How precise should this result be?</h2>'+
+  '<p class="reference-caption">These are different display roundings of the same calculation for '+
+  esc(formatNumber(value,9))+' '+esc(sourceUnit.symbol)+'. Do not mistake the number of shown decimals for the measurement’s accuracy.</p>'+
+  '<div class="reference-scroll"><table class="number-table reference-table" data-precision-table>'+
+  '<thead><tr><th scope="col">Display precision</th><th scope="col">Result</th></tr></thead>'+
+  '<tbody>'+rows+'</tbody></table></div>'+
+  '<p class="hint">For further calculations, use the unrounded internal value from the live converter rather than a copied rounded number.</p>';
+}
