@@ -124,6 +124,18 @@ function process(){
  const invalid=batchResult.invalid.length?' Invalid rows: '+batchResult.invalid.slice(0,12).join(', ')+(batchResult.invalid.length>12?'…':'')+'.':'';
  status.textContent='Converted '+batchResult.converted+' of '+table.rows.length+' rows ('+table.delimiter+' input). Preserved '+batchResult.preservedColumns+' input column'+(batchResult.preservedColumns===1?'':'s')+'.'+(rowFromColumn.value||rowToColumn.value?' Used each row’s source/target units.':' Applied the selected unit pair.')+skipped+invalid+' All calculations stayed in your browser.';
 }
+el('[data-batch-example]')?.addEventListener('click',()=>{
+ values.value=[
+  'label,value,from,to',
+  'parcel,149,lb,kg',
+  'travel,330,km/h,mph',
+  'weather,37.9,°C,°F',
+  'elapsed,60000,ms,s'
+ ].join('\n');
+ column.value='2';separator.value='comma';
+ rowFromColumn.value='3';rowToColumn.value='4';
+ process();
+});
 for(const field of [dimension,from,to,values,column,separator,rowFromColumn,rowToColumn])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
 el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
 el('[data-process]')?.addEventListener('click',process);el('[data-download]')?.addEventListener('click',()=>{if(!csv)process();if(csv)download('unit-conversions.csv',csv);});el('[data-print]')?.addEventListener('click',()=>window.print());}
