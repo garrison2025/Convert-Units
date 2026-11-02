@@ -230,6 +230,8 @@ test('CSV output retains TSV source columns and names missing headings for heade
  assert.equal(converted.preservedColumns,3);
  assert.match(converted.csv,/sku,value,ref,ExactUnit line/);
  assert.match(converted.csv,/x,2\.5,AB,2,2500,kg,g,OK/);
+ assert.match(converted.csv,/z,-1\.2,CD,3,-1200,kg,g,OK/);
+ assert.ok(!converted.csv.includes('\"-1,200\"'),'Negative output must remain a spreadsheet number, not grouped display text');
  const plain=convertBatchToCsv(parseBatchTable('149\n126'),'lbs','kg');
  assert.equal(plain.preservedColumns,1);
  assert.match(plain.csv,/^Column 1,ExactUnit line,ExactUnit result/);
