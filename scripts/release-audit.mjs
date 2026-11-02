@@ -13,6 +13,16 @@ const pilot=new Set(numericPolicy.pilotIndexUrls);
 const info=JSON.parse(fs.readFileSync(path.join(dist,'build-info.json'),'utf8'));
 const failures=[], warnings=[];
 const fail=(message)=>failures.push(message);
+const eligibleValuePages=seeds.filter(s=>!unindexableNumeric.has(s.url));
+const byDirection=new Map();
+for(const seed of eligibleValuePages){
+ const count=(byDirection.get(seed.slug)||0)+1;
+ byDirection.set(seed.slug,count);
+ if(info.numericIndexMode==='curated'&&count>1)fail('Curated SEO index collision: more than one numeric value for '+seed.slug);
+}
+if(info.numericIndexMode==='curated'&&numericPolicy.strategy==='one-numeric-value-per-direction-launch'&&eligibleValuePages.length!==15)
+ fail('Curated SEO pilot should contain exactly 15 selected numeric pages, got '+eligibleValuePages.length);
+
 const normalize=(p)=>p==='/'?'/':p.endsWith('/')?p:p+'/';
 const walk=(dir)=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>{
   const full=path.join(dir,e.name);
@@ -148,7 +158,7 @@ for(let i=0;i<numericBodies.length;i++)for(let j=i+1;j<numericBodies.length;j++)
 }
 if(highSimilarity)warnings.push('Content review across all 92 numeric pages: '+highSimilarity+'/'+comparable+' same-direction page pairs are >=0.95 similar.');
 if(pilotHighSimilarity)warnings.push('Production indexable numeric pilot review: '+pilotHighSimilarity+'/'+pilotComparable+' comparable page pairs are >=0.95 similar; this is not a quality approval.');
-const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,pilotHighSimilarityPairs:pilotHighSimilarity,pilotSimilarityPairsCompared:pilotComparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
+const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,pilotHighSimilarityPairs:pilotHighSimilarity,pilotSimilarityPairsCompared:pilotComparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,selectedNumericDirections:[...byDirection.keys()].sort(),numericSameDirectionIndexCollisions:[...byDirection].filter(([,count])=>count>1).map(([slug,count])=>({slug,count})),excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
 fs.writeFileSync(path.join(dist,'release-audit-report.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(failures.length)process.exitCode=1;
