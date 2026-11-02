@@ -26,7 +26,7 @@ for(const item of seeds){
  for(const field of ['volumeUS','kd','rank','trafficEstimate']){
   if(!Number.isFinite(item[field])||item[field]<0)failures.push('Missing or invalid competitor '+field+' for '+item.url);
  }
- if(item.kd>100||item.rank<1)failures.push('Invalid competitor KD/rank for '+item.url);
+ if(item.kd>100||item.rank<0)failures.push('Invalid competitor KD/rank for '+item.url);
  if(!/^\/[a-z0-9./-]+$/.test(item.competitorURL||''))failures.push('Missing competitor URL path for '+item.url);
  if(!Number.isFinite(item.value)||!item.valueText)failures.push('Missing verified numeric input for '+item.url);
  const pair=pairs.find(p=>p.slug===item.slug)||
@@ -44,7 +44,8 @@ const reviewed=seeds.map(item=>{
   route:item.url,keyword:item.keyword,unitDirection:item.slug,
   sourceUnit:u?units[u.from].symbol:null,targetUnit:u?units[u.to].symbol:null,
   originalNumericValue:item.value,competitorSearchVolumeUS:item.volumeUS,
-  competitorKeywordDifficulty:item.kd,competitorObservedRank:item.rank,
+  competitorKeywordDifficulty:item.kd,competitorObservedRank:item.rank>0?item.rank:null,
+  competitorRankSourceValue:item.rank,competitorRankEvidence:item.rank===0?'source reports rank 0; no valid position confirmed':'source ranking estimate',
   competitorTrafficEstimate:item.trafficEstimate,competitorLandingPath:item.competitorURL,
   sameDirectionPageCount:peerCount,
   editorialRisk:peerCount>=10?'high duplication cluster':peerCount>=2?'similar intent cluster':'single value in direction',
@@ -59,14 +60,16 @@ const groups=[...bySlug].map(([slug,items])=>({
  highestObservedCompetitorTrafficEstimate:Math.max(...items.map(x=>x.trafficEstimate)),
  risk:items.length>=10?'high duplication cluster':items.length>=2?'similar intent cluster':'single numeric page'
 })).sort((a,b)=>b.pageCount-a.pageCount);
+const sourceAnomalies=reviewed.filter(x=>x.competitorRankSourceValue===0).map(x=>({route:x.route,keyword:x.keyword,reason:'Source rank=0 cannot be interpreted as an actual organic search position.'}));
 const report={
+ sourceAnomalies,
  note:'Volume, KD, rank and traffic estimate originate from competitor Semrush results; no metrics are from ExactUnit. Index decisions remain open; this audit never adds/removes indexable pages.',
  date:'2026-11-02',numericPages:seeds.length,verifiedSourceRoutes:urls.size,
  groups,records:reviewed,failures
 };
 fs.writeFileSync(path.join(dist,'keyword-evidence-review.json'),JSON.stringify(report,null,2));
 const fields=['route','keyword','unitDirection','originalNumericValue','competitorSearchVolumeUS',
- 'competitorKeywordDifficulty','competitorObservedRank','competitorTrafficEstimate',
+ 'competitorKeywordDifficulty','competitorObservedRank','competitorRankSourceValue','competitorRankEvidence','competitorTrafficEstimate',
  'competitorLandingPath','sameDirectionPageCount','editorialRisk','indexDecision'];
 const csv=[fields.join(','),...reviewed.map(row=>fields.map(key=>escapeCsvCell(row[key])).join(','))].join('\r\n');
 fs.writeFileSync(path.join(dist,'keyword-evidence-review.csv'),csv);
