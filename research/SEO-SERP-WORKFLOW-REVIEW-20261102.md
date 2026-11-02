@@ -21,7 +21,7 @@ We implemented a user-visible enhancement to `/batch-converter/`, a relatively d
 - Keep all successfully parsed **original source columns and their headings**, and append namespaced fields for `ExactUnit line`, `ExactUnit result`, `ExactUnit from`, `ExactUnit to`, and `ExactUnit status`.
 - Preserve original source cells even when the measurement is invalid; report the source line number instead of silently omitting the record.
 - Export numerical results as ungrouped machine-readable decimals (e.g. `-1200`, not `"-1,200"` or a text-prefixed CSV formula). User-provided source cells continue to use CSV formula-injection protection.
-- Keep a single source/target unit pair per batch. **Per-row mixed units and support for multiline quoted CSV records are not claimed.** No uploads, paid APIs, database or server are introduced.
+- **Updated implementation:** the CSV tool now supports either a fixed source/target pair or explicit per-row source and target unit columns with strict dimension validation. Embedded-newline quoted CSV fields remain unsupported. No uploads, paid APIs, database or server are introduced.
 - Update visible title, description and guide to communicate what the tool actually does. Add math, header, invalid-row, CSV/TSV and browser regression tests and an SEO content audit gate.
 
 This increases real main-content functionality on a dedicated workflow page, rather than inventing new template-only answer pages.
@@ -37,3 +37,7 @@ We retained the existing **15 selected numeric pages / 77 suppressed numeric pag
 ## Next research gate
 
 Before increasing indexing or committing to a custom domain, obtain an explicitly **US-location/device** SERP sample for high-priority queries, including numeric/parent pairs and the `batch unit converter` task. Record the observed organic landing URL, Google conversion features/AI overview, page type, domain diversity and screenshot evidence with exact date/region. Only Search Console after launch can verify the website's own impressions, indexing and organic clicks. A successful GitHub CI run is evidence of implementation correctness, **not** proof of organic ranking or revenue.
+
+## Implementation update: optional row-unit columns
+
+The batch tool now implements the key competitor workflow in addition to preserving original columns: each CSV record can include different source and target units, using exact supported symbols or internal unit IDs. A real in-page example lets users try this immediately. Incompatible rows are surfaced as errors without dropping other records. This is a product-function improvement, **not evidence of winning Google rankings**. Public search results still cannot establish real US device-specific keyword clicks for the site.
