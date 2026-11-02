@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {convert,formatNumber,units} from '../src/assets/engine.mjs';
+import {convert,formatNumber,units,displayRelation} from '../src/assets/engine.mjs';
 import {precisionComparison,calculationDetails,answerBanner,practicalEquivalents} from '../src/landing.mjs';
 
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url),'utf8'));
@@ -55,4 +55,21 @@ test('clock-style time equivalents correctly distinguish durations from times of
  assert.match(practicalEquivalents({from:'minutes',to:'hours'},10000),/166:40:00/);
  assert.equal(practicalEquivalents({from:'seconds',to:'minutes'},1.25),'');
  assert.match(practicalEquivalents({from:'seconds',to:'hours'},0),/0:00:00/);
+});
+
+
+test('server-rendered conversion answers do not present rounded decimals as exact equality',()=>{
+ const kgToLb=pairs.find(x=>x.slug==='kg-to-lbs');
+ const result=formatNumber(convert(240,'kg','lbs'),9);
+ assert.equal(displayRelation(convert(240,'kg','lbs'),result),'≈');
+ const html=answerBanner(kgToLb,'240',result);
+ assert.match(html,/240 kg ≈ /);
+ assert.match(html,/is approximately/);
+ assert.match(html,/data-answer="240 kg ≈ /);
+ const lbsToKg=pairs.find(x=>x.slug==='lbs-to-kg');
+ const exact=formatNumber(convert(149,'lbs','kg'),9);
+ assert.equal(displayRelation(convert(149,'lbs','kg'),exact),'=');
+ assert.match(answerBanner(lbsToKg,'149',exact),/149 lb = 67\.58526313 kg/);
+ assert.equal(displayRelation(60,'60'),'=');
+ assert.throws(()=>displayRelation(NaN,'0'),/finite/);
 });
