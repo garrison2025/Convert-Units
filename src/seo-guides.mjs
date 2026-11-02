@@ -174,15 +174,22 @@ export function directionExplanation(pair,allPairs){
  * (which remain conservatively noindex by default). Prioritizes the reverse
  * pair, then other choices sharing an input or output unit.
  */
-export function relatedDirectionLinks(pair,allPairs){
+/** Relevant existing directions first, never numerical noindex URLs. */
+export function rankedRelatedDirections(pair,allPairs,limit=6){
  const from=units[pair.from],to=units[pair.to];
  if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Invalid related direction');
  const rank=x=>x.from===pair.to&&x.to===pair.from?0:
   x.from===pair.from?1:x.to===pair.to?2:
   x.from===pair.to||x.to===pair.from?3:4;
- const choices=allPairs.filter(x=>x.slug!==pair.slug&&
+ return allPairs.filter(x=>x.slug!==pair.slug&&
   units[x.from]?.dimension===from.dimension&&units[x.to]?.dimension===from.dimension)
-  .sort((a,b)=>rank(a)-rank(b)||a.slug.localeCompare(b.slug)).slice(0,4);
+  .sort((a,b)=>rank(a)-rank(b)||a.slug.localeCompare(b.slug)).slice(0,limit);
+}
+
+export function relatedDirectionLinks(pair,allPairs){
+ const from=units[pair.from],to=units[pair.to];
+ if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Invalid related direction');
+ const choices=rankedRelatedDirections(pair,allPairs,4);
  return '<section class="mini-card related-direction-links" aria-label="Related unit conversion tools">'+
    '<h3>Other conversions in '+esc(dimensions[from.dimension].label.toLowerCase())+'</h3>'+
    '<p>Use a different direction or unit with a complete interactive calculator.</p>'+
