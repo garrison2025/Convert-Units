@@ -24,7 +24,7 @@ Approved numeric URLs by direction:
 | Other one-value directions | 8 | Verify unit semantics and evidence-backed demand |
 | **Total** | **92** | **Do not equate generated URLs with verified content quality** |
 
-All 92 approved static pages remain available, but the **curated launch policy** now makes only 26 source-backed numeric pages eligible for production indexing. The remaining 66 render `noindex,follow` and do not enter the production sitemap; this is a reversible launch pilot, not a penalty or keyword-value determination. On `*.pages.dev`, every page stays `noindex` regardless of the site build's mode.
+All 92 approved static pages remain available, but the **curated launch policy** now makes only 15 source-backed representative numeric pages eligible for production indexing. The remaining 77 render `noindex,follow` and do not enter the production sitemap; this is a reversible launch pilot, not a penalty or keyword-value determination. On `*.pages.dev`, every page stays `noindex` regardless of the site build's mode.
 
 ## Editorial release decision
 
@@ -50,6 +50,10 @@ Each build exports `dist/keyword-evidence-review.csv` and `dist/keyword-evidence
 
 The source keyword `1.8 kilograms in pounds` has a raw competitor rank value of **0**. A zero ranking is not a valid organic position. The report preserves the raw 0 and represents the observed rank as **unverified**, not as rank #0 or rank #1.
 
-The audit reports 15 directional clusters, with the `lbs-to-kg` (56 pages) and `kg-to-lbs` (14 pages) groups requiring highest-priority editorial scrutiny. All approved pages stay present and functional; a documented 26-URL pilot allowlist now controls production indexability. Switching from `curated` to `all` requires an explicit environment change and human review. No prose is invented to disguise duplication.
+The audit reports 15 directional clusters, with the `lbs-to-kg` (56 pages) and `kg-to-lbs` (14 pages) groups requiring highest-priority editorial scrutiny. All approved pages stay present and functional; a documented 15-URL pilot allowlist now controls production indexability. Switching from `curated` to `all` requires an explicit environment change and human review. No prose is invented to disguise duplication.
 
 Before purchasing a domain, use the downloadable review CSV and `research/SEO-LAUNCH-PILOT-20261102.md` to mark **keep, consolidate or noindex-review** for each page based on search intent, evidence and distinct user utility. Do not automatically index every number simply because a competitor ranked for its keyword. The preview is globally noindexed until a confirmed custom-domain build.
+
+## V3 refinement (2026-11-02)
+
+The current V3 default has no two index-eligible numeric pages within the same direction. **15** numerical pages represent the 15 directional clusters, while 77 numerical URLs remain functional but excluded from the production sitemap. This removes numeric-to-numeric same-direction overlap within the pilot (no comparable pairs remain), but does not prove the representative value page is distinct from its parent calculator. Original keyword evidence, search intent and actual GSC data remain mandatory before deciding future expansion. See [SEO-PILOT-V3-20261102.md](SEO-PILOT-V3-20261102.md).
