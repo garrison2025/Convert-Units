@@ -85,6 +85,7 @@ for(const [route,html] of pages){
     const visible=plain(extract(html,/<main id="main">([\s\S]*?)<\/main>/i));
     if(!visible.includes(expected)||!visible.includes(s.valueText))fail(route+': prerendered numerical result missing');
     if(!html.includes('data-copy-answer')||!html.includes('data-load-value'))fail(route+': missing value interaction');
+    if(Object.values(units).filter(u=>u.dimension===units[pair.from].dimension).length>2 && !html.includes('Same value in other units'))fail(route+': other compatible unit equivalents missing');
     if(!html.includes('data-answer="'+expectedAnswer.replaceAll('&','&amp;')+'"'))fail(route+': copy answer mismatches computation');
     if(!title.includes(s.valueText)||!h1.includes(s.valueText))fail(route+': SEO metadata mismatches URL value');
   }
