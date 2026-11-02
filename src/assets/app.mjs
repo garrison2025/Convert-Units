@@ -1,4 +1,4 @@
-import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchTable,escapeCsvCell as safeCsv} from './engine.mjs';
+import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchTable,convertBatchToCsv} from './engine.mjs';
 const el=(s,root=document)=>root.querySelector(s);
 const all=(s,root=document)=>[...root.querySelectorAll(s)];
 const fmt=(x,d=6)=>formatNumber(x,d);
@@ -108,26 +108,17 @@ function changeDim(){const d=dimension.value;const arr=dimensionUnits(d);from.in
 from.addEventListener('change',()=>{if(units[from.value].dimension!==units[to.value].dimension){to.innerHTML=options(units[from.value].dimension,dimensionUnits(units[from.value].dimension).find(x=>x.id!==from.value)?.id??from.value);}});
 dimension.addEventListener('change',changeDim);changeDim();
 function process(){
- let table;
- try{table=parseBatchTable(values.value,{column:Number(column.value),delimiter:separator.value});}
- catch(e){csv='';out.value='';status.textContent=e.message;return;}
- if(!table.rows.length){csv='';out.value='';status.textContent='Enter at least one numeric data row.';return;}
- const rows=[['Line','Input','From','Result','To','Status']];
- let ok=0;
- const errors=[];
- for(const record of table.rows){
-  let result='',message='OK';
-  try{
-   if(record.error)throw new RangeError(record.error);
-   result=fmt(convert(record.value,from.value,to.value),9);ok++;
-  }catch(e){message=e.message;errors.push(record.line);}
-  rows.push([String(record.line),record.value,units[from.value].symbol,result,units[to.value].symbol,message]);
- }
- csv=rows.map(row=>row.map(safeCsv).join(',')).join('\r\n');
- out.value=rows.slice(1).map(row=>'Line '+row[0]+': '+row[1]+' '+row[2]+' → '+(row[3]?row[3]+' '+row[4]:'Error: '+row[5])).join('\n');
- const skipped=table.headerSkipped?' Recognized header skipped.':'';
- const invalid=errors.length?' Invalid rows: '+errors.slice(0,12).join(', ')+(errors.length>12?'…':'')+'.':'';
- status.textContent='Converted '+ok+' of '+table.rows.length+' rows ('+table.delimiter+' input).'+skipped+invalid+' All calculations stayed in your browser.';
+ let table,batchResult;
+ try{
+  table=parseBatchTable(values.value,{column:Number(column.value),delimiter:separator.value});
+  if(!table.rows.length){csv='';out.value='';status.textContent='Enter at least one numeric data row.';return;}
+  batchResult=convertBatchToCsv(table,from.value,to.value);
+ }catch(e){csv='';out.value='';status.textContent=e.message;return;}
+ csv=batchResult.csv;
+ out.value=batchResult.rows.map(row=>'Line '+row.line+': '+row.input+' '+row.from+' → '+(row.result?row.result+' '+row.to:'Error: '+row.status)).join('\n');
+ const skipped=table.headerSkipped?' Original column headings preserved.':'';
+ const invalid=batchResult.invalid.length?' Invalid rows: '+batchResult.invalid.slice(0,12).join(', ')+(batchResult.invalid.length>12?'…':'')+'.':'';
+ status.textContent='Converted '+batchResult.converted+' of '+table.rows.length+' rows ('+table.delimiter+' input). Preserved '+batchResult.preservedColumns+' input column'+(batchResult.preservedColumns===1?'':'s')+'.'+skipped+invalid+' All calculations stayed in your browser.';
 }
 for(const field of [dimension,from,to,values,column,separator])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
 el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
