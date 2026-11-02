@@ -245,7 +245,7 @@ export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={
   const sep=delimiter==='auto'?csvSeparator(records):allowed[delimiter];
   // 1,5 and 12,34 can mean decimals in many locales, not two CSV cells.
   // Never silently interpret a numeric-only ambiguous column in auto mode.
-  if(delimiter==='auto'&&sep===','&&records.some(({text})=>/^[+-]?\\d+,\\d{1,2}$/.test(text.trim()))){
+  if(delimiter==='auto'&&sep===','&&records.some(({text})=>/^[+-]?\d+,\d{1,2}$/.test(text.trim()))){
     throw new RangeError('Ambiguous comma-separated numbers. For CSV columns, explicitly select Comma (,). For decimal values, replace the decimal comma with a dot (1.5).');
   }
   const headerTokens=/^(?:value|input|amount|number|quantity|weight|mass|length|temperature|distance)$/i;
