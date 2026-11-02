@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {convert,fluidOunceComparison,units,displayRelation,formatNumber} from '../src/assets/engine.mjs';
 test('US fluid ounce and UK imperial fluid ounce factors are deliberately different',()=>{
  assert.equal(convert(1,'us-fl-oz','ml'),29.5735295625);
- assert.equal(convert(1,'imp-fl-oz','ml'),28.4130625);
+ assert.ok(Math.abs(convert(1,'imp-fl-oz','ml')-28.4130625)<1e-10,'binary floating-point arithmetic must preserve defined factor within calculation tolerance');
  assert.ok(units['imp-fl-oz'].name.startsWith('UK'));
  assert.equal(units['imp-fl-oz'].dimension,'volume');
  assert.ok(convert(1,'imp-fl-oz','us-fl-oz')<1);
