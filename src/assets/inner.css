@@ -228,3 +228,15 @@
  .category-conversion-examples li{align-items:flex-start;flex-direction:column;gap:4px}
  .category-conversion-examples li strong{text-align:left}
 }
+
+/* Core mass converter: precise decimal kg plus a useful whole-gram readout. */
+.inner-page .mass-mixed,.home-page .mass-mixed{
+ display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 11px;
+ margin:9px 0 13px;padding:11px 13px;
+ border:1px solid #dce5f6;background:#f7faff;border-radius:10px;
+}
+.mass-mixed[hidden]{display:none!important}
+.mass-mixed>span{color:#52627e;font-size:.81rem;font-weight:600}
+.mass-mixed>strong{font-size:.98rem;color:#203f73;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.mass-mixed>small{font-size:.74rem;color:#687a98}
+@media(max-width:400px){.mass-mixed>span,.mass-mixed>strong{width:100%}}
