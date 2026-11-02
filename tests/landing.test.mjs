@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {convert,formatNumber,units,displayRelation} from '../src/assets/engine.mjs';
-import {precisionComparison,calculationDetails,answerBanner,practicalEquivalents} from '../src/landing.mjs';
+import {precisionComparison,calculationDetails,answerBanner,practicalEquivalents,roundTripPrecisionNote} from '../src/landing.mjs';
 
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url),'utf8'));
@@ -72,4 +72,38 @@ test('server-rendered conversion answers do not present rounded decimals as exac
  assert.match(answerBanner(lbsToKg,'149',exact),/149 lb = 67\.58526313 kg/);
  assert.equal(displayRelation(60,'60'),'=');
  assert.throws(()=>displayRelation(NaN,'0'),/finite/);
+});
+
+test('pilot numeric answers explain only consequential two-decimal round-trip loss',()=>{
+ const kgToLbs=pairs.find(x=>x.slug==='kg-to-lbs');
+ const loss=roundTripPrecisionNote(kgToLbs,240);
+ assert.match(loss,/data-roundtrip-check/);
+ assert.match(loss,/What two-decimal rounding changes/);
+ assert.match(loss,/529\.11 lb/);
+ assert.match(loss,/difference of about/);
+ assert.ok(!loss.includes('NaN')&&!loss.includes('Infinity'));
+ const minToHours=pairs.find(x=>x.slug==='minutes-to-hours');
+ const duration=roundTripPrecisionNote(minToHours,10000);
+ assert.match(duration,/166\.67 hr/);
+ assert.match(duration,/10,000\.2 min/);
+ assert.match(duration,/0\.2 min/);
+ const meterToFeet=pairs.find(x=>x.slug==='m-to-ft');
+ assert.match(roundTripPrecisionNote(meterToFeet,8849),/29,032\.15 ft/,'grouping commas must not break numeric parsing');
+ const secondsToHours=pairs.find(x=>x.slug==='seconds-to-hours');
+ assert.equal(roundTripPrecisionNote(secondsToHours,14400),'','exact 4 hours must not be padded with a redundant warning');
+ const msToSeconds=pairs.find(x=>x.slug==='milliseconds-to-seconds');
+ assert.equal(roundTripPrecisionNote(msToSeconds,60000),'','exact 60 seconds should not claim invented error');
+ const cToF=pairs.find(x=>x.slug==='celsius-to-fahrenheit');
+ assert.equal(roundTripPrecisionNote(cToF,37.9),'','37.9 Celsius converts to 100.22 F without two-decimal loss');
+ const policy=JSON.parse(fs.readFileSync(new URL('../src/data/numeric-seo-policy.json',import.meta.url),'utf8'));
+ const pilot=new Set(policy.pilotIndexUrls);
+ const panels=seeds.filter(s=>pilot.has(s.url)).map(s=>{
+  const pair=pairs.find(p=>p.slug===s.slug);
+  return roundTripPrecisionNote(pair,s.value);
+ }).filter(Boolean);
+ assert.ok(panels.length>=6&&panels.length<=12,'show the panel only where the specific value actually loses precision');
+ for(const html of panels){
+  assert.ok(!html.includes('NaN')&&!html.includes('Infinity'));
+  assert.match(html,/does not estimate the accuracy of the original measurement/);
+ }
 });
