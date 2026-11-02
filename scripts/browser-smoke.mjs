@@ -98,6 +98,40 @@ async function smokeScenario(SCENARIO){
      ok(heading.textContent.includes('Pounds → Kilograms'),'reset returns heading and controls to original direction');
      break;
    }
+   case 'time-duration':{
+     const input=q('[data-converter] [data-value]'),panel=q('[data-elapsed-duration]');
+     const clock=q('[data-elapsed-clock]'),words=q('[data-elapsed-words]');
+     ok(panel&&!panel.hidden&&clock.textContent==='0:05:00','time tool must render its initial elapsed value in static HTML');
+     input.value='10000';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(clock.textContent==='166:40:00','10000 min should equal 166:40:00 elapsed, without a day wrap');
+     ok(words.textContent==='166 h 40 min','time tool must provide an accessible word-based reading');
+     const copy=q('[data-copy-elapsed]');let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>written=value}});
+     copy.click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written==='166:40:00','copy duration must use computed clock format');
+     input.value='90.5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(clock.textContent==='1:30:30','decimal minutes should represent leftover seconds');
+     q('[data-swap]').click();
+     input.value='1.5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(clock.textContent==='1:30:00','swapping hour direction must keep elapsed reading correct');
+     input.value='-1';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'negative durations must not display fabricated clock values');
+     break;
+   }
+   case 'time-milliseconds':{
+     const input=q('[data-value]'),panel=q('[data-elapsed-duration]');
+     const clock=q('[data-elapsed-clock]'),note=q('[data-elapsed-note]');
+     input.value='1001';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(clock.textContent==='0:00:01.001','millisecond granularity must be kept');
+     input.value='2.4';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(clock.textContent==='≈ 0:00:00.002','sub-millisecond rounding must be labeled approximate');
+     ok(note.textContent.includes('Rounded'),'rounding must be disclosed');
+     input.value='1';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(clock.textContent==='0:00:00.001','exact millisecond reading does not claim approximation');
+     ok(note.textContent.includes('Not a time of day'),'duration must not be mistaken for clock-time');
+     ok(!panel.hidden,'panel should stay visible for finite time');
+     break;
+   }
    case 'batch-visual':{
      const advanced=q('[data-batch-advanced]'),input=q('[data-batch-input]'),output=q('[data-batch-result]');
      ok(advanced?.tagName==='DETAILS'&&!advanced.open,'CSV advanced settings should begin collapsed');
@@ -286,6 +320,7 @@ const suites=[
  {name:'batch-multiline',url:'/batch-converter/'},
  {name:'batch-alias',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
+ {name:'time-duration',url:'/convert/minutes-to-hours/'},{name:'time-milliseconds',url:'/convert/milliseconds-to-seconds/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
