@@ -176,3 +176,20 @@
   .home-page .tool-card label.small{margin-top:8px!important}
   .home-page .tool-actions{margin-top:10px}
 }
+
+/* V7: a real conversion answer before the calculator, not SEO-only prose. */
+.inner-page .pair-key-fact{
+ display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;
+ margin:16px 0 4px;padding:12px 17px;
+ background:#f1f5ff;border:1px solid #d8e2ff;
+ border-radius:13px;color:#24416c;
+}
+.pair-key-fact .pair-key-kicker{font-size:.68rem;font-weight:800;letter-spacing:.09em;color:#6278a5}
+.pair-key-fact strong{font-size:clamp(1rem,2.1vw,1.22rem);font-weight:800;letter-spacing:-.02em;white-space:normal;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.pair-key-fact a{margin-left:auto;font-size:.78rem;font-weight:700;color:#2853c4;white-space:nowrap}
+.pair-key-fact a:focus-visible{outline:2px solid #2853c4;outline-offset:4px;border-radius:3px}
+@media(max-width:520px){
+ .inner-page .pair-key-fact{padding:11px 12px;margin-top:12px;gap:5px 9px}
+ .pair-key-fact .pair-key-kicker{width:100%}
+ .pair-key-fact a{margin-left:0}
+}
