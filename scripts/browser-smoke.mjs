@@ -73,6 +73,24 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('kg'),'live calculator gives converted answer');
      break;
    }
+   case 'temperature':{
+     const value=q('[data-value]');
+     value.value='-40';value.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('-40'),'minus 40 C equals minus 40 F');
+     value.value='-273.16';value.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.trim()==='—','below absolute zero must not yield a result');
+     ok(q('[data-error]').textContent.includes('absolute zero'),'invalid temperature must report a meaningful error');
+     break;
+   }
+   case 'fuel':{
+     const value=q('[data-value]');
+     value.value='30';value.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('7.840486'),'30 US mpg approximately 7.840486 L/100 km');
+     value.value='0';value.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.trim()==='—','zero reciprocal input is invalid');
+     ok(q('[data-error]').textContent.includes('greater than zero'),'fuel error is explained');
+     break;
+   }
    case 'mobile':{
      for(const width of [320,375,768]){
        const iframe=document.createElement('iframe');
@@ -100,6 +118,8 @@ async function smokeScenario(SCENARIO){
 const suites=[
  {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
+ {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
+ {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'}
 ];
