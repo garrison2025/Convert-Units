@@ -60,3 +60,17 @@
 .multi-unit-panel .number-table{width:100%;font-size:.83rem}
 .multi-unit-panel .number-table th,.multi-unit-panel .number-table td{padding:9px 10px;text-align:left;overflow-wrap:anywhere}
 .multi-unit-panel .number-table tbody th{font-weight:650;color:#415777}
+
+/* Printer-friendly unit tables. No separate service or PDF API is required. */
+@media print{
+  .topbar,.footer,.tool-actions,.menu-btn,.hero-search,.value-presets,.swapline,.nav,.aside-stack{display:none!important}
+  html,body,main,.wrap,.tool-card,.card{background:#fff!important;color:#111!important;box-shadow:none!important;max-width:none!important}
+  .tool-card,.direct-answer,.card{border:1px solid #bbb!important;box-shadow:none!important}
+  .direct-answer{color:#111!important;background:#fff!important}
+  .direct-answer strong,.direct-answer small,.direct-answer p{color:#111!important}
+  .tool-layout,.hero,.batch-grid{display:block!important}
+  .tool-card,.multi-unit-panel,.number-table,.direct-answer,.card{break-inside:avoid;page-break-inside:avoid}
+  .reference-scroll{overflow:visible!important}
+  .number-table{width:100%!important}
+  a{color:#111!important}
+}
