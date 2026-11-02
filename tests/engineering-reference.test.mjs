@@ -16,7 +16,7 @@ test('torque adds genuine inch-pound and kilogram-force-meter units without mass
  assert.equal(units.lbs.dimension,'mass');
  near(convert(100,'ft-lbf','in-lbf'),1200);
  near(convert(400,'ft-lbf','nm'),542.3271793325602);
- near(convert(100,'ft-lbf','kgf-m'),13.825494745862164);
+ near(convert(100,'ft-lbf','kgf-m'),13.8254954376);
  near(convert(100,'nm','ft-lbf'),73.7562149277);
  near(convert(1,'in-lbf','nm'),1.3558179483314004/12);
  assert.equal(dimensionUnits('torque').length,4);
