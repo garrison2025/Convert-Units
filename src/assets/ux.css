@@ -26,3 +26,124 @@
 
 /* Respect the HTML hidden state even when tiles/results use author display:grid/flex. */
 [hidden]:not([hidden="until-found"]){display:none!important}
+
+
+/* v4 · Task-first conversion workspace: result first, progressive tools second. */
+.hero{
+  align-items:center;
+  min-height:0;
+  padding:42px 46px;
+  gap:36px;
+  background:linear-gradient(110deg,#ffffff 0%,#ffffff 54%,#eef3ff 54%,#e7efff 100%);
+  box-shadow:0 10px 40px rgba(26,53,100,.055);
+}
+.hero:before{content:none}
+.hero-copy{min-width:0;align-self:center}
+.hero-intro{max-width:565px}
+.hero h1{font-size:clamp(3.2rem,4.6vw,4.8rem);margin-bottom:16px}
+.hero p{font-size:1rem;max-width:480px}
+.hero-search{margin-top:24px}
+.hero-proof{margin-top:17px}
+.hero-utility{margin-top:16px}
+.hero .demo{width:100%;min-width:0}
+.hero .tool-card{
+  box-shadow:0 18px 56px rgba(34,62,117,.12),0 2px 4px rgba(24,55,110,.035);
+  border-color:#dce5f7;
+}
+.tool-head{align-items:flex-start}
+.tool-head strong{font-weight:790;line-height:1.35;overflow-wrap:anywhere;max-width:68%}
+.tool-head .small{flex-shrink:0;white-space:nowrap}
+.tool-card .tool-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.tool-actions .btn{min-width:0;min-height:45px}
+.tool-more-actions{
+  margin:12px 0 0;
+  padding-top:10px;
+  border-top:1px solid #edf0f6;
+}
+.tool-more-actions summary,
+.multi-unit-panel summary{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:42px;
+  cursor:pointer;
+  color:#3c527b;
+  font-size:.82rem;
+  font-weight:750;
+  border-radius:9px;
+  padding:8px 11px;
+  transition:background .15s,color .15s;
+}
+.tool-more-actions summary::-webkit-details-marker,
+.multi-unit-panel summary::-webkit-details-marker{display:none}
+.tool-more-actions summary:hover,
+.multi-unit-panel summary:hover{background:#f2f5ff;color:#2852cb}
+.tool-more-actions summary:focus-visible,
+.multi-unit-panel summary:focus-visible{outline:3px solid #9ebafa;outline-offset:2px}
+.tool-more-actions summary:before,
+.multi-unit-panel summary:before{
+  content:'+';display:grid;place-items:center;
+  width:23px;height:23px;flex-shrink:0;
+  border:1px solid #d7e1f3;background:#f8faff;border-radius:7px;
+  color:#2a56d5;font-size:1.1rem;line-height:1;
+}
+.tool-more-actions[open] summary:before,
+.multi-unit-panel[open] summary:before{content:'−'}
+.tool-more-actions summary span{margin-left:auto;color:#8191ad;letter-spacing:.12em}
+.tool-secondary-actions{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;padding:10px 0 2px;
+}
+.tool-secondary-actions .btn{min-height:39px;padding:8px;font-size:.77rem}
+.multi-unit-panel{
+  margin-top:16px!important;
+  border-top:1px solid #edf0f6;
+  border-bottom:1px solid #edf0f6;
+}
+.multi-unit-panel summary{min-height:49px;padding-left:0;padding-right:0}
+.multi-unit-panel summary span{margin-left:auto;color:#8390a9;font-weight:570;font-size:.75rem}
+.multi-unit-panel .reference-scroll{padding:0 2px 12px}
+.multi-unit-panel .number-table{font-size:.84rem}
+@media(max-width:900px){
+  .hero{padding:34px;gap:23px;background:linear-gradient(180deg,#fff 0%,#fff 38%,#ecf2ff 100%)}
+  .hero-copy{display:contents}
+  .hero-intro{order:1;max-width:none}
+  .hero .demo{order:2}
+  .hero-discovery{order:3;width:100%}
+  .hero{display:flex;flex-direction:column;align-items:stretch}
+  .hero .tool-card{max-width:630px;margin-inline:auto}
+  .hero h1{font-size:clamp(3rem,7vw,4.4rem)}
+  .hero .hero-search{margin-top:3px;max-width:none}
+  .hero-utility{margin-top:12px}
+}
+@media(max-width:620px){
+  .hero{padding:25px 15px 19px;gap:17px}
+  .hero h1{font-size:clamp(2.55rem,10.5vw,3.55rem);margin-bottom:12px}
+  .hero-intro .eyebrow{margin-bottom:12px}
+  .hero-intro p{font-size:.9rem;line-height:1.52}
+  .hero .tool-card{padding:20px 16px}
+  .tool-head{gap:8px}
+  .tool-head strong{font-size:.92rem;max-width:66%}
+  .tool-head .small{font-size:.61rem}
+  .tool-card .tool-actions{gap:7px}
+  .tool-card .tool-actions .btn{grid-column:auto;font-size:.8rem}
+  .tool-secondary-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .tool-secondary-actions .btn{padding:7px 4px;font-size:.7rem}
+  .hero-discovery{padding:16px 3px 0;border-top:1px solid #dce5f6}
+  .hero-discovery .hero-proof{margin-top:14px}
+  .hero-discovery .hero-utility a{font-size:.7rem;padding:6px 9px}
+}
+@media(max-width:360px){
+  .tool-head .small{white-space:normal;text-align:right;max-width:40%}
+  .tool-secondary-actions{grid-template-columns:1fr 1fr}
+  .tool-secondary-actions .btn:last-child{grid-column:span 2}
+}
+@media(prefers-reduced-motion:reduce){
+  .tool-more-actions summary,.multi-unit-panel summary{transition:none}
+}
