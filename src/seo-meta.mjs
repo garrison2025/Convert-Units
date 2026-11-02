@@ -12,7 +12,7 @@ export function numericHeading(seed,pair){
 }
 export function numericTitle(seed,pair){
  const from=units[pair.from],to=units[pair.to];
- const result=formatNumber(convert(seed.value,pair.from,pair.to),9);
+ const result=formatNumber(convert(seed.value,pair.from,pair.to),6);
  return seed.valueText+' '+from.symbol+' to '+to.symbol+' '+displayRelation(convert(seed.value,pair.from,pair.to),result)+' '+result+' '+to.symbol;
 }
 export function numericDescription(seed,pair){
