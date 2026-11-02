@@ -283,10 +283,34 @@ export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={
  * (CSV output adds namespaced columns to avoid clobbering e.g. "result").
  * An unparseable row is kept verbatim in its first source cell, never lost.
  */
-export function convertBatchToCsv(table,fromUnit,toUnit){
+export function resolveUnitLabel(input){
+  const raw=String(input??'').trim();
+  if(!raw)throw new RangeError('A row unit is missing.');
+  if(Object.hasOwn(units,raw))return raw;
+  const key=Object.keys(units).find(id=>id.toLowerCase()===raw.toLowerCase());
+  if(key)return key;
+  const symbols=Object.keys(units).filter(id=>units[id].symbol===raw);
+  if(symbols.length===1)return symbols[0];
+  const names=Object.keys(units).filter(id=>units[id].name.toLowerCase()===raw.toLowerCase());
+  if(names.length===1)return names[0];
+  throw new RangeError('Unknown unit "'+raw+'". Use an ExactUnit unit ID or its exact symbol.');
+}
+
+/**
+ * Use source table unit columns only when both one-based column positions
+ * are explicitly selected. No automatic guessing across unit dimensions.
+ */
+export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColumn=null}={}){
+
   if(!table||!Array.isArray(table.rows))throw new TypeError('A parsed batch table is required.');
   if(!units[fromUnit]||!units[toUnit]||units[fromUnit].dimension!==units[toUnit].dimension){
-    throw new RangeError('Choose two compatible units.');
+    throw new RangeError('Choose two compatible default units.');
+  }
+  const mixed=fromColumn!==null||toColumn!==null;
+  if(mixed && (!Number.isInteger(Number(fromColumn))||!Number.isInteger(Number(toColumn))
+       ||Number(fromColumn)<1||Number(toColumn)<1||Number(fromColumn)>20||Number(toColumn)>20
+       ||Number(fromColumn)===Number(toColumn))){
+    throw new RangeError('For row-specific units, choose two different source and target columns (1–20).');
   }
   const sourceColumns=Math.max(1,table.headerCells?.length||0,...table.rows.map(row=>row.cells?.length||0));
   const headers=table.headerCells
@@ -298,19 +322,29 @@ export function convertBatchToCsv(table,fromUnit,toUnit){
   let converted=0;
   for(const row of table.rows){
     let result='',message='OK';
-    if(row.error)message=row.error;
-    else{
+    let sourceUnit=fromUnit,targetUnit=toUnit;
+    if(mixed){
       try{
-        // CSV output must use machine-readable decimal values, not the UI's
-        // thousands grouping (which can also misclassify negative CSV values).
-        result=formatNumber(convert(row.value,fromUnit,toUnit),9).replaceAll(',','');
+        sourceUnit=resolveUnitLabel(row.cells?.[Number(fromColumn)-1]);
+        targetUnit=resolveUnitLabel(row.cells?.[Number(toColumn)-1]);
+      }catch(e){message=e.message;}
+    }
+    if(row.error)message=row.error;
+    if(message==='OK'){
+      try{
+        // Never coerce incompatible row units. Keep failed rows with their
+        // original data instead of silently using the global selection.
+        const value=convert(row.value,sourceUnit,targetUnit);
+        result=formatNumber(value,9).replaceAll(',','');
         converted++;
       }catch(e){message=e.message;}
     }
     const source=row.cells?.length?row.cells.slice():[row.raw||''];
     while(source.length<sourceColumns)source.push('');
-    csvRows.push([...source,String(row.line),result,units[fromUnit].symbol,units[toUnit].symbol,message]);
-    results.push({line:row.line,input:row.value,result,from:units[fromUnit].symbol,to:units[toUnit].symbol,status:message});
+    const fromLabel=units[sourceUnit]?.symbol??String(sourceUnit??'');
+    const toLabel=units[targetUnit]?.symbol??String(targetUnit??'');
+    csvRows.push([...source,String(row.line),result,fromLabel,toLabel,message]);
+    results.push({line:row.line,input:row.value,result,from:fromLabel,to:toLabel,status:message});
   }
   return {
     csv:csvRows.map(cells=>cells.map(escapeCsvCell).join(',')).join('\r\n'),
