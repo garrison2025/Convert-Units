@@ -157,3 +157,16 @@ export function parseBatchFirstCell(line){
  if(/^[+-]?\d{1,3}(,\d{3})+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(cell))cell=cell.replaceAll(',','');
  return cell;
 }
+
+
+/** Pure CSV row selection: optional first-column header, malformed rows retained for per-row errors. */
+export function parseBatchLines(input,maxRows=1000){
+  const lines=String(input??'').split(/\r?\n/).filter(line=>line.trim());
+  if(!lines.length)return [];
+  let header=false;
+  try{header=/^(?:value|input|amount|number)$/i.test(parseBatchFirstCell(lines[0]));}
+  catch{ /* A malformed first CSV row must not crash the whole batch. */ }
+  const data=header?lines.slice(1):lines;
+  if(data.length>maxRows)throw new RangeError('Maximum '+maxRows+' data rows per batch.');
+  return data;
+}
