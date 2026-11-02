@@ -98,3 +98,64 @@
 .measurement-guide h3,.conversion-guide h3{font-size:1.02rem;line-height:1.3;margin:18px 0 9px}
 .measurement-guide p,.conversion-guide p{line-height:1.75;overflow-wrap:anywhere}
 .measurement-guide p:last-child,.conversion-guide p:last-child{margin-bottom:0}
+
+
+/* V5 visual-review fixes: preserve numeric integrity on 320px and lead batch
+   users to the actual data instead of optional CSV import configuration. */
+.resultbox .big [data-output-number]{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.resultbox .big [data-output-unit]{font-size:.75em;white-space:nowrap}
+@media(max-width:360px){
+  .tool-card .field-row:has(.resultbox){
+    display:flex;flex-direction:column-reverse;align-items:stretch;gap:8px;
+  }
+  .tool-card .field-row:has(.resultbox)>select{width:100%;min-height:43px}
+  .tool-card .field-row:has(.resultbox) .resultbox{width:100%;min-height:88px}
+  .tool-card .field-row:has(.resultbox) .resultbox .big,
+  .inner-page .tool-card .field-row:has(.resultbox) .resultbox .big{
+    font-size:clamp(1.55rem,7.9vw,1.85rem);letter-spacing:-.05em;line-height:1.22;
+  }
+  .value-presets{flex-wrap:nowrap;gap:4px}
+  .value-presets span{font-size:.64rem;margin-right:0;white-space:nowrap;flex:none}
+  .value-presets .preset{font-size:.71rem;padding:4px 7px;min-width:0;min-height:31px;flex:none}
+}
+.batch-page .page-title h1{max-width:900px;font-size:clamp(2.2rem,3.75vw,3.7rem)}
+.batch-page .page-title p{max-width:820px}
+.batch-page .page-top{padding-bottom:8px}
+.batch-page [data-batch]{margin-top:20px;padding:27px}
+.batch-advanced{border:1px solid #dfe7f5;border-radius:11px;background:#f8faff;margin:14px 0 18px;overflow:hidden}
+.batch-advanced summary{cursor:pointer;padding:12px 14px;color:#2d4a83;font-size:.85rem;font-weight:760;min-height:45px}
+.batch-advanced summary:hover{background:#eff3ff}
+.batch-advanced summary:focus-visible{outline:3px solid #91b0ff;outline-offset:-3px}
+.batch-advanced summary span{font-weight:550;font-size:.76rem;color:#61718c;margin-left:9px}
+.batch-advanced[open] summary{border-bottom:1px solid #dfe7f5;background:#f2f6ff}
+.batch-advanced-body{padding:16px}
+.batch-advanced-body .hint{line-height:1.65}
+.batch-submit{margin-top:18px;display:flex;justify-content:flex-start}
+.batch-submit .btn{min-height:46px;min-width:172px;font-size:.9rem}
+.batch-page [data-batch-input]{min-height:155px;height:165px}
+@media(max-width:650px){
+ .batch-page [data-batch]{padding:19px 16px}
+ .batch-page .page-title h1{font-size:clamp(2rem,8.2vw,2.65rem)}
+ .batch-advanced summary span{display:block;margin:2px 0 0;font-size:.69rem}
+ .batch-advanced-body{padding:13px}
+ .batch-submit .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.batch-advanced summary{scroll-behavior:auto}}
+
+
+/* V5 viewport refinements from screenshot comparison. */
+.batch-page .page-title h1{font-size:clamp(2.15rem,3.3vw,3.3rem);line-height:1.055}
+.batch-page .page-title{margin-bottom:8px}
+.batch-page [data-batch]{margin-top:9px}
+@media(max-width:650px){
+  .batch-page .page-title h1{font-size:clamp(1.95rem,8vw,2.5rem)}
+  .batch-page .page-title p{font-size:.89rem;line-height:1.5}
+  .batch-page [data-batch]>.batch-grid>div:first-child>.batch-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+    margin:12px 0!important;
+  }
+  .batch-page [data-batch]>.batch-grid>div:first-child>.batch-grid .select{
+    width:100%;min-width:0;padding:12px 8px;
+  }
+  .batch-page .batch-advanced{margin:11px 0 14px}
+}

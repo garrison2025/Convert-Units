@@ -22,6 +22,15 @@ jobs:
         run: |
           command -v google-chrome || command -v chromium
           node scripts/browser-smoke.mjs
+      - name: Capture desktop and mobile visual QA screenshots (local build only)
+        run: node scripts/visual-capture.mjs
+      - name: Upload browser screenshot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: exactunit-visual-qa
+          path: qa-snapshots/
+          if-no-files-found: error
+          retention-days: 7
       - name: Guard against accidental indexing when SITE_URL is set without launch approval
         env:
           SITE_URL: https://qa.example.test
