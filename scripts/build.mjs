@@ -111,7 +111,12 @@ fs.writeFileSync(path.join(dist,'sitemap.xml'),`<?xml version="1.0" encoding="UT
 fs.writeFileSync(path.join(dist,'_headers'),`/assets/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n${IS_PRODUCTION?'':'  X-Robots-Tag: noindex, nofollow\n'}`);
 // Cloudflare's official host-matching headers prevent production Pages mirrors and
 // branch previews from being indexed even when SITE_URL points at a real domain.
-fs.appendFileSync(path.join(dist,'_headers'),'\\nhttps://:project.pages.dev/*\\n  X-Robots-Tag: noindex\\nhttps://:version.:project.pages.dev/*\\n  X-Robots-Tag: noindex\\n'.replaceAll('\\\\n','\\n'));
+fs.appendFileSync(path.join(dist,'_headers'), `
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
+`);
 // Cloudflare Pages serves /404.html for missing routes (real 404 status).
 fs.copyFileSync(path.join(dist,'404','index.html'),path.join(dist,'404.html'));
 const adsPublisher=process.env.ADSENSE_PUBLISHER_ID||'';
