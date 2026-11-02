@@ -75,3 +75,9 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - **All 92 numeric-result titles:** keep the user's exact numeric intent, but limit visible SERP-title answer rounding to at most 6 decimal places (rather than up to 9) to reduce awkward, overly long titles. H1, HTML description, and prerendered body remain clear, accurate and tied to the same source engine.
 - Preserve the accessible working calculator above unrelated explanatory material. No extra thin-value URLs, FAQ schema, invented testimonials, self-described experts or paid APIs.
 - A new unit test independently verifies all 38 quick answers, and SEO content audit requires server-rendered quick answers so crawlers can see them without JavaScript. Cloudflare preview remains fully noindex; official-domain user approval is unchanged.
+
+## V8 conversion-intent and crawlable-navigation refinements (2026-11-02)
+- All 38 directional converter Meta Descriptions now use the common calculator engine and `displayRelation()`, preventing a rounded number being published as an exact equality. This is informational accuracy, not a claim about search-ranking changes or verified generic keyword demand.
+- All 92 numeric answer pages replace a redundant "related measurements" parent self-link with up to four semantically related **existing directional converter** links. Reverse directions are first where available; category navigation remains a fallback. None links to the 77 deliberately noindex numeric siblings.
+- The static SEO audit independently asserts accurate server-rendered snippets and related conversion links on every numeric and directional page. Node tests enforce the same 38-direction snippets and related pair validity.
+- The page count (157), 15/77 numeric indexing policy, and existing `pages.dev` noindex remain unchanged. Official domain selection is deferred.
