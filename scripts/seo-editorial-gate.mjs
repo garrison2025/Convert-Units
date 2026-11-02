@@ -17,11 +17,27 @@ const pairs=readJson('src/data/pairs.json');
 const seeds=readJson('src/data/seeds.json');
 const policy=readJson('src/data/numeric-seo-policy.json');
 const selected=new Set(policy.pilotIndexUrls);
+const currentSerpReview=readJson('research/SEO-15-SERP-EVIDENCE-20261102.json');
+const serpReviews=currentSerpReview.items||[];
 const out=path.join(root,'dist');
 const failures=[];
 if(pairs.length!==38||seeds.length!==92)failures.push('Expected verified 38 converter and 92 numeric routes.');
 if(selected.size!==15)failures.push('Editorial inventory must agree with the conservative 15-value pilot.');
 if(selected.size!==policy.pilotIndexUrls.length)failures.push('Duplicate selected numeric URL in policy.');
+if(serpReviews.length!==15||new Set(serpReviews.map(x=>x.url)).size!==15)
+ failures.push('Public SERP competitor review must cover 15 distinct approved numeric URLs.');
+for(const entry of serpReviews){
+ const seed=seeds.find(x=>x.url===entry.url);
+ if(!seed||!selected.has(entry.url)||entry.query!==seed.keyword)
+  failures.push('SERP observation does not map to one approved numeric query: '+entry.url);
+ if(!['exact-value-page','generic-tool-table','generic-tool-example'].includes(entry.observedPageType))
+  failures.push('Unknown SERP competitor page type: '+entry.url);
+ let candidate=null;try{candidate=new URL(entry.competitorUrl);}catch{}
+ if(candidate?.protocol!=='https:'||!candidate?.hostname||!entry.observedFunction)
+  failures.push('Missing verifiable competitor page and observed feature for '+entry.url);
+ if(entry.rankingProven!==false||entry.siteVsCompetitorUniqueValueProven!==false)
+  failures.push('Unaudited Google ranking/competitive advantage cannot be asserted for '+entry.url);
+}
 const seedUrls=new Set(seeds.map(x=>x.url));
 const bySlug=new Map();
 for(const s of seeds){
@@ -134,6 +150,10 @@ const report={
  converterDirectionsWithoutApprovedNumericEvidence:pairRows.length-totalNumericSupportedDirections,
  pilotSameDirectionPairs:0,
  numericSourceReconciled:valueRows.filter(x=>x.sourceReconciliation.startsWith('exact')).length,
+ serpCompetitorReviews:serpReviews.length,
+ serpExactValuePageObservations:serpReviews.filter(x=>x.observedPageType==='exact-value-page').length,
+ serpGenericToolOrTableObservations:serpReviews.filter(x=>x.observedPageType!=='exact-value-page').length,
+ serpUSGoogleRankVerified:false,
  rawCompetitorLandingNumberMismatches:sourcePathDisagreements.length,
  approvedSeedsOverlappingRawLandingMismatches:taintedNumericSeeds.length,
  note:'This is a zero-invention content planning and release safety inventory. Generic converter keyword demand and Google SERP user-intent divergence remain unverified. No index policy or URL has been changed.',
