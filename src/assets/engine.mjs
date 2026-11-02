@@ -520,3 +520,30 @@ export function kgToPoundsOunces(valueKg){
  const label=formatNumber(pounds,0)+' lb '+formatNumber(ounces,1)+' oz';
  return {pounds,ounces,relation,label};
 }
+
+
+/**
+ * Show the same absolute temperature in Celsius, Fahrenheit and kelvin.
+ * The degree scales have an offset for absolute temperature readings;
+ * conversion of temperature DIFFERENCES is a distinct operation.
+ * Use the same tested convert() engine as the principal calculator.
+ */
+export function temperatureThreeScaleReadout(value,fromUnit){
+ const n=Number(value),source=units[fromUnit];
+ if(!source||source.dimension!=='temperature'||!Number.isFinite(n))return null;
+ try{
+  const result=['celsius','fahrenheit','kelvin'].map(id=>{
+   const raw=id===fromUnit?n:convert(n,fromUnit,id);
+   const shown=formatNumber(raw,6);
+   const rounded=Number(shown.replaceAll(',',''));
+   // Arithmetic through Kelvin may add a handful of binary ULPs. Do not
+   // misclassify 37.9 C = 100.22 F as physically approximate because of that.
+   const tolerance=4*Number.EPSILON*Math.max(1,Math.abs(raw));
+   const relation=Math.abs(raw-rounded)<=tolerance?'=':'≈';
+   return {unit:id,symbol:units[id].symbol,shown,relation};
+  });
+  // Also validate same-unit values (e.g. Celsius -273.16 or Kelvin -1).
+  convert(n,fromUnit,'kelvin');
+  return result;
+ }catch{return null;}
+}
