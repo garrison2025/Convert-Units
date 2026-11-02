@@ -141,3 +141,21 @@
  .batch-submit .btn{width:100%}
 }
 @media(prefers-reduced-motion:reduce){.batch-advanced summary{scroll-behavior:auto}}
+
+
+/* V5 viewport refinements from screenshot comparison. */
+.batch-page .page-title h1{font-size:clamp(2.15rem,3.3vw,3.3rem);line-height:1.055}
+.batch-page .page-title{margin-bottom:8px}
+.batch-page [data-batch]{margin-top:9px}
+@media(max-width:650px){
+  .batch-page .page-title h1{font-size:clamp(1.95rem,8vw,2.5rem)}
+  .batch-page .page-title p{font-size:.89rem;line-height:1.5}
+  .batch-page [data-batch]>.batch-grid>div:first-child>.batch-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+    margin:12px 0!important;
+  }
+  .batch-page [data-batch]>.batch-grid>div:first-child>.batch-grid .select{
+    width:100%;min-width:0;padding:12px 8px;
+  }
+  .batch-page .batch-advanced{margin:11px 0 14px}
+}
