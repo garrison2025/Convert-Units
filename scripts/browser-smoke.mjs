@@ -47,6 +47,17 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-batch-result]').value==='','stale results must be cleared');
      break;
    }
+   case 'batch-multiline':{
+     q('[data-batch-column]').value='2';
+     q('[data-batch-delimiter]').value='comma';
+     q('[data-batch-input]').value='sku,value,notes\nshirt,149,"first line\nsecond line"\ncap,126,normal';
+     q('[data-process]').click();
+     const output=q('[data-batch-result]').value;
+     ok(output.includes('Line 2: 149 lb'),'multi-line first record must survive');
+     ok(output.includes('Line 4: 126 lb'),'next record must retain original physical line number');
+     ok(q('[data-batch-status]').textContent.includes('Converted 2 of 2'),'quoted multiline notes count as a single logical CSV row');
+     break;
+   }
    case 'batch-mixed':{
      const rowFrom=q('[data-batch-from-column]'),rowTo=q('[data-batch-to-column]');
      ok(Boolean(rowFrom&&rowTo),'row-specific CSV unit columns must appear in the browser');
@@ -142,6 +153,7 @@ async function smokeScenario(SCENARIO){
 }
 const suites=[
  {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
+ {name:'batch-multiline',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
