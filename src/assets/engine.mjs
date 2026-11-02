@@ -134,7 +134,12 @@ export function displayRelation(unrounded,displayText){
  const original=Number(unrounded);
  const shown=Number(String(displayText).replaceAll(',',''));
  if(!Number.isFinite(original)||!Number.isFinite(shown))throw new RangeError('A finite numeric conversion result is required.');
- return original===shown?'=':'≈';
+ // Binary round trips add a few ULPs even where the physical decimal result
+ // is exactly representable (37.9 °C → 100.22 °F). Distinguish this numerical
+ // noise from meaningful display rounding, without treating six-place
+ // truncation or actual significant differences as equality.
+ const tolerance=4*Number.EPSILON*Math.max(1,Math.abs(original),Math.abs(shown));
+ return Math.abs(original-shown)<=tolerance?'=':'≈';
 }
 export function formula(from,to){
  const a=units[from],b=units[to];
@@ -530,10 +535,7 @@ export function temperatureThreeScaleReadout(value,fromUnit){
   const result=['celsius','fahrenheit','kelvin'].map(id=>{
    const raw=id===fromUnit?n:convert(n,fromUnit,id);
    const shown=formatNumber(raw,6);
-   const rounded=Number(shown.replaceAll(',',''));
-   // Ignore binary ULP tails, not real six-place rounding.
-   const tolerance=4*Number.EPSILON*Math.max(1,Math.abs(raw));
-   const relation=Math.abs(raw-rounded)<=tolerance?'=':'≈';
+   const relation=displayRelation(raw,shown);
    return {unit:id,symbol:units[id].symbol,shown,relation};
   });
 
