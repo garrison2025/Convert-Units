@@ -438,6 +438,44 @@ async function smokeScenario(SCENARIO){
      ok(document.querySelector('.aside-stack .chiplist a')?.getAttribute('href')==='/convert/kg-to-lbs/','other categories still prioritize relevant reverse converter');
      break;
    }
+   case 'source-metric-feet':{
+     const panel=q('[data-engineering-reference="length"]');
+     ok(panel?.dataset.engineeringSource==='m','meters page reference must start from meters');
+     ok(panel.textContent.includes('1.75 m')&&panel.textContent.includes('5 ft 8 7/8 in'),'meters page offers mixed feet and inch example');
+     ok(!panel.textContent.includes('Fractional inches to metric lengths'),'do not show unrelated inch ruler table');
+     break;
+   }
+   case 'source-feet-metric':{
+     const panel=q('[data-engineering-reference="length"]');
+     ok(panel?.dataset.engineeringSource==='ft','feet source reference');
+     ok(panel.textContent.includes('5.5 ft')&&panel.textContent.includes('1.6764 m'),'decimal feet converted to meters');
+     break;
+   }
+   case 'source-centimeters-inch':{
+     const panel=q('[data-engineering-reference="length"]');
+     ok(panel?.dataset.engineeringSource==='cm','centimeters source reference');
+     ok(panel.textContent.includes('2.54 cm')&&panel.textContent.includes('1 in'),'centimeters page gives direct and fractional inch values');
+     break;
+   }
+   case 'source-mph-speed':{
+     const panel=q('[data-engineering-reference="speed"]');
+     ok(panel?.dataset.engineeringSource==='mph','mph source reference');
+     ok(panel.textContent.includes('60 mph')&&panel.textContent.includes('96.56064 km/h')&&panel.textContent.includes('26.8224 m/s'),'mph source values are correct');
+     break;
+   }
+   case 'source-nm-torque':{
+     const panel=q('[data-engineering-reference="torque"]');
+     ok(panel?.dataset.engineeringSource==='nm','newton-meter source reference');
+     ok(panel.textContent.includes('100 N·m')&&panel.textContent.includes('73.756215 ft·lbf'),'newton-meter source values are correct');
+     ok(!panel.textContent.includes('100 foot-pound-force in other torque units'),'irrelevant reverse torque source gone');
+     break;
+   }
+   case 'source-inch-mm':{
+     const panel=q('[data-engineering-reference="length"]');
+     ok(panel?.dataset.engineeringSource==='in','inch source reference for millimeters');
+     ok(panel.textContent.includes('1/16 in')&&panel.textContent.includes('1.5875 mm'),'inch ruler fractions remain valid');
+     break;
+   }
    case 'engineering-length':{
      const panel=q('[data-engineering-reference="length"]');
      ok(Boolean(panel&&panel.textContent.includes('1/16 in')&&panel.textContent.includes('1.5875 mm')),
@@ -483,8 +521,9 @@ async function smokeScenario(SCENARIO){
    }
    case 'engineering-speed':{
      const panel=q('[data-engineering-reference="speed"]');
-     ok(Boolean(panel&&panel.textContent.includes('96.56064 km/h')&&panel.textContent.includes('26.8224 m/s')),
-       'speed page must render accurate multi-unit cross-check');
+     ok(Boolean(panel&&panel.dataset.engineeringSource==='kmh'&&
+       panel.textContent.includes('100 km/h')&&panel.textContent.includes('62.137119 mph')),
+       'km/h source page must render 100 km/h equivalents, not an unrelated 60 mph reference');
      const input=q('[data-value]');
      input.value='330';input.dispatchEvent(new Event('input',{bubbles:true}));
      ok(q('[data-output]').textContent.includes('205.052493'),'330 km/h speed result must update live');
@@ -593,6 +632,12 @@ const suites=[
  {name:'intent-speed-core',url:'/convert/kmh-to-mph/'},
  {name:'intent-torque-core',url:'/convert/ft-lbf-to-nm/'},
  {name:'intent-no-leak',url:'/convert/lbs-to-kg/'},
+ {name:'source-metric-feet',url:'/convert/m-to-ft/'},
+ {name:'source-feet-metric',url:'/convert/ft-to-m/'},
+ {name:'source-centimeters-inch',url:'/convert/cm-to-in/'},
+ {name:'source-mph-speed',url:'/convert/mph-to-kmh/'},
+ {name:'source-nm-torque',url:'/convert/nm-to-ft-lbf/'},
+ {name:'source-inch-mm',url:'/convert/in-to-mm/'},
  {name:'engineering-length',url:'/convert/in-to-cm/'},
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
  {name:'speed-four-330',url:'/convert/kmh-to-mph/330/'},
@@ -606,7 +651,7 @@ const suites=[
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
