@@ -83,7 +83,7 @@ export function roundTripPrecisionNote(pair,value){
  if(!Number.isFinite(n))return '';
  const target=convert(n,pair.from,pair.to);
  if(!Number.isFinite(target))return '';
- const rounded=Number(formatNumber(target,2));
+ const rounded=Number(formatNumber(target,2).replaceAll(',',''));
  if(!Number.isFinite(rounded))return '';
  const restored=convert(rounded,pair.to,pair.from);
  if(!Number.isFinite(restored))return '';
