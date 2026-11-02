@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -180,6 +180,16 @@ for(const pair of pairList){
     errors.push(pair.url+': source-calculated temperature scale or difference warning missing');
  }else if(html.includes('data-temperature-triple')){
   errors.push(pair.url+': temperature panel leaked into non-temperature conversion');
+ }
+ if(units[pair.from].dimension==='torque'){
+  const rows=torqueFourUnitComparison(5,pair.from);
+  if(!rows||!html.includes('data-torque-summary')||!html.includes('data-copy-torque')||
+     !html.includes('Torque is a moment of force, not energy.')||
+     rows.some(v=>!html.includes('data-torque-unit="'+v.unit+'"')||
+       !html.includes(v.relation+' '+v.shown+' '+v.symbol)))
+    errors.push(pair.url+': torque four-unit SSR or physical-context warning missing');
+ }else if(html.includes('data-torque-summary')){
+  errors.push(pair.url+': torque panel leaked onto a non-torque conversion');
  }
  if(units[pair.from].dimension==='pressure'){
   const rows=pressureFourUnitComparison(5,pair.from);
