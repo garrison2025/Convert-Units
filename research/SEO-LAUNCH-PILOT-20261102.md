@@ -81,3 +81,16 @@ Google official references:
 ## Similarity result after the pilot — still unresolved
 
 Verified by GitHub Actions run 41372934999: across all 92 numeric pages the token-normalized similarity alert remains **1,646/1,646** comparable same-direction pairs, while among the **26 index-eligible pilot numeric pages**, it flags **17/17** comparable same-direction pairs at the 0.95 threshold. The metric normalizes numeric values and is sensitive to shared templates; it is not Google's own duplicate-content measure. Nevertheless, these results are a material editorial risk. Reducing sitemap volume does **not** itself create independently useful content. Leave the pilot conservative until real US SERP and content usefulness review; consolidate page groups when a pair-tool page sufficiently satisfies the same search intent. Do not invent unique prose merely to lower similarity.
+
+## Adjacent information-intent opportunities found in the same 600-row source
+
+The competitor keyword appendix also includes terms for which a direct numeric answer without more context would be misleading. These are **research leads, not approved landing pages or verified organic traffic for ExactUnit**:
+
+| Observed competitor query | US volume estimate | KD | Competitor traffic estimate | User problem |
+|---|---:|---:|---:|---|
+| how to convert ml to mg | 210 | 2 | 27 | A volume-to-mass calculation requires the material's density |
+| how many ml in kilogram | 480 | 27 | 63 | Different materials yield different volumes for the same mass |
+| gram and milliliter conversion | 480 | 33 | 63 | A conditional mass/volume conversion needs density |
+| hpa to mmhg | 320 | 4 | 42 | A direct pressure conversion with possible immediate-answer competition |
+
+These values come from the original competitor TSV (one observed row per example); they are not forecasts or US Google top-ten verification. The first three queries suggest one coherent, density-aware information need rather than three independently justified SEO pages. **Do not publish a generic `kg to mL` or `mL to mg` numerical answer without a density input.** If future US SERP research confirms sufficiently independent click intent, a density-aware calculator and a well-sourced explanation may provide more value than another mass number page. No extra tool was added in this optimization pass.
