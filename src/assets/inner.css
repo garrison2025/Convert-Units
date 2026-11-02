@@ -74,3 +74,15 @@
   .number-table{width:100%!important}
   a{color:#111!important}
 }
+
+/* Universal finder: accessible, free-text alias search without a third-party library. */
+.unit-find{width:100%;margin:5px 0 5px!important;font-size:.91rem}
+.unit-suggestions{border:1px solid #d8e4f4;border-radius:12px;overflow:hidden;margin:8px 0 16px;background:#fff}
+.unit-suggestion{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 11px;border-top:1px solid #eaf0fa}
+.unit-suggestion:first-child{border-top:0}
+.unit-suggestion span{font-weight:650;color:#33465f;flex:1;min-width:115px;font-size:.84rem}
+.unit-suggestion button{padding:7px 9px;border:1px solid #bed1e8;background:#f5f8ff;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;color:#1b4d96}
+.unit-suggestion button:hover{background:#e5efff}
+.unit-suggestion button:focus-visible{outline:3px solid #7aa5ed;outline-offset:2px}
+@media(max-width:620px){.unit-suggestion span{flex-basis:100%}.unit-suggestion button{flex:1}}
+@media print{.unit-find,.unit-suggestions,[data-unit-status]{display:none!important}}
