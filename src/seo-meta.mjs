@@ -21,3 +21,18 @@ export function numericDescription(seed,pair){
  return numericHeading(seed,pair)+': '+seed.valueText+' '+from.symbol+' '+displayRelation(convert(seed.value,pair.from,pair.to),result)+' '+result+' '+to.symbol+
   '. Verify the formula, adjust precision and compare nearby values in the free calculator.';
 }
+
+/**
+ * Search snippet for one actual directional tool. Never use '=' for a number
+ * rounded to fewer decimal places than the underlying conversion yields.
+ * Generic query volume is not asserted by this descriptive page metadata.
+ */
+export function directionMetaDescription(pair){
+ const from=units[pair.from],to=units[pair.to];
+ if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Incompatible SEO units');
+ const raw=convert(1,pair.from,pair.to);
+ const rendered=formatNumber(raw,9);
+ const relation=displayRelation(raw,rendered);
+ return pair.title+': 1 '+from.symbol+' '+relation+' '+rendered+' '+to.symbol+
+  '. Enter any value, check the formula and use the reference table or local batch converter.';
+}

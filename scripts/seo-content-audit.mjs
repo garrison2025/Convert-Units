@@ -6,8 +6,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
+import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
 import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
+import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -121,6 +122,8 @@ for(const pair of pairList){
  const shortAnswer='1 '+units[pair.from].symbol+' '+displayRelation(oneResult,formatNumber(oneResult,9))+' '+formatNumber(oneResult,9)+' '+units[pair.to].symbol;
  if(!html.includes('class="pair-key-fact"')||!html.includes(shortAnswer))
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
+ if(decode(meta(html,'description'))!==directionMetaDescription(pair))
+  errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
  if(!html.includes('class="card conversion-guide"'))errors.push(pair.url+': source-linked conversion guidance missing');
  if(!html.includes('NIST conversion factors'))errors.push(pair.url+': methodology reference missing');
  if(!html.includes('Quick reference table'))errors.push(pair.url+': numeric check table missing');
@@ -143,6 +146,11 @@ for(const seed of seeds){
  if(h1!==numericHeading(seed,pair))errors.push(seed.url+': H1 does not name actual measurement and units');
  const desc=meta(html,'description');
  if(desc!==numericDescription(seed,pair))errors.push(seed.url+': descriptive snippet is inconsistent with the numeric answer');
+ if(!html.includes('class="mini-card related-direction-links"'))
+  errors.push(seed.url+': related converter navigation missing');
+ const expectedRelated=relatedDirectionLinks(pair,pairList);
+ for(const match of expectedRelated.matchAll(/<a class="chip" href="([^"]+)"/g))
+  if(!html.includes('href="'+match[1]+'"'))errors.push(seed.url+': related conversion path absent '+match[1]);
  if(!html.includes('data-precision-table'))errors.push(seed.url+': useful rounding comparison missing');
  if(!html.includes('CONVERSION RESULT'))errors.push(seed.url+': answer-first content missing');
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
