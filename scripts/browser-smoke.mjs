@@ -403,6 +403,41 @@ async function smokeScenario(SCENARIO){
      }
      break;
    }
+   case 'intent-inch-cm':{
+     const section=q('[data-intent-answers="in-to-cm"]'),aside=[...document.querySelectorAll('.aside-stack .chiplist a')];
+     ok(Boolean(section&&section.textContent.includes('17.7 in = 44.958 cm')),'the existing inch-to-cm page has a source-calculated real question');
+     ok(section.textContent.includes('exactly 2.54 centimeters'),'the international inch definition is explained');
+     ok(aside[0]?.getAttribute('href')==='/convert/cm-to-in/','reverse conversion must rank above unrelated length links');
+     ok(aside[1]?.getAttribute('href')==='/convert/in-to-mm/','same inch-source direction must rank next');
+     ok(section.querySelector('a[href="/convert/in-to-mm/"]'),'contextual navigation uses a regular crawlable anchor');
+     ok(!section.querySelector('[type="application/ld+json"]'),'do not invent FAQ structured data');
+     break;
+   }
+   case 'intent-meter-feet':{
+     const section=q('[data-intent-answers="m-to-ft"]');
+     ok(Boolean(section&&section.textContent.includes('5 ft 8.90 in')&&section.textContent.includes('5 ft 8 7/8 in')),'meters page answers decimal and fractional feet-and-inches');
+     ok(document.querySelector('.aside-stack .chiplist a')?.getAttribute('href')==='/convert/ft-to-m/','reverse feet page first');
+     break;
+   }
+   case 'intent-speed-core':{
+     const section=q('[data-intent-answers="kmh-to-mph"]');
+     ok(Boolean(section&&section.textContent.includes('100 km/h ≈ 62.137119 mph')),'100 kmh contextual answer source-calculated');
+     ok(section.textContent.includes('knot means one nautical mile per hour'),'answer covers knots, not duplicate calculation prose');
+     ok(document.querySelector('.aside-stack .chiplist a')?.getAttribute('href')==='/convert/mph-to-kmh/','reverse speed direction first');
+     break;
+   }
+   case 'intent-torque-core':{
+     const section=q('[data-intent-answers="ft-lbf-to-nm"]');
+     ok(Boolean(section&&section.textContent.includes('400 ft·lbf ≈ 542.327179 N·m')),'torque question uses true exact-factor conversion');
+     ok(section.textContent.includes('manufacturer'),'unsafe tightening recommendations are not presented');
+     ok(document.querySelector('.aside-stack .chiplist a')?.getAttribute('href')==='/convert/nm-to-ft-lbf/','reverse torque direction first');
+     break;
+   }
+   case 'intent-no-leak':{
+     ok(!q('[data-intent-answers]'),'non-curated mass converter should not receive generic templated FAQs');
+     ok(document.querySelector('.aside-stack .chiplist a')?.getAttribute('href')==='/convert/kg-to-lbs/','other categories still prioritize relevant reverse converter');
+     break;
+   }
    case 'engineering-length':{
      const panel=q('[data-engineering-reference="length"]');
      ok(Boolean(panel&&panel.textContent.includes('1/16 in')&&panel.textContent.includes('1.5875 mm')),
@@ -553,6 +588,11 @@ const suites=[
  {name:'pressure-50',url:'/convert/kpa-to-atm/50/'},{name:'pressure-108',url:'/convert/kpa-to-psi/108/'},
  {name:'temperature-three-scale',url:'/convert/celsius-to-fahrenheit/37.9/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
+ {name:'intent-inch-cm',url:'/convert/in-to-cm/'},
+ {name:'intent-meter-feet',url:'/convert/m-to-ft/'},
+ {name:'intent-speed-core',url:'/convert/kmh-to-mph/'},
+ {name:'intent-torque-core',url:'/convert/ft-lbf-to-nm/'},
+ {name:'intent-no-leak',url:'/convert/lbs-to-kg/'},
  {name:'engineering-length',url:'/convert/in-to-cm/'},
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
  {name:'speed-four-330',url:'/convert/kmh-to-mph/330/'},
@@ -566,7 +606,7 @@ const suites=[
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
