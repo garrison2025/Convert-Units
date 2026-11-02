@@ -403,6 +403,41 @@ async function smokeScenario(SCENARIO){
      }
      break;
    }
+   case 'engineering-length':{
+     const panel=q('[data-engineering-reference="length"]');
+     ok(Boolean(panel&&panel.textContent.includes('1/16 in')&&panel.textContent.includes('1.5875 mm')),
+       'length page must render accurate fractional international inch values');
+     const input=q('[data-value]');
+     input.value='17.7';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('44.958'),'17.7 inches must equal 44.958 centimeters');
+     break;
+   }
+   case 'engineering-speed':{
+     const panel=q('[data-engineering-reference="speed"]');
+     ok(Boolean(panel&&panel.textContent.includes('96.56064 km/h')&&panel.textContent.includes('26.8224 m/s')),
+       'speed page must render accurate multi-unit cross-check');
+     const input=q('[data-value]');
+     input.value='330';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('205.052493'),'330 km/h speed result must update live');
+     const table=q('[data-multi-results]');
+     ok(table.textContent.includes('m/s')&&table.textContent.includes('kn'),'speed comparison includes SI and nautical units');
+     break;
+   }
+   case 'engineering-torque':{
+     const panel=q('[data-engineering-reference="torque"]');
+     ok(Boolean(panel&&panel.textContent.includes('1,200 in·lbf')),
+       'torque page must render source-computed inch-pound cross-check');
+     const input=q('[data-value]'),destination=q('[data-to]');
+     input.value='400';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('542.327179'),'400 ft·lbf must convert live to N·m');
+     ok([...destination.options].some(x=>x.value==='in-lbf')&&[...destination.options].some(x=>x.value==='kgf-m'),
+       'new engineering torque units must be real selectable targets');
+     destination.value='in-lbf';destination.dispatchEvent(new Event('change',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('4,800'),'400 foot-pounds must produce 4,800 inch-pounds');
+     destination.value='kgf-m';destination.dispatchEvent(new Event('change',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('55.301'),'kgf·m must calculate from the same source engine');
+     break;
+   }
    default:throw new Error('Unknown smoke scenario');
   }
 }
@@ -417,6 +452,9 @@ const suites=[
  {name:'pressure-50',url:'/convert/kpa-to-atm/50/'},{name:'pressure-108',url:'/convert/kpa-to-psi/108/'},
  {name:'temperature-three-scale',url:'/convert/celsius-to-fahrenheit/37.9/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
+ {name:'engineering-length',url:'/convert/in-to-cm/'},
+ {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
+ {name:'engineering-torque',url:'/convert/ft-lbf-to-nm/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
