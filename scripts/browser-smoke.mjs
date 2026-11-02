@@ -50,6 +50,10 @@ async function smokeScenario(SCENARIO){
    case 'batch-mixed':{
      const rowFrom=q('[data-batch-from-column]'),rowTo=q('[data-batch-to-column]');
      ok(Boolean(rowFrom&&rowTo),'row-specific CSV unit columns must appear in the browser');
+     ok(Boolean(q('[data-batch-example]')),'sample CSV must be visible');
+     q('[data-batch-example]').click();
+     ok(q('[data-batch-status]').textContent.includes('Converted 4 of 4'),'load example must convert all mixed units');
+     ok(q('[data-batch-result]').value.includes('330 km/h'),'example must cover speed conversion');
      q('[data-batch-column]').value='2';
      q('[data-batch-input]').value='label,value,from,to\nparcel,149,lb,kg\nclock,60000,ms,s\ninvalid,50,kg,s';
      q('[data-batch-delimiter]').value='comma';
