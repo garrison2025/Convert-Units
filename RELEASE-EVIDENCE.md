@@ -35,3 +35,30 @@ The current implementation uses dependency-free Node ESM static generation and v
 
 ## Boundaries
 Cloudflare's generated `*.pages.dev` name is a temporary preview, **not** the production URL. Without a valid custom-domain SITE_URL, the build emits noindex, no production canonical and an empty sitemap. Automated CI passing is not proof of production uptime, AdSense acceptance, rankings, traffic, or revenue.
+
+## 2026-11-02 additional pre-domain static audit
+
+Scope: **source code, unit data, test suite and generated-page audits only**. The official domain has not been purchased. No live-domain, real browser, Google indexing, Core Web Vitals or AdSense test is claimed.
+
+### Fixes completed in this review
+- Strictly parse decimal and scientific numeric input; reject JS numeric coercions such as hex, booleans and objects, and reject underflow of nonzero values to false zero.
+- Keep batch conversion alive when the first CSV row is malformed; isolate malformed rows for per-row reporting.
+- Default mass batch conversion to **lbs → kg**, consistent with the site's main audience.
+- On extreme input, an unrepresentable alternate unit no longer erases the primary conversion result.
+- Search the converter directory and homepage using real unit abbreviations/aliases (e.g. lbs, kg, pounds, kilos); the universal converter has a keyboard-accessible alias finder for From/To.
+- Consolidate five layered CSS source files into one production HTTP stylesheet (`/assets/styles.css`), preserving CSS cascade order.
+- Export CSV with formula-injection guards, including malicious text starting with spreadsheet formula characters; preserve valid negative numbers.
+- Production `npm run build` now runs the numerical unit tests **before** the static generation and audit steps. Cloudflare deployment must fail if tests fail.
+- Extend release audit to verify the stylesheet and universal/directory search controls. Add tests for CSV header parsing, strict decimal inputs, scientific underflow and CSV formula protections.
+
+### Findings that are not yet fully resolved
+1. **Editorial uniqueness:** 70 weight-value landing pages necessarily share a large fraction of their explanation and layout. Each has a real on-page answer and interactive tool, but automated similarity warnings cannot certify Google Search/AdSense quality. Do not invent filler paragraphs just to lower similarity or generate additional numeric SEO pages.
+2. **Actual UX/performance:** responsive behavior at 320px, keyboard/assistive technology, CSV downloads on mobile, actual printer output and Lighthouse measurements require real browser tests after the user chooses to do them.
+3. **Official origin:** configure the user's future custom HTTPS domain as `SITE_URL`; verify live canonical URLs, response codes, robots and sitemap only then. Cloudflare-generated preview hostname remains `noindex`.
+4. **Paid advertising:** no automatic ad scripts, analytics, paid APIs or storage were introduced. A real AdSense publisher account and any necessary consent configuration remain the owner's separate setup.
+5. **Technology choice:** the implemented site remains zero-dependency Node static generation and vanilla JS, not Astro + TypeScript. Migrating frameworks is not justified solely to match the plan when behavior, cost and testing requirements are met.
+
+### Evidence
+- Reproducible local command: `npm run check`, which now runs tests and the complete build-time audit.
+- CI on main builds both preview and synthetic official-domain modes; check the latest workflow at https://github.com/garrison2025/Convert-Units/actions .
+- Scripts: `scripts/audit.mjs`, `scripts/deep-audit.mjs`, `scripts/release-audit.mjs`. Reports are emitted under `dist/`.
