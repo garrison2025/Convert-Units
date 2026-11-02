@@ -29,6 +29,26 @@ async function smokeScenario(SCENARIO){
      ok([...document.querySelectorAll('[data-quick-item]')].some(el=>!el.hidden),'suggestions should include matching tools');
      break;
    }
+   case 'copy-number':{
+     const numberButton=q('[data-copy-number]');
+     const feedback=q('[data-action-status]');
+     ok(Boolean(numberButton&&feedback),'number-only copy and accessible feedback must exist');
+     const input=q('[data-converter] [data-value]');
+     input.value='150';input.dispatchEvent(new Event('input',{bubbles:true}));
+     const precision=q('[data-precision]');
+     precision.value='2';precision.dispatchEvent(new Event('change',{bubbles:true}));
+     let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{written=value;}}});
+     numberButton.click();
+     await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written==='68.04','number-only copy must match displayed 2-decimal result without the unit');
+     ok(feedback.textContent.includes('without units'),'copy announcement must describe unit-free value');
+     q('[data-copy]').click();
+     await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written.startsWith('150 lb = ')&&written.endsWith(' kg'),
+       'existing full-expression copy remains available');
+     break;
+   }
    case 'batch':{
      ok(q('[data-batch-from]').value==='lbs','batch default lbs');
      ok(q('[data-batch-to]').value==='kg','batch default kg');
@@ -167,7 +187,7 @@ async function smokeScenario(SCENARIO){
   }
 }
 const suites=[
- {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
+ {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'batch-multiline',url:'/batch-converter/'},
  {name:'batch-alias',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
