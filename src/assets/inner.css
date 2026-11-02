@@ -90,3 +90,11 @@
 /* Grid children must be allowed to shrink below tables' intrinsic min-content width. */
 .inner-page .tool-layout > div,.inner-page .aside-stack,.inner-page .tool-card,.inner-page .body-content{min-width:0;max-width:100%}
 .inner-page .reference-scroll{max-width:100%;overflow-x:auto}
+
+/* Verifiable, user-oriented measurement guidance; avoid walls of SEO text. */
+.measurement-guide{margin:24px 0 0;max-width:960px}
+.conversion-guide{margin-top:16px}
+.measurement-guide h2,.conversion-guide h2{font-size:clamp(1.16rem,2.5vw,1.5rem);line-height:1.25}
+.measurement-guide h3,.conversion-guide h3{font-size:1.02rem;line-height:1.3;margin:18px 0 9px}
+.measurement-guide p,.conversion-guide p{line-height:1.75;overflow-wrap:anywhere}
+.measurement-guide p:last-child,.conversion-guide p:last-child{margin-bottom:0}
