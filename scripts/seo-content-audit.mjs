@@ -10,6 +10,7 @@ import {numericHeading,numericTitle,numericDescription,directionMetaDescription}
 import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
+import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -133,6 +134,10 @@ for(const pair of pairList){
 for(const dim of ['mass','length','volume','temperature','pressure','torque','time','speed','area','force','storage','density','power','acceleration','fuel','flow']){
  const route='/category/'+dim+'/';
  const html=checkMarkup(route,false);
+ if(decode(meta(html,'description'))!==categoryMetaDescription(dim))
+  errors.push(route+': generic or inaccurate category meta description');
+ if(!html.includes(categoryConversionExamples(dim,pairList)))
+  errors.push(route+': computed category examples or eligible tool links do not match shared engine');
  if(!html.includes('class="card measurement-guide"'))errors.push(route+': category-specific measurement explanation missing');
  if(!html.includes('How to verify a conversion'))errors.push(route+': category-specific verification missing');
  if(!html.includes('nist.gov'))errors.push(route+': NIST source link missing');
@@ -162,7 +167,9 @@ for(const seed of seeds){
  if(!html.includes('CONVERSION RESULT'))errors.push(seed.url+': answer-first content missing');
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
 }
-checkMarkup('/',false);
+const homepage=checkMarkup('/',false);
+if(!/<h1>Unit converter\.<br>/.test(homepage))
+ errors.push('/: principal H1 omits Unit converter task and no longer aligns with search title');
 const batchHtml=checkMarkup('/batch-converter/',true);
 for(const feature of [
  'Batch unit converter for CSV and spreadsheets',
