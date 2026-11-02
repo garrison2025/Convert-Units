@@ -49,6 +49,32 @@ async function smokeScenario(SCENARIO){
        'existing full-expression copy remains available');
      break;
    }
+   case 'progressive':{
+     const actions=q('.tool-more-actions'),table=q('.multi-unit-panel');
+     ok(actions?.tagName==='DETAILS'&&table?.tagName==='DETAILS','secondary controls and equivalent unit values use native accessible disclosures');
+     ok(!actions.open&&!table.open,'secondary content starts collapsed to keep the conversion in view');
+     ok(Boolean(q('[data-copy]'))&&Boolean(q('[data-copy-number]')),'two primary copy actions remain visible');
+     ok(q('[data-share]')?.closest('.tool-more-actions')===actions,'share action is not lost');
+     ok(q('[data-multi-results]')?.children.length>1,'other unit values stay prerendered in the DOM');
+     table.querySelector('summary').click();
+     ok(table.open&&q('[data-multi-results]').textContent.includes('kg'),'reference values can be expanded');
+     actions.querySelector('summary').click();
+     ok(actions.open,'secondary actions can be expanded');
+     const input=q('[data-value]');input.value='100';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output]').textContent.includes('45.359'),'live result remains correct when disclosures are open');
+     q('[data-reset]').click();
+     ok(input.value==='149','secondary reset restores original value');
+     table.open=false;actions.open=false;
+     window.dispatchEvent(new Event('beforeprint'));
+     ok(table.open,'the hidden comparison table must expand for printing');
+     window.dispatchEvent(new Event('afterprint'));
+     ok(!table.open,'after print the previous closed state must be restored');
+     table.open=true;
+     window.dispatchEvent(new Event('beforeprint'));
+     window.dispatchEvent(new Event('afterprint'));
+     ok(table.open,'a previously expanded reference table must remain expanded after print');
+     break;
+   }
    case 'batch':{
      ok(q('[data-batch-from]').value==='lbs','batch default lbs');
      ok(q('[data-batch-to]').value==='kg','batch default kg');
@@ -179,6 +205,14 @@ async function smokeScenario(SCENARIO){
        ok(Math.abs(measured-width)<=2,'Expected iframe viewport '+width+'px, observed '+measured);
        const offenders=extra>2?[...doc.querySelectorAll('body *')].map(el=>({el,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})).filter(x=>x.right>visible+2||x.left< -2).sort((a,b)=>b.right-a.right).slice(0,8).map(x=>x.el.tagName.toLowerCase()+(x.el.className&&typeof x.el.className==='string'?'.'+x.el.className.split(/\s+/).join('.'):'' )+' right='+Math.round(x.right)).join(', '):'';
        ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname+'; offenders: '+offenders);
+       if(location.pathname==='/'&&width<=900){
+         const top=doc.querySelector('.hero-intro').getBoundingClientRect();
+         const tool=doc.querySelector('.hero .demo').getBoundingClientRect();
+         const search=doc.querySelector('.hero-discovery').getBoundingClientRect();
+         ok(top.top<tool.top&&tool.bottom<=search.top+2,'mobile homepage must show introduction, calculator, then search/discovery');
+         ok(doc.querySelector('.hero .tool-more-actions')&&!doc.querySelector('.hero .tool-more-actions').open,
+           'mobile calculator keeps extended controls folded');
+       }
        iframe.remove();
      }
      break;
@@ -187,7 +221,7 @@ async function smokeScenario(SCENARIO){
   }
 }
 const suites=[
- {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
+ {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'progressive',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'batch-multiline',url:'/batch-converter/'},
  {name:'batch-alias',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},

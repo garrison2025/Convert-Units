@@ -42,3 +42,10 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - Cloudflare `*.pages.dev` remains preview and nonindexable. Official custom domain is activated only by valid `SITE_URL`.
 - Maintain tests for 37 tools, 92 numeric seeds, and SEO HTML. Full interactive visual QA on real mobile devices is an independent gate; GitHub tests do not prove pixel-level appearance.
 - Add future UI improvements to `refresh.css` and update this file when changing tokens.
+
+## V4.0 tool-first progressive disclosure (2026-11-02)
+- Homepage mobile reading order: compact introductory heading → **working converter** → search/discovery and proof. Desktop retains the two-column task-and-discovery composition.
+- Main calculator always shows the live numeric input, input/output units and instantly updated result. Copy expression and copy numeric value are the only two permanently visible actions; sharing, reset and printing live under a native accessible `details` control.
+- Other-unit equivalents remain server-rendered and available in an expandable table. This reduces first-screen noise without deleting useful explanatory information.
+- A distinct but restrained indigo panel grounds the result on a white working surface; no automatic motion or remote resources are required.
+- Retain the brand's existing indexed routes and launch guard. Browser smoke verifies details disclosure and order. Real screenshot inspection is still a separate release gate.
