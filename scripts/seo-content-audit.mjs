@@ -17,6 +17,7 @@ const policy=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-pol
 const info=JSON.parse(fs.readFileSync(path.join(dist,'build-info.json'),'utf8'));
 const pilot=new Set(policy.pilotIndexUrls);
 const errors=[], warnings=[];
+const verifiedHtmlRoutes=new Set();
 const read=(route)=>fs.readFileSync(path.join(dist,route.replace(/^\/+/,''),'index.html'),'utf8');
 const meta=(html,name)=>html.match(new RegExp('<meta\\s+name="'+name+'"\\s+content="([^"]*)"','i'))?.[1]||'';
 const decode=s=>s.replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'");
@@ -45,12 +46,13 @@ function expectedBreadcrumbRoutes(route){
 
 
 function checkMarkup(route,expectedApp=false){
+ verifiedHtmlRoutes.add(route);
  const html=read(route);
  const jsonBlocks=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(x=>{
   try{return JSON.parse(x[1]);}catch(e){errors.push(route+': invalid JSON-LD: '+e.message);return null;}
  }).filter(Boolean);
  const isNumeric=seeds.some(s=>s.url===route);
- const excluded=info.mode!=='production'||(isNumeric&&!indexedSeed(seeds.find(s=>s.url===route)));
+ const excluded=info.mode!=='production'||route==='/404/'||(isNumeric&&!indexedSeed(seeds.find(s=>s.url===route)));
  if(excluded){
   if(!meta(html,'robots').includes('noindex'))errors.push(route+': excluded route missing noindex');
   if(jsonBlocks.length)errors.push(route+': excluded route has index-focused JSON-LD');
@@ -158,14 +160,31 @@ if(!/convertBatchToCsv\(table,from\.value,to\.value,\{/.test(appSource))
 if(!appSource.includes("[data-batch-example]"))errors.push('Visible mixed-unit CSV example is not wired in the browser.');
 
 checkMarkup('/universal-converter/',true);
+// Inspect every built HTML file, including /about/, /privacy/, /terms/,
+// /methodology/ and the 404 page. Previously the content audit silently
+// omitted these routes even though they were included in the release build.
+function inspectRemaining(dir){
+ for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+  const file=path.join(dir,entry.name);
+  if(entry.isDirectory())inspectRemaining(file);
+  else if(entry.name==='index.html'){
+   const rel=path.relative(dist,path.dirname(file)).replaceAll(path.sep,'/');
+   const route=rel?'/'+rel+'/':'/';
+   if(!verifiedHtmlRoutes.has(route))checkMarkup(route,false);
+  }
+ }
+}
+inspectRemaining(dist);
+if(verifiedHtmlRoutes.size!==157)errors.push('Expected full 157-route HTML schema coverage; got '+verifiedHtmlRoutes.size);
 const result={
  status:errors.length?'failed':'passed',
  disclaimer:'Server-rendered HTML correctness only; Google indexation, SERP ranking and Core Web Vitals remain unverified.',
  mode:info.mode, pairPages:pairList.length,categoryPages:16,numericPages:seeds.length,
  numericEligibleForIndex:seeds.filter(indexedSeed).length,
+ checkedHtmlRoutes:verifiedHtmlRoutes.size,
  schemaStats,
  errors,warnings
 };
 fs.writeFileSync(path.join(dist,'seo-content-audit.json'),JSON.stringify(result,null,2));
-console.log('SEO CONTENT AUDIT:',result.status,pairList.length,'pairs, 16 categories,',seeds.length,'numeric results;',errors.length,'errors');
+console.log('SEO CONTENT AUDIT:',result.status,verifiedHtmlRoutes.size,'HTML routes;',pairList.length,'pairs, 16 categories,',seeds.length,'numeric results;',errors.length,'errors');
 if(errors.length){console.error(errors.slice(0,15).join('\n'));process.exitCode=1;}
