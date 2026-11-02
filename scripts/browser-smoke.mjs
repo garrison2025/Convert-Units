@@ -438,6 +438,41 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('55.301'),'kgf·m must calculate from the same source engine');
      break;
    }
+   case 'feet-inches-m':{
+     const panel=q('[data-feet-inches]'),input=q('[data-value]');
+     ok(Boolean(panel&&!panel.hidden),'meters to feet page must SSR the mixed readout');
+     input.value='1.75';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-feet-decimal]').textContent.includes('5 ft 8.90 in'),'decimal inches update');
+     ok(q('[data-feet-fraction]').textContent.includes('5 ft 8 7/8 in'),'fractional inches update');
+     let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{written=text;}}});
+     q('[data-copy-feet-inches]').click();await new Promise(r=>setTimeout(r,0));
+     ok(written.includes('5 ft 8 7/8 in')&&written.includes('rounded'),'copy discloses rounding');
+     q('[data-swap]').click();
+     ok(q('[data-from]').value==='ft','swap changes input unit');
+     input.value='1';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-feet-fraction]').textContent.includes('1 ft 0 in'),'swapped reading stays accurate');
+     input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'invalid inputs hide old reading');
+     break;
+   }
+   case 'feet-inches-ft':{
+     const input=q('[data-value]');
+     input.value='5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-feet-decimal]').textContent.includes('5 ft 0.00 in'),'feet source correct');
+     q('[data-swap]').click();
+     input.value='0.3048';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-feet-fraction]').textContent.includes('1 ft 0 in'),'swapping to meters still correct');
+     break;
+   }
+   case 'feet-inches-8849':{
+     const panel=q('[data-feet-inches]');
+     ok(Boolean(panel&&!panel.hidden),'approved existing 8849-meter page SSR reading required');
+     ok(q('[data-value]').value==='8849','SEO page value unchanged');
+     ok(panel.textContent.includes('ft')&&panel.textContent.includes('in'),'both units visible');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview still noindex');
+     break;
+   }
    default:throw new Error('Unknown smoke scenario');
   }
 }
@@ -455,10 +490,13 @@ const suites=[
  {name:'engineering-length',url:'/convert/in-to-cm/'},
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
  {name:'engineering-torque',url:'/convert/ft-lbf-to-nm/'},
+ {name:'feet-inches-m',url:'/convert/m-to-ft/'},
+ {name:'feet-inches-ft',url:'/convert/ft-to-m/'},
+ {name:'feet-inches-8849',url:'/convert/m-to-ft/8849/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
