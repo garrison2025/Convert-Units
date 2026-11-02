@@ -11,6 +11,8 @@ const dist=path.join(root,'dist');
 const plan=fs.readFileSync(path.join(root,'research/SEO-PLAN-V2.md'),'utf8');
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
+const numericPolicy=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-policy.json'),'utf8'));
+const selected=new Set(numericPolicy.pilotIndexUrls);
 const failures=[];
 if(seeds.length!==92||pairs.length!==38)failures.push('Approved V2 inventory differs from 92 numeric / 38 pair pages');
 const urls=new Set(),keywords=new Set();
@@ -49,7 +51,9 @@ const reviewed=seeds.map(item=>{
   competitorTrafficEstimate:item.trafficEstimate,competitorLandingPath:item.competitorURL,
   sameDirectionPageCount:peerCount,
   editorialRisk:peerCount>=10?'high duplication cluster':peerCount>=2?'similar intent cluster':'single value in direction',
-  indexDecision:'unreviewed — do not infer index eligibility',
+  productionPilotIndexEligible:selected.has(item.url),
+  indexDecision:selected.has(item.url)?'15-URL technical pilot candidate (not Google-approved)':'noindex by default; usable directly',
+  editorialDecision:'not manually validated in Google US SERP; do not infer indexing or traffic',
   source:'approved V2 Semrush competitor keyword dataset'
  };
 }).sort((a,b)=>b.competitorSearchVolumeUS-a.competitorSearchVolumeUS||b.competitorTrafficEstimate-a.competitorTrafficEstimate);
@@ -63,6 +67,7 @@ const groups=[...bySlug].map(([slug,items])=>({
 const sourceAnomalies=reviewed.filter(x=>x.competitorRankSourceValue===0).map(x=>({route:x.route,keyword:x.keyword,reason:'Source rank=0 cannot be interpreted as an actual organic search position.'}));
 const report={
  sourceAnomalies,
+ technicalPilot:{strategy:numericPolicy.strategy,eligibleSelectedUrls:selected.size,suppressedNumericUrls:seeds.length-selected.size,disclaimer:'Selected means technically allowed for a future custom-domain build, not editorially verified or indexed by Google.'},
  note:'Volume, KD, rank and traffic estimate originate from competitor Semrush results; no metrics are from ExactUnit. Index decisions remain open; this audit never adds/removes indexable pages.',
  date:'2026-11-02',numericPages:seeds.length,verifiedSourceRoutes:urls.size,
  groups,records:reviewed,failures
@@ -70,7 +75,7 @@ const report={
 fs.writeFileSync(path.join(dist,'keyword-evidence-review.json'),JSON.stringify(report,null,2));
 const fields=['route','keyword','unitDirection','originalNumericValue','competitorSearchVolumeUS',
  'competitorKeywordDifficulty','competitorObservedRank','competitorRankSourceValue','competitorRankEvidence','competitorTrafficEstimate',
- 'competitorLandingPath','sameDirectionPageCount','editorialRisk','indexDecision'];
+ 'competitorLandingPath','sameDirectionPageCount','editorialRisk','productionPilotIndexEligible','indexDecision','editorialDecision'];
 const csv=[fields.join(','),...reviewed.map(row=>fields.map(key=>escapeCsvCell(row[key])).join(','))].join('\r\n');
 fs.writeFileSync(path.join(dist,'keyword-evidence-review.csv'),csv);
 console.log('KEYWORD AUDIT:',seeds.length,'real keyword records,',groups.length,'direction groups;',
