@@ -23,6 +23,7 @@ async function smokeScenario(SCENARIO){
      const input=q('[data-converter] [data-value]');
      input.value='150';input.dispatchEvent(new Event('input',{bubbles:true}));
      ok(q('[data-converter] [data-output]').textContent.includes('68.038856'),'150 lb should equal 68.038856 kg');
+     ok(!q('.crumb'),'homepage should not waste space on a self-referential Home breadcrumb');
      const finder=q('[data-home-find]');
      finder.value='pounds';finder.dispatchEvent(new Event('input',{bubbles:true}));
      ok(!q('[data-suggestions]').hidden,'search suggestions should open');
@@ -214,7 +215,7 @@ async function smokeScenario(SCENARIO){
    case 'mobile':{
      for(const width of [320,375,768,900,1024]){
        const iframe=document.createElement('iframe');
-       iframe.style.width=width+'px';iframe.style.height='800px';iframe.style.border='0';
+       iframe.style.width=width+'px';iframe.style.height='870px';iframe.style.border='0';
        iframe.src=location.pathname;
        document.body.append(iframe);
        await new Promise((resolve,reject)=>{
@@ -228,6 +229,10 @@ async function smokeScenario(SCENARIO){
        ok(Math.abs(measured-width)<=2,'Expected iframe viewport '+width+'px, observed '+measured);
        const offenders=extra>2?[...doc.querySelectorAll('body *')].map(el=>({el,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})).filter(x=>x.right>visible+2||x.left< -2).sort((a,b)=>b.right-a.right).slice(0,8).map(x=>x.el.tagName.toLowerCase()+(x.el.className&&typeof x.el.className==='string'?'.'+x.el.className.split(/\s+/).join('.'):'' )+' right='+Math.round(x.right)).join(', '):'';
        ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname+'; offenders: '+offenders);
+       if(location.pathname==='/'&&width===320){
+         const firstCopy=doc.querySelector('.hero [data-copy]').getBoundingClientRect();
+         ok(firstCopy.bottom<=870,'320px homepage should reveal the primary copy action in the 870px first screen (actual bottom: '+Math.round(firstCopy.bottom)+'px)');
+       }
        if(location.pathname==='/'&&width<=900){
          const top=doc.querySelector('.hero-intro').getBoundingClientRect();
          const tool=doc.querySelector('.hero .demo').getBoundingClientRect();
