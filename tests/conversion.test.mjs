@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,parseBatchTable,convertBatchToCsv,escapeCsvCell}from'../src/assets/engine.mjs';
+import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,parseBatchTable,convertBatchToCsv,resolveUnitLabel,escapeCsvCell}from'../src/assets/engine.mjs';
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,38);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,38);});
@@ -237,4 +237,44 @@ test('CSV output retains TSV source columns and names missing headings for heade
  assert.match(plain.csv,/^Column 1,ExactUnit line,ExactUnit result/);
  assert.match(plain.csv,/149,1,67\.58526313,lb,kg,OK/);
  assert.throws(()=>convertBatchToCsv(tab,'lbs','seconds'),/compatible units/);
+});
+
+
+test('mixed-unit batch CSV converts multiple dimensions safely in the same source table',()=>{
+ const text='sku,value,from,to,notes\nfirst,149,lb,kg,parcel\nsecond,2.5,kg,g,inventory\nthird,37.9,°C,°F,weather\nfourth,60000,ms,s,duration\nbad,100,kg,s,incompatible';
+ const table=parseBatchTable(text,{column:2,delimiter:'comma'});
+ const out=convertBatchToCsv(table,'lbs','kg',{fromColumn:3,toColumn:4});
+ assert.equal(out.converted,4);
+ assert.deepEqual(out.invalid,[6]);
+ assert.equal(out.preservedColumns,5);
+ assert.match(out.csv,/first,149,lb,kg,parcel,2,67\.58526313,lb,kg,OK/);
+ assert.match(out.csv,/second,2\.5,kg,g,inventory,3,2500,kg,g,OK/);
+ assert.match(out.csv,/third,37\.9,°C,°F,weather,4,100\.22,°C,°F,OK/);
+ assert.match(out.csv,/fourth,60000,ms,s,duration,5,60,ms,s,OK/);
+ assert.ok(out.csv.includes('Choose two units of the same physical dimension.'));
+ assert.equal(out.headerPreserved,true);
+});
+
+test('mixed-row CSV does not silently fall back for unknown units or partial column configuration',()=>{
+ const table=parseBatchTable('value,from,to\n12,kg,lb\n8,bogus,kg\n5,,kg',{column:1,delimiter:'comma'});
+ const out=convertBatchToCsv(table,'lbs','kg',{fromColumn:2,toColumn:3});
+ assert.equal(out.converted,1);
+ assert.deepEqual(out.invalid,[3,4]);
+ assert.match(out.csv,/Unknown unit "bogus"/);
+ assert.match(out.csv,/A row unit is missing/);
+ assert.throws(()=>convertBatchToCsv(table,'lbs','kg',{fromColumn:2}),/two different/);
+ assert.throws(()=>convertBatchToCsv(table,'lbs','kg',{fromColumn:2,toColumn:2}),/two different/);
+ assert.throws(()=>convertBatchToCsv(table,'lbs','kg',{fromColumn:0,toColumn:3}),/two different/);
+});
+
+test('mixed-unit labels match exact symbols or IDs without guessing ambiguous dimensions',()=>{
+ assert.equal(resolveUnitLabel('lb'),'lbs');
+ assert.equal(resolveUnitLabel('lbs'),'lbs');
+ assert.equal(resolveUnitLabel('US fl oz'),'us-fl-oz');
+ assert.equal(resolveUnitLabel('ft·lbf'),'ft-lbf');
+ assert.equal(resolveUnitLabel('°C'),'celsius');
+ assert.equal(resolveUnitLabel('g'),'g');
+ assert.equal(resolveUnitLabel('ms'),'milliseconds');
+ assert.throws(()=>resolveUnitLabel(''),/missing/);
+ assert.throws(()=>resolveUnitLabel('fluid ounces'),/Unknown unit/);
 });
