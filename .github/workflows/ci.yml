@@ -26,3 +26,15 @@ jobs:
         env:
           SITE_URL: https://qa.example.test
         run: npm run build
+      - name: Upload small QA reports for manual SEO review
+        uses: actions/upload-artifact@v4
+        with:
+          name: exactunit-quality-reports
+          path: |
+            dist/keyword-evidence-review.csv
+            dist/keyword-evidence-review.json
+            dist/release-audit-report.json
+            dist/quality-report.json
+            dist/performance-budget-report.json
+          if-no-files-found: error
+          retention-days: 7
