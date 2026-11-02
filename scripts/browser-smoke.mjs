@@ -88,7 +88,8 @@ async function smokeScenario(SCENARIO){
        const visible=doc.documentElement.clientWidth;
        const extra=doc.documentElement.scrollWidth-visible;
        ok(Math.abs(measured-width)<=2,'Expected iframe viewport '+width+'px, observed '+measured);
-       ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname);
+       const offenders=extra>2?[...doc.querySelectorAll('body *')].map(el=>({el,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})).filter(x=>x.right>visible+2||x.left< -2).sort((a,b)=>b.right-a.right).slice(0,8).map(x=>x.el.tagName.toLowerCase()+(x.el.className&&typeof x.el.className==='string'?'.'+x.el.className.split(/\s+/).join('.'):'' )+' right='+Math.round(x.right)).join(', '):'';
+       ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname+'; offenders: '+offenders);
        iframe.remove();
      }
      break;
