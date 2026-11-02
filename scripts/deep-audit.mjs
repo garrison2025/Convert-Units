@@ -12,6 +12,8 @@ const errors=[],warnings=[],titles=new Map(),descriptions=new Map(),h1s=new Map(
 const attributes=(html,name)=>[...html.matchAll(new RegExp('\\b'+name+'\\s*=\\s*["\\x27]([^"\\x27]*)["\\x27]','gi'))].map(x=>x[1].replaceAll('&amp;','&'));
 const clean=(html)=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<(?:header|footer|nav)\b[^>]*>[\s\S]*?<\/(?:header|footer|nav)>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&(?:nbsp|amp|lt|gt|quot);/g,' ').replace(/\s+/g,' ').trim();
 const build=JSON.parse(fs.readFileSync(path.join(dist,'build-info.json'),'utf8'));
+const policy=JSON.parse(fs.readFileSync(path.resolve(dist,'../src/data/numeric-seo-policy.json'),'utf8'));
+const excluded=new Set(build.numericIndexMode==='all'?[]:JSON.parse(fs.readFileSync(path.resolve(dist,'../src/data/seeds.json'),'utf8')).filter(x=>!policy.pilotIndexUrls.includes(x.url)).map(x=>x.url));
 for(const [route,html] of routes){
  const title=html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim();
  const desc=html.match(/<meta\s+name="description"\s+content="([^"]*)"/i)?.[1];
@@ -21,9 +23,12 @@ for(const [route,html] of routes){
   else if(map.has(value) && route!='/404/') warnings.push('Repeated '+label+': '+route+' and '+map.get(value));
   else map.set(value,route);
  }
- if(build.mode==='production' && route!='/404/'){
+ if(build.mode==='production' && route!='/404/' && !excluded.has(route)){
   const canonical=html.match(/<link\s+rel="canonical"\s+href="([^"]*)"/i)?.[1];
   if(canonical!==new URL(route,build.site).href)errors.push(route+': inconsistent canonical');
+ }
+ if(build.mode==='production'&&excluded.has(route)){
+  if(!html.includes('content="noindex,follow"')||html.includes('rel="canonical"'))errors.push(route+': numeric pilot exclusion leaks indexability');
  }
  for(const href of attributes(html,'href')){
   if(href.startsWith('#')||href.startsWith('mailto:')||href.startsWith('tel:')||href.startsWith('javascript:'))continue;
