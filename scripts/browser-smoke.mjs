@@ -51,7 +51,7 @@ async function smokeScenario(SCENARIO){
      const rowFrom=q('[data-batch-from-column]'),rowTo=q('[data-batch-to-column]');
      ok(Boolean(rowFrom&&rowTo),'row-specific CSV unit columns must appear in the browser');
      q('[data-batch-column]').value='2';
-     q('[data-batch-input]').value='label,value,from,to\\nparcel,149,lb,kg\\nclock,60000,ms,s\\ninvalid,50,kg,s';
+     q('[data-batch-input]').value='label,value,from,to\nparcel,149,lb,kg\nclock,60000,ms,s\ninvalid,50,kg,s';
      q('[data-batch-delimiter]').value='comma';
      rowFrom.value='3';rowTo.value='4';
      q('[data-process]').click();
