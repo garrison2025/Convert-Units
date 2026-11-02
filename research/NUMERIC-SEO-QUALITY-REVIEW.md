@@ -43,3 +43,13 @@ Google's people-first content guidance:
 https://developers.google.com/search/docs/fundamentals/creating-helpful-content
 
 This document does not claim a Google audit, manual indexation test, or verified organic traffic.
+
+## Evidence review output (2026-11-02)
+
+Each build exports `dist/keyword-evidence-review.csv` and `dist/keyword-evidence-review.json` for all 92 approved numeric routes. The report retains the observed **competitor** Semrush US keyword volume, difficulty, recorded ranking, estimated visits, keyword, and observed competitor landing path. None of these metrics measures ExactUnit traffic or proves an individual page should be indexed.
+
+The source keyword `1.8 kilograms in pounds` has a raw competitor rank value of **0**. A zero ranking is not a valid organic position. The report preserves the raw 0 and represents the observed rank as **unverified**, not as rank #0 or rank #1.
+
+The audit reports 15 directional clusters, with the `lbs-to-kg` (56 pages) and `kg-to-lbs` (14 pages) groups requiring highest-priority editorial scrutiny. All approved pages stay present and functional; the program does not autonomously change their indexing status or invent prose to disguise duplication.
+
+Before purchasing a domain, use the downloadable review CSV to mark **keep, consolidate or noindex-review** for each page based on search intent, evidence and distinct user utility. Do not automatically index every number simply because a competitor ranked for its keyword. The preview is globally noindexed until a confirmed custom-domain build.
