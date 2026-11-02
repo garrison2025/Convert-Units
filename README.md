@@ -98,3 +98,9 @@ Every **38** directional calculator page has a static, source-linked explanation
 The zero-dependency `scripts/seo-content-audit.mjs` runs automatically on both preview and synthetic production builds and validates static HTML, expected content, original keyword phrasing, numeric answers and JSON-LD. The CI artifacts contain `seo-content-audit.json`. For reproducible external evidence and the *limitations* of public web search, see [competitor landing page spot-check](research/GOOGLE-SEO-SERP-SPOTCHECK-20261102.md).
 
 No live Google US rankings, Googlebot indexing, GSC clicks, AdSense revenue or actual field Core Web Vitals are claimed. The 26 numeric pilot still needs individual usefulness review and source-confirmed search demand. Cloudflare preview remains `noindex` until an official domain has been configured.
+
+## Crawl depth, search titles and safe indexing
+
+The `scripts/seo-crawl-audit.mjs` gate tests actual static links, 3-click reachability from the homepage and inbound parent links to all 26 selected values. It exports `dist/seo-crawl-audit.json` and `dist/seo-url-inventory.csv` listing each page's title, H1, description, robots, canonical, click depth and proposed index status in GitHub Actions artifacts.
+
+Source keywords remain unchanged in research data; human-readable SEO page titles and snippet copy come from `src/seo-meta.mjs`. Enabling `NUMERIC_INDEX_MODE=all` now also requires `NUMERIC_INDEX_CONFIRMATION=REVIEWED_ALL_92` after editorial review. This is only a safety mechanism, not a Google quality guarantee.
