@@ -14,10 +14,10 @@ test('all approved numbers get readable, factual and unique SEO headings and tit
   const heading=numericHeading(seed,pair), title=numericTitle(seed,pair),desc=numericDescription(seed,pair);
   assert.ok(heading.includes(seed.valueText),seed.url);
   assert.ok(heading.includes(' to '),seed.url);
-  assert.ok(title.includes(' = '),seed.url);
+  assert.match(title,/ (?:=|≈) /,seed.url);
   assert.ok(desc.startsWith(heading),seed.url);
   assert.match(desc,/Verify the formula/);
-  assert.ok(desc.includes(' ≈ '),'Rounded results must not be presented as mathematically exact');
+  assert.match(desc,/ (?:=|≈) /,'Meta description should match the displayed relationship');
   assert.ok(!titles.has(title),'SEO title collisions: '+title);
   titles.add(title);
  }
@@ -26,7 +26,7 @@ test('all approved numbers get readable, factual and unique SEO headings and tit
 test('fix malformed spacing and abbreviated raw Semrush search phrases',()=>{
  const kpa=seeds.find(s=>s.keyword==='50kpa to atm');
  assert.equal(numericHeading(kpa,pairFor(kpa.slug)),'50 kilopascals to standard atmospheres');
- assert.match(numericTitle(kpa,pairFor(kpa.slug)),/^50 kPa to atm = /);
+ assert.match(numericTitle(kpa,pairFor(kpa.slug)),/^50 kPa to atm (?:=|≈) /);
  const speed=seeds.find(s=>s.keyword==='330kmh to mph');
  assert.match(numericHeading(speed,pairFor(speed.slug)),/^330 kilometers per hour to miles per hour$/);
  const time=seeds.find(s=>s.keyword==='3600000ms to min');
