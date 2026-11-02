@@ -29,3 +29,43 @@ export function precisionComparison(pair,value){
   '<tbody>'+rows+'</tbody></table></div>'+
   '<p class="hint">For further calculations, use the unrounded internal value from the live converter rather than a copied rounded number.</p>';
 }
+
+
+/**
+ * Value-specific utility, without fictional use cases or SEO paraphrasing.
+ * UK mass compound notation and clock-like duration representation are
+ * derived directly from the shared conversion engine.
+ */
+export function practicalEquivalents(pair,value){
+ const dimension=units[pair.from].dimension;
+ const n=Number(value);
+ if(!Number.isFinite(n)||n<0)return '';
+ if(dimension==='mass'){
+  const pounds=convert(n,pair.from,'lbs');
+  if(!Number.isFinite(pounds)||pounds>1e12)return '';
+  const stones=Math.floor(pounds/14);
+  // Round only the displayed remainder, with a carry if it reaches 14.
+  let remainder=Math.round((pounds-stones*14)*1000)/1000;
+  const carried=remainder>=14?1:0;
+  if(carried)remainder=0;
+  const label=esc(formatNumber(n,6))+' '+esc(units[pair.from].symbol);
+  return '<section class="practical-equivalence"><h2>UK stones and pounds</h2>'+
+   '<p class="reference-caption">For the same mass, '+label+' is approximately '+
+   '<strong>'+esc(stones+carried)+' st '+esc(formatNumber(remainder,3))+' lb</strong>. '+
+   'One stone equals exactly 14 international avoirdupois pounds. '+
+   'This is a different way to display the same quantity, not a health or body-composition assessment.</p></section>';
+ }
+ if(dimension==='time'){
+  const seconds=convert(n,pair.from,'seconds');
+  if(!Number.isSafeInteger(seconds)||seconds>Number.MAX_SAFE_INTEGER)return '';
+  const hours=Math.floor(seconds/3600);
+  const minutes=Math.floor(seconds%3600/60);
+  const remaining=seconds%60;
+  const pad=x=>String(x).padStart(2,'0');
+  return '<section class="practical-equivalence"><h2>Clock-style duration</h2>'+
+   '<p class="reference-caption">'+esc(formatNumber(n,6))+' '+esc(units[pair.from].symbol)+
+   ' is <strong>'+esc(hours+':'+pad(minutes)+':'+pad(remaining))+
+   '</strong> (hours:minutes:seconds). This is an elapsed duration, not a time of day.</p></section>';
+ }
+ return '';
+}
