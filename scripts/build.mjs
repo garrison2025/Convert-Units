@@ -3,15 +3,14 @@ import{units,dimensions,convert,formatNumber,formula,dimensionUnits}from'../src/
 import {measurementNote,answerBanner,referenceValues,calculationDetails,precisionComparison,practicalEquivalents} from '../src/landing.mjs';
 import {categoryExplanation,directionExplanation} from '../src/seo-guides.mjs';
 import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
+import {resolveNumericIndexMode} from '../src/seo-index-policy.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
 const numericPolicy=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-policy.json'),'utf8'));
 const launchPilot=new Set(numericPolicy.pilotIndexUrls);
 if(launchPilot.size!==numericPolicy.pilotIndexUrls.length||![...launchPilot].every(url=>seeds.some(s=>s.url===url)))throw Error('Numeric pilot index policy must contain only unique approved numeric URLs.');
-const numericIndexMode=(process.env.NUMERIC_INDEX_MODE||'curated').trim();
-if(!['curated','all'].includes(numericIndexMode))throw Error('NUMERIC_INDEX_MODE must be curated or all.');
-if(numericIndexMode==='all'&&process.env.NUMERIC_INDEX_CONFIRMATION!=='REVIEWED_ALL_92')throw Error('Enabling all 92 numeric pages for indexing requires NUMERIC_INDEX_CONFIRMATION=REVIEWED_ALL_92. Review SERP intent and page usefulness before changing the default.');
+const numericIndexMode=resolveNumericIndexMode(process.env.NUMERIC_INDEX_MODE,process.env.NUMERIC_INDEX_CONFIRMATION);
 const numericIndexable=(url)=>numericIndexMode==='all'||launchPilot.has(url);
 const dist=path.join(root,'dist');fs.rmSync(dist,{recursive:true,force:true});fs.mkdirSync(dist,{recursive:true});
 // Only the confirmed custom domain is an indexable production address.
