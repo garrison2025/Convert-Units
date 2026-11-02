@@ -259,3 +259,18 @@
  .elapsed-readout{padding:10px 12px}
  .elapsed-body{align-items:flex-start;flex-direction:column}
 }
+
+/* V14: real source-calculated comparison of US and UK fluid ounces. */
+.fluid-oz-readout{
+ margin:10px 0 14px;padding:14px 15px;
+ border:1px solid #dce6f5;border-radius:12px;background:#f7faff;
+}
+.fluid-oz-readout[hidden]{display:none!important}
+.fluid-oz-readout h3{margin:0 0 10px;font-size:.97rem;line-height:1.4;color:#23406e}
+.fluid-oz-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.fluid-oz-values p{display:flex;flex-direction:column;gap:4px;margin:0;padding:9px 11px;background:#fff;border:1px solid #e1e8f4;border-radius:9px;min-width:0}
+.fluid-oz-values span{font-size:.76rem;color:#586d8d;font-weight:600}
+.fluid-oz-values strong{font-size:.98rem;font-variant-numeric:tabular-nums;color:#254575;overflow-wrap:anywhere}
+.fluid-oz-readout small{display:block;margin-top:9px;line-height:1.55;font-size:.72rem;color:#637493}
+.fluid-oz-readout a{color:#2853bb;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:520px){.fluid-oz-values{grid-template-columns:1fr}.fluid-oz-readout{padding:11px 12px}}
