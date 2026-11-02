@@ -279,3 +279,40 @@ test('mixed-unit labels match exact symbols or IDs without guessing ambiguous di
  assert.throws(()=>resolveUnitLabel(''),/missing/);
  assert.throws(()=>resolveUnitLabel('fluid ounces'),/Unknown unit/);
 });
+
+
+test('quoted multiline CSV cells preserve records, embedded notes and physical line numbers',()=>{
+ const text='sku,value,notes,from,to\n'
+  +'shirt,149,"first line\nsecond line",lb,kg\n'
+  +'cap,126,"contains ""quoted"" text",lb,kg\n'
+  +'wrong,50,"another\nmultiline note",kg,s';
+ const parsed=parseBatchTable(text,{column:2,delimiter:'auto'});
+ assert.equal(parsed.delimiter,'comma');
+ assert.equal(parsed.headerSkipped,true);
+ assert.deepEqual(parsed.rows.map(r=>r.line),[2,4,5]);
+ assert.equal(parsed.rows[0].cells[2],'first line\nsecond line');
+ assert.equal(parsed.rows[1].cells[2],'contains "quoted" text');
+ assert.equal(parsed.rows[2].cells[2],'another\nmultiline note');
+ const result=convertBatchToCsv(parsed,'lbs','kg',{fromColumn:4,toColumn:5});
+ assert.equal(result.converted,2);
+ assert.deepEqual(result.invalid,[5]);
+ assert.ok(result.csv.includes('"first line\nsecond line"'),'export must quote embedded newline');
+ assert.ok(result.csv.includes('"contains ""quoted"" text"'),'embedded quotes must remain properly escaped');
+ assert.ok(result.csv.includes('another\nmultiline note'),'invalid source row multiline notes must survive');
+ assert.ok(result.csv.includes('Choose two units of the same physical dimension.'));
+});
+
+test('quoted TSV multi-line cells and a 1000-logical-record limit survive physical line breaks',()=>{
+ const text='name\tvalue\tnote\n'+'p\t2.5\t"one line\nsecond line"\n'+'q\t3\tplain';
+ const table=parseBatchTable(text,{column:2,delimiter:'tab',maxRows:2});
+ assert.equal(table.rows.length,2);
+ assert.deepEqual(table.rows.map(r=>r.line),[2,4]);
+ assert.equal(table.rows[0].cells[2],'one line\nsecond line');
+ assert.throws(()=>parseBatchTable(text,{column:2,delimiter:'tab',maxRows:1}),/Maximum 1/);
+ // A quote that never closes still reports its own malformed physical row,
+ // preserving the subsequent valid input.
+ const broken=parseBatchTable('value,note\n10,ok\n"unclosed,note\n25,ok',{delimiter:'comma'});
+ assert.equal(broken.rows.length,3);
+ assert.match(broken.rows[1].error,/Unclosed CSV quoted field/);
+ assert.equal(broken.rows[2].value,'25');
+});
