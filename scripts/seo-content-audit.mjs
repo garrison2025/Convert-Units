@@ -126,6 +126,10 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ if(pair.slug==='lbs-to-kg'){
+  if(!html.includes('data-mixed-kg')||!html.includes('data-mixed-kg-result')||!html.includes('Rounded to the nearest gram'))
+    errors.push(pair.url+': helpful live kilograms-plus-grams readout missing');
+ }
  if(!html.includes('class="card conversion-guide"'))errors.push(pair.url+': source-linked conversion guidance missing');
  if(!html.includes('NIST conversion factors'))errors.push(pair.url+': methodology reference missing');
  if(!html.includes('Quick reference table'))errors.push(pair.url+': numeric check table missing');
@@ -168,6 +172,8 @@ for(const seed of seeds){
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
 }
 const homepage=checkMarkup('/',false);
+if(!homepage.includes('data-mixed-kg')||!homepage.includes('67 kg 585 g'))
+ errors.push('/: calculated kilograms-plus-grams initial homepage result missing');
 if(!/<h1>Unit converter\.<br>/.test(homepage))
  errors.push('/: principal H1 omits Unit converter task and no longer aligns with search title');
 const batchHtml=checkMarkup('/batch-converter/',true);
