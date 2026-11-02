@@ -80,7 +80,7 @@ for(const feature of [
  'data-batch-from-column','data-batch-to-column',
  'The export preserves original spreadsheet columns',
  'row-specific units',
- 'Nothing is uploaded'
+ 'everything runs locally'
 ])if(!batchHtml.includes(feature))errors.push('/batch-converter/: stated feature or interface missing: '+feature);
 const appSource=fs.readFileSync(path.join(root,'src/assets/app.mjs'),'utf8');
 if(!/convertBatchToCsv\(table,from\.value,to\.value,\{/.test(appSource))
