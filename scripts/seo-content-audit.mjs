@@ -117,6 +117,10 @@ function checkMarkup(route,expectedApp=false){
 }
 for(const pair of pairList){
  const html=checkMarkup(pair.url,true);
+ const oneResult=convert(1,pair.from,pair.to);
+ const shortAnswer='1 '+units[pair.from].symbol+' '+displayRelation(oneResult,formatNumber(oneResult,9))+' '+formatNumber(oneResult,9)+' '+units[pair.to].symbol;
+ if(!html.includes('class="pair-key-fact"')||!html.includes(shortAnswer))
+  errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(!html.includes('class="card conversion-guide"'))errors.push(pair.url+': source-linked conversion guidance missing');
  if(!html.includes('NIST conversion factors'))errors.push(pair.url+': methodology reference missing');
  if(!html.includes('Quick reference table'))errors.push(pair.url+': numeric check table missing');
