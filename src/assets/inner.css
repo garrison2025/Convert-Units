@@ -159,3 +159,20 @@
   }
   .batch-page .batch-advanced{margin:11px 0 14px}
 }
+
+
+/* V6 homepage: remove dead breadcrumb space; keep the primary copy actions
+   in an ordinary 320px phone first view without sacrificing readable inputs. */
+.home-page .hero{margin-top:24px}
+@media(max-width:650px){
+  .home-page .hero{margin-top:12px;gap:13px;padding:20px 13px 15px}
+  .home-page .hero-intro .eyebrow{margin-bottom:10px}
+  .home-page .hero h1{font-size:clamp(2.45rem,10vw,3.25rem);margin-bottom:9px}
+  .home-page .hero-intro p{font-size:.86rem;line-height:1.45}
+  .home-page .hero .tool-card{padding:17px 14px}
+  .home-page .tool-head{margin-bottom:15px!important;padding-bottom:12px}
+  .home-page .tool-card .swapline{height:35px}
+  .home-page .resultbox{min-height:90px}
+  .home-page .tool-card label.small{margin-top:8px!important}
+  .home-page .tool-actions{margin-top:10px}
+}
