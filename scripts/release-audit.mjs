@@ -156,9 +156,32 @@ for(let i=0;i<numericBodies.length;i++)for(let j=i+1;j<numericBodies.length;j++)
   const score=common/(a.tokens.size+b.tokens.size-common||1);
   if(score>=0.95){highSimilarity++;if(bothPilot)pilotHighSimilarity++;clusters.get(a.slug).highSimilarityPairs++;}
 }
+
+const pairBySlug=new Map(pairs.map(pair=>[pair.slug,pair]));
+const parentChildOverlap=seeds.filter(seed=>canonicalRoutes.has(seed.url)).map(seed=>{
+ const pair=pairBySlug.get(seed.slug);
+ const parent=pages.get(pair?.url)||'';
+ const child=pages.get(seed.url)||'';
+ const tokensFor=html=>{
+   const main=plain(extract(html,/<main id="main">([\s\S]*?)<\/main>/i)).toLowerCase()
+     .replace(/[-+]?(?:\d[\d,.]*)(?:e[-+]?\d+)?/g,'#').replace(/\s+/g,' ');
+   return new Set(main.match(/[a-z°/]+/g)||[]);
+ };
+ const parentWords=tokensFor(parent),childWords=tokensFor(child);
+ const both=[...childWords].filter(x=>parentWords.has(x)).length;
+ const jaccard=both/(parentWords.size+childWords.size-both||1);
+ return {valueUrl:seed.url,parentToolUrl:pair?.url||null,
+   normalizedTokenJaccard:Number(jaccard.toFixed(4)),
+   valueDistinctTokens:childWords.size-both,
+   parentDistinctTokens:parentWords.size-both,
+   note:'A heuristic text comparison, not a Google duplicate-content decision.'};
+}).sort((a,b)=>b.normalizedTokenJaccard-a.normalizedTokenJaccard);
+if(parentChildOverlap.some(x=>!x.parentToolUrl))fail('Missing parent tool when comparing index-eligible numeric answer');
+if(parentChildOverlap.some(x=>x.normalizedTokenJaccard>=0.85))
+ warnings.push('Parent-vs-value content requires review: '+parentChildOverlap.filter(x=>x.normalizedTokenJaccard>=0.85).length+' numeric pages share >=0.85 normalized-token Jaccard with their parent tool.');
 if(highSimilarity)warnings.push('Content review across all 92 numeric pages: '+highSimilarity+'/'+comparable+' same-direction page pairs are >=0.95 similar.');
 if(pilotHighSimilarity)warnings.push('Production indexable numeric pilot review: '+pilotHighSimilarity+'/'+pilotComparable+' comparable page pairs are >=0.95 similar; this is not a quality approval.');
-const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,pilotHighSimilarityPairs:pilotHighSimilarity,pilotSimilarityPairsCompared:pilotComparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,selectedNumericDirections:[...byDirection.keys()].sort(),numericSameDirectionIndexCollisions:[...byDirection].filter(([,count])=>count>1).map(([slug,count])=>({slug,count})),excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
+const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,pilotHighSimilarityPairs:pilotHighSimilarity,pilotSimilarityPairsCompared:pilotComparable,parentChildOverlap,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),numericIndexMode:info.numericIndexMode,indexableNumericPages:seeds.length-unindexableNumeric.size,selectedNumericDirections:[...byDirection.keys()].sort(),numericSameDirectionIndexCollisions:[...byDirection].filter(([,count])=>count>1).map(([slug,count])=>({slug,count})),excludedNumericPages:[...unindexableNumeric],failures,warnings,checkedAt:new Date().toISOString()};
 fs.writeFileSync(path.join(dist,'release-audit-report.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(failures.length)process.exitCode=1;
