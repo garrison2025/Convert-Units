@@ -238,6 +238,23 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('kg'),'live calculator gives converted answer');
      break;
    }
+   case 'fluid-ounce-us-uk':{
+     const source=q('[data-converter] [data-value]');
+     const panel=q('[data-fluid-oz-compare]'),us=q('[data-fluid-us]'),uk=q('[data-fluid-uk]');
+     ok(panel&&!panel.hidden&&us&&uk,'US/UK fluid ounce comparison must be visible');
+     ok(us.textContent.includes('≈ 12.004 US fl oz'),'355 mL must show correct US fluid ounces');
+     ok(uk.textContent.includes('≈ 12.4943 UK fl oz'),'355 mL must show correct UK fluid ounces');
+     source.value='100';source.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(us.textContent.includes('3.3814')&&uk.textContent.includes('3.5195'),
+       'changing source updates both systems without intermediate rounding');
+     q('[data-swap]').click();
+     source.value='12';source.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(us.textContent.includes('= 12 US fl oz'),'reverse direction uses exact US ounces');
+     ok(uk.textContent.includes('UK fl oz'),'reverse direction keeps correct imperial label');
+     source.value='-1';source.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'invalid negative physical volume must not show misleading comparison');
+     break;
+   }
    case 'temperature':{
      const value=q('[data-value]');
      value.value='-40';value.dispatchEvent(new Event('input',{bubbles:true}));
@@ -321,11 +338,12 @@ const suites=[
  {name:'batch-alias',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
  {name:'time-duration',url:'/convert/minutes-to-hours/'},{name:'time-milliseconds',url:'/convert/milliseconds-to-seconds/'},
+ {name:'fluid-ounce-us-uk',url:'/convert/ml-to-us-fl-oz/355/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
