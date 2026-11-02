@@ -19,6 +19,35 @@ all('[data-share]',root).forEach(btn=>btn.addEventListener('click',async()=>{con
 all('[data-print-converter]',root).forEach(btn=>btn.addEventListener('click',()=>window.print()));
 all('[data-reset]',root).forEach(btn=>btn.addEventListener('click',()=>{input.value=initialValue;if(root.id==='universal'){const dimension=el('[data-dimension]',root);const originalDim=units[initialFrom].dimension;if(dimension)dimension.value=originalDim;setUnits(originalDim,initialFrom,initialTo);}from.value=initialFrom;to.value=initialTo;calculate();}));
 if(root.id==='universal'){const dimSelect=el('[data-dimension]',root);dimSelect?.addEventListener('change',()=>{const arr=dimensionUnits(dimSelect.value);setUnits(dimSelect.value,arr[0].id,arr[1]?.id??arr[0].id);calculate();});}
+// Unit-name/abbreviation finder: native selects remain accessible and are not mutated while typing.
+if(root.id==='universal'){
+ const finder=el('[data-unit-find]',root),results=el('[data-unit-results]',root),status=el('[data-unit-status]',root),dimension=el('[data-dimension]',root);
+ const aliases={lbs:'pound pounds lb lbs',kg:'kilogram kilograms kilo kilos kgs',oz:'ounce ounces',g:'gram grams',ft:'feet foot',in:'inch inches',m:'meter meters metre metres',cm:'centimeter centimeters centimetre centimetres',ml:'milliliter milliliters millilitre millilitres',l:'liter liters litre litres',celsius:'centigrade',fahrenheit:'fahrenheit',kmh:'kph kmh',ms2:'acceleration meters per second squared',nm:'newton meter'};
+ const clear=()=>{finder.value='';results.replaceChildren();results.hidden=true;status.textContent='Search within the selected measurement category.';};
+ finder?.addEventListener('input',()=>{
+  const term=finder.value.trim().toLowerCase();
+  results.replaceChildren();
+  if(!term){clear();return;}
+  const found=dimensionUnits(dimension.value).filter(u=>([u.id,u.name,u.symbol,aliases[u.id]||''].join(' ').toLowerCase().includes(term))).slice(0,6);
+  for(const u of found){
+   const row=document.createElement('div');row.className='unit-suggestion';
+   const name=document.createElement('span');name.textContent=u.name+' ('+u.symbol+')';row.append(name);
+   for(const side of ['from','to']){
+    const button=document.createElement('button');button.type='button';button.dataset.useUnit=u.id;button.dataset.side=side;button.textContent=side==='from'?'Use as From':'Use as To';button.setAttribute('aria-label','Use '+u.name+' as '+(side==='from'?'source':'target')+' unit');row.append(button);
+   }
+   results.append(row);
+  }
+  results.hidden=!found.length;
+  status.textContent=found.length?'Choose a matching unit as From or To.':'No matching units in this category.';
+ });
+ finder?.addEventListener('keydown',event=>{if(event.key==='Escape')clear();});
+ results?.addEventListener('click',event=>{
+  const button=event.target.closest('[data-use-unit]');if(!button)return;
+  const id=button.dataset.useUnit;if(units[id]?.dimension!==dimension.value)return;
+  (button.dataset.side==='to'?to:from).value=id;calculate();clear();
+ });
+ dimension?.addEventListener('change',clear);
+}
 const q=new URLSearchParams(location.search);if(root.id==='universal'&&units[q.get('from')]&&units[q.get('to')]&&units[q.get('from')].dimension===units[q.get('to')].dimension){const f=q.get('from'),t=q.get('to');const choose=el('[data-dimension]',root);if(choose)choose.value=units[f].dimension;setUnits(units[f].dimension,f,t);}if(q.has('value')){const v=q.get('value');if(v&&v.length<60)input.value=v;}
 calculate();}
 all('[data-converter]').forEach(initConverter);
