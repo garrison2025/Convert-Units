@@ -1,4 +1,4 @@
-import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchFirstCell,parseBatchLines,escapeCsvCell as safeCsv} from './engine.mjs';
+import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchTable,escapeCsvCell as safeCsv} from './engine.mjs';
 const el=(s,root=document)=>root.querySelector(s);
 const all=(s,root=document)=>[...root.querySelectorAll(s)];
 const fmt=(x,d=6)=>formatNumber(x,d);
@@ -88,12 +88,32 @@ if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSugg
   document.addEventListener('pointerdown',e=>{if(!homeSuggestions.contains(e.target)&&e.target!==homeInput)close();});
 }
 const search=el('[data-filter]');if(search){const requested=new URLSearchParams(location.search).get('q');if(requested&&requested.length<=80)search.value=requested;const targets=all('[data-filter-item]');search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();const tokens=q.split(/\s+/).filter(Boolean);let n=0;for(const node of targets){const text=(node.dataset.search||node.textContent).toLowerCase();const ok=tokens.every(token=>text.includes(token));node.hidden=!ok;if(ok)n++;}const status=el('[data-filter-status]');if(status)status.textContent=`Showing ${n} matching tools`;const empty=el('[data-filter-empty]');if(empty)empty.hidden=n!==0;});el('[data-clear-filter]')?.addEventListener('click',()=>{search.value='';search.dispatchEvent(new Event('input'));search.focus();});if(search.value)search.dispatchEvent(new Event('input'));}
-const batch=el('[data-batch]');if(batch){const dimension=el('[data-batch-dimension]'),from=el('[data-batch-from]'),to=el('[data-batch-to]'),values=el('[data-batch-input]'),out=el('[data-batch-result]'),status=el('[data-batch-status]');let csv='';
+const batch=el('[data-batch]');if(batch){const dimension=el('[data-batch-dimension]'),from=el('[data-batch-from]'),to=el('[data-batch-to]'),values=el('[data-batch-input]'),column=el('[data-batch-column]'),separator=el('[data-batch-delimiter]'),out=el('[data-batch-result]'),status=el('[data-batch-status]');let csv='';
 function changeDim(){const d=dimension.value;const arr=dimensionUnits(d);from.innerHTML=options(d,d==='mass'?'lbs':arr[0].id);to.innerHTML=options(d,d==='mass'?'kg':arr[1]?.id??arr[0].id);}
 from.addEventListener('change',()=>{if(units[from.value].dimension!==units[to.value].dimension){to.innerHTML=options(units[from.value].dimension,dimensionUnits(units[from.value].dimension).find(x=>x.id!==from.value)?.id??from.value);}});
 dimension.addEventListener('change',changeDim);changeDim();
-function process(){let inputLines;try{inputLines=parseBatchLines(values.value);}catch(e){csv='';out.value='';status.textContent=e.message;return;}if(!inputLines.length){csv='';out.value='';status.textContent='Enter one number per line.';return;}const rows=[['Input','From','Result','To','Status']];let ok=0;for(const line of inputLines){let field='';try{field=parseBatchFirstCell(line);const result=convert(field,from.value,to.value);rows.push([field,units[from.value].symbol,fmt(result,9),units[to.value].symbol,'OK']);ok++;}catch(e){rows.push([field,units[from.value].symbol,'',units[to.value].symbol,e.message]);}}
-csv=rows.map(r=>r.map(safeCsv).join(',')).join('\r\n');out.value=rows.slice(1).map(r=>r[0]+' '+r[1]+' → '+(r[2]?r[2]+' '+r[3]:'Error: '+r[4])).join('\n');status.textContent=`Converted ${ok} of ${inputLines.length} rows. All calculations remain in your browser.`;}
-for(const field of [dimension,from,to,values])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
+function process(){
+ let table;
+ try{table=parseBatchTable(values.value,{column:Number(column.value),delimiter:separator.value});}
+ catch(e){csv='';out.value='';status.textContent=e.message;return;}
+ if(!table.rows.length){csv='';out.value='';status.textContent='Enter at least one numeric data row.';return;}
+ const rows=[['Line','Input','From','Result','To','Status']];
+ let ok=0;
+ const errors=[];
+ for(const record of table.rows){
+  let result='',message='OK';
+  try{
+   if(record.error)throw new RangeError(record.error);
+   result=fmt(convert(record.value,from.value,to.value),9);ok++;
+  }catch(e){message=e.message;errors.push(record.line);}
+  rows.push([String(record.line),record.value,units[from.value].symbol,result,units[to.value].symbol,message]);
+ }
+ csv=rows.map(row=>row.map(safeCsv).join(',')).join('\r\n');
+ out.value=rows.slice(1).map(row=>'Line '+row[0]+': '+row[1]+' '+row[2]+' → '+(row[3]?row[3]+' '+row[4]:'Error: '+row[5])).join('\n');
+ const skipped=table.headerSkipped?' Recognized header skipped.':'';
+ const invalid=errors.length?' Invalid rows: '+errors.slice(0,12).join(', ')+(errors.length>12?'…':'')+'.':'';
+ status.textContent='Converted '+ok+' of '+table.rows.length+' rows ('+table.delimiter+' input).'+skipped+invalid+' All calculations stayed in your browser.';
+}
+for(const field of [dimension,from,to,values,column,separator])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
 el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
 el('[data-process]')?.addEventListener('click',process);el('[data-download]')?.addEventListener('click',()=>{if(!csv)process();if(csv)download('unit-conversions.csv',csv);});el('[data-print]')?.addEventListener('click',()=>window.print());}
