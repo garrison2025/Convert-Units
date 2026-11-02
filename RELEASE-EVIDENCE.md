@@ -88,3 +88,13 @@ Scope: **source code, unit data, test suite and generated-page audits only**. Th
 - GitHub Actions archives the source review CSV/JSON and SEO/performance audit JSON for 7 days as `exactunit-quality-reports`. This does not change indexing behavior or site runtime costs.
 - Verified latest passing CI: https://github.com/garrison2025/Convert-Units/actions/runs/41370958165 (commit `987c78b940e1e68150accd4f6b5b19b5c5d5dc38`); GitHub artifact ID `13109445317`.
 - **Still pending:** editorial decision for highly similar numeric pages (1,646 / 1,646 same-direction comparable pairs flagged), real device/browser diversity beyond CI, measured Core Web Vitals and official custom-domain / AdSense / GSC status. The Cloudflare preview remains `noindex`.
+
+## 2026-11-02 — SEO structural pass (supersedes earlier indexability assumptions)
+
+- Repaired one previously missing parent tool for the V2 source-backed numeric keyword `14400 seconds to hours`; 38 separate pair tools now exist (37 original + 1 repaired parent), while numeric seed count remains 92.
+- Added `src/data/numeric-seo-policy.json`: 26 explicitly selected first-launch indexable numeric pages, with 66 other functional numeric pages set to production `noindex,follow` and omitted from the sitemap. All preview deployments stay noindex. Optional `NUMERIC_INDEX_MODE=all` must not be used without an explicit editorial decision.
+- Production-mode sitemap contains **90 canonical URLs** (38 pairs + 26 pilot numeric + 16 categories + 10 other pages); static build produces 157 HTML routes including the noindex 404 page.
+- Titles and H1s on numeric pages now use the original observed keyword phrasing without keyword stuffing; informational pair pages retain their own topic-focused titles. A real `WebSite` entity and free `WebApplication` markup have been added without fabricated ratings/reviews, and only to indexable pages.
+- Added Pages host-specific `X-Robots-Tag: noindex` rules for `https://:project.pages.dev/*` and `https://:version.:project.pages.dev/*`, so a future official production domain does not leave an indexable `pages.dev` mirror.
+- Structured data, canonical, noindex and sitemap audits were updated to verify the index policy on both preview and synthetic-production builds. Research and launch checklist: `research/SEO-LAUNCH-PILOT-20261102.md`.
+- This is a technical SEO and pilot-risk reduction pass, **not evidence of ranking improvement, organic search clicks or Google approval**. 26 pages remain internally similar and require editorial/usefulness review, US SERP verification and eventual GSC measurement. The historical V2 37-tool plan remains preserved as source evidence.
