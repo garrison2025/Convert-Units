@@ -147,3 +147,9 @@
 @media(prefers-reduced-motion:reduce){
   .tool-more-actions summary,.multi-unit-panel summary{transition:none}
 }
+
+@media print{
+  .tool-more-actions{display:none!important}
+  .multi-unit-panel summary span{display:none}
+  .multi-unit-panel .reference-scroll{display:block!important;overflow:visible!important}
+}
