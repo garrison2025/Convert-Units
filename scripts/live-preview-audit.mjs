@@ -18,7 +18,8 @@ const expectedSha=/^[a-f0-9]{40}$/i.test(process.env.EXPECTED_MAIN_SHA||'')?
 fs.mkdirSync(out,{recursive:true});
 
 const checks=[];
-const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/assets/styles.css','/assets/app.mjs','/build-info.json'];
+const privateReports=['/keyword-evidence-review.csv','/seo-editorial-review.csv','/quality-report.json'];
+const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/assets/styles.css','/assets/app.mjs','/build-info.json',...privateReports];
 async function probe(route){
  const url=site+route;
  try{
@@ -56,6 +57,7 @@ const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.b
 let revision='not checked';
 if(expectedSha)revision=!deployedSha?'missing remote commit marker':deployedSha===expectedSha?'matches main commit':'different from main commit';
 const assetStatuses=checks.filter(x=>x.route.startsWith('/assets/')).map(x=>({route:x.route,ok:x.ok,status:x.status}));
+const qaReportExposure=privateReports.filter(route=>get(route)?.ok&&!get(route)?.error);
 let status;
 if(!allReachable)status='INCONCLUSIVE_UNREACHABLE';
 else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
@@ -63,12 +65,13 @@ else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
 else if(!hasV6)status='VERIFIED_PREVIOUS_VERSION';
+else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
 else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,assetStatuses},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,assetStatuses,qaReportExposure,qaReportsNotPublic:qaReportExposure.length===0&&privateReports.every(route=>get(route)?.status===404)},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,xRobotsTag,error})=>({route,url,status,ok,bytes,contentType,xRobotsTag,error}))
 };
