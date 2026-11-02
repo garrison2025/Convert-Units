@@ -126,17 +126,19 @@ const numericBodies=seeds.map(s=>{
     .toLowerCase().replace(/[-+]?(?:\d[\d,.]*)(?:e[-+]?\d+)?/g,'#').replace(/\s+/g,' ');
   return {slug:s.slug,url:s.url,tokens:new Set(text.match(/[a-z°/]+/g)||[])};
 });
+const clusters=new Map(seeds.map(s=>s.slug).filter((slug,i,arr)=>arr.indexOf(slug)===i).map(slug=>[slug,{slug,numberPages:seeds.filter(s=>s.slug===slug).length,comparedPairs:0,highSimilarityPairs:0}]));
 let highSimilarity=0,comparable=0;
 for(let i=0;i<numericBodies.length;i++)for(let j=i+1;j<numericBodies.length;j++){
   const a=numericBodies[i],b=numericBodies[j];
   if(a.slug!==b.slug)continue;
   comparable++;
+  clusters.get(a.slug).comparedPairs++;
   const common=[...a.tokens].filter(x=>b.tokens.has(x)).length;
   const score=common/(a.tokens.size+b.tokens.size-common||1);
-  if(score>=0.95)highSimilarity++;
+  if(score>=0.95){highSimilarity++;clusters.get(a.slug).highSimilarityPairs++;}
 }
 if(highSimilarity)warnings.push('Content review: '+highSimilarity+'/'+comparable+' same-direction numeric page pairs have >=0.95 normalized-token Jaccard similarity. Inspect usefulness manually; no automatic quality approval.');
-const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,failures,warnings,checkedAt:new Date().toISOString()};
+const report={mode:info.mode,site:info.site,htmlPages:pages.size,indexableExpected:canonicalRoutes.size,linksChecked:true,seedResultsChecked:seeds.length,highSimilarityPairs:highSimilarity,similarityPairsCompared:comparable,similarityClusters:[...clusters.values()].sort((a,b)=>b.highSimilarityPairs-a.highSimilarityPairs),failures,warnings,checkedAt:new Date().toISOString()};
 fs.writeFileSync(path.join(dist,'release-audit-report.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(failures.length)process.exitCode=1;
