@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import{convert,formatNumber,formula,dimensions,units,parseBatchFirstCell}from'../src/assets/engine.mjs';
+import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines}from'../src/assets/engine.mjs';
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,37);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,37);});
@@ -80,4 +80,21 @@ test('displayed formulas distinguish exact division from rounded factors',()=>{
   assert.equal(formula('minutes','hours'),'Divide min by 60 to get hr.');
   assert.equal(formula('lbs','kg'),'Multiply lb by 0.45359237 to get kg.');
   assert.match(formula('ft-lbf','nm'),/approximately/);
+});
+
+
+test('numeric inputs accept decimal/scientific notation but reject JavaScript coercion',()=>{
+ for(const [literal,expected] of [['.5',0.5],['1.',1],['-0.5',-0.5],['+2.5e+2',250],['1e-6',1e-6],[' 12.30 ',12.3]])eq(validateValue(literal),expected,1e-12);
+ for(const invalid of ['0x10','0b11','0o11','1_000','1,000','--2','1e','+','.',true,false,[],{},'0 Infinity']){
+  assert.throws(()=>validateValue(invalid),/valid number/,String(invalid));
+ }
+});
+
+test('malformed first CSV row is processed as an error row, never a batch crash',()=>{
+ assert.deepEqual(parseBatchLines('value,result\n149\n126'),['149','126']);
+ assert.deepEqual(parseBatchLines('"not closed,3\n149'),['"not closed,3','149']);
+ assert.deepEqual(parseBatchLines('input\n'),[]);
+ assert.deepEqual(parseBatchLines('   '),[]);
+ assert.deepEqual(parseBatchLines('\uFEFFvalue,result\r\n149\r\n126'),['149','126']);
+ assert.throws(()=>parseBatchLines('1\n2\n3',2),/Maximum 2 data rows/);
 });
