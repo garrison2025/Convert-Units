@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import{convert,formatNumber,dimensions,units,parseBatchFirstCell}from'../src/assets/engine.mjs';
+import{convert,formatNumber,formula,dimensions,units,parseBatchFirstCell}from'../src/assets/engine.mjs';
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,37);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,37);});
@@ -73,4 +73,11 @@ test('seed values can be recalculated without NaN, infinity, or roundtripping dr
     const backward=convert(v,p.to,p.from);
     eq(backward,s.value,1e-8);
   }
+});
+
+test('displayed formulas distinguish exact division from rounded factors',()=>{
+  assert.equal(formula('seconds','hours'),'Divide s by 3,600 to get hr.');
+  assert.equal(formula('minutes','hours'),'Divide min by 60 to get hr.');
+  assert.equal(formula('lbs','kg'),'Multiply lb by 0.45359237 to get kg.');
+  assert.match(formula('ft-lbf','nm'),/approximately/);
 });

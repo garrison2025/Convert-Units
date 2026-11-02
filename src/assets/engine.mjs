@@ -129,7 +129,12 @@ export function formula(from,to){
  if(a.dimension==='temperature')return 'Convert through Kelvin: K = °C + 273.15 = (°F − 32) × 5/9 + 273.15.';
  if(a.dimension==='fuel')return 'L/100 km = 235.214583 ÷ US mpg (and vice versa).';
  const x=convert(1,from,to);
- return `Multiply ${a.symbol} by ${formatNumber(x,9)} to get ${b.symbol}.`;
+ // Prefer an exact division rule for recurring decimal factors (e.g. seconds/hour).
+ const inverse=1/x,nearest=Math.round(inverse);
+ if(inverse>=2 && inverse<=1e12 && Math.abs(inverse-nearest)<=1e-12*Math.max(1,Math.abs(inverse)))return `Divide ${a.symbol} by ${formatNumber(nearest,0)} to get ${b.symbol}.`;
+ const displayed=formatNumber(x,9);
+ const exact=Number(displayed.replaceAll(',',''))===x;
+ return `Multiply ${a.symbol} by ${exact?'':'approximately '}${displayed} to get ${b.symbol}.`;
 }
 export function dimensionUnits(dim){return Object.entries(units).filter(([,u])=>u.dimension===dim).map(([id,u])=>({id,...u}));}
 export function safeValueText(n){return String(n).replace(/,/g,'');}
