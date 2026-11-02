@@ -5,9 +5,9 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 ## Delivered
 
 - **38** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
-- **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
-- **156** public static page routes in total (38 tools plus 92 numeric pages, 16 categories and site pages; 79 are initial production-indexable candidates under the curated policy) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
-- Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, **original input columns and recognized headers preserved in CSV export**, numeric machine-readable output, sanitized source cells and print. One unit pair per batch.
+- **92** accurately prerendered numeric results, of which **15** are conditional official-domain index candidates and **77** remain `noindex`.
+- **157** generated static page routes in total (38 tools plus 92 numeric pages, 16 categories and site pages; 79 are initial production-indexable candidates under the curated policy) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
+- Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, **original input columns and recognized headers preserved in CSV export**, numeric machine-readable output, sanitized source cells and print. One fixed unit pair per batch or mixed source/target units specified by individual CSV columns.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
@@ -20,7 +20,7 @@ Requires Node 20+.
 npm run check
 ```
 
-The command runs conversion and batch CSV tests, static builds, link crawling, metadata uniqueness and numeric-page similarity reviews, plus a dependency-free resource-size budget gate. Site is generated in `dist/`. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
+The command runs conversion and batch CSV tests, static builds, link crawling, metadata uniqueness and numeric-page similarity reviews, plus a dependency-free resource-size budget gate. Only public site assets are generated into `dist/`; internal SEO audit CSV/JSON reports are moved into `qa-reports/` and uploaded to GitHub Actions artifacts. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
 
 The site also includes an accessibility statement and runs preview plus synthetic-production SEO checks in CI. Numeric-page similarity warnings require editorial review; a passing build is not AdSense approval.
 
@@ -41,13 +41,13 @@ The site also includes an accessibility statement and runs preview plus syntheti
 
 Do not submit the temporary Pages subdomain or its preview sitemap to Google Search Console.
 
-Cloudflare Pages will serve route folders' `index.html` on clean URLs. `robots.txt`, `sitemap.xml`, `_headers`, and `404.html` are generated at build time. The `dist/` folder is output only, not checked into source.
+Cloudflare Pages will serve route folders' `index.html` on clean URLs. `robots.txt`, `sitemap.xml`, `_headers`, and `404.html` are generated at build time. The `dist/` folder is output only, not checked into source. Do not copy the nonpublic `qa-reports/` directory into Cloudflare's deployment output.
 
 ## Important boundaries
 
 This source build and its automated tests have been verified locally. They do not prove a production Cloudflare deployment, a connected domain, Google indexing, AdSense approval, organic traffic, or ad revenue.
 
-Publishing many similar numeric pages is not itself proof of usefulness. Keep user value and accuracy as the primary requirements. Keyword Volume/KD/rank are estimates of the competitor's October 31, 2026 results, **not forecasts** for this website. SEO canonical destinations are controlled by the curated 92-page seed list.
+Publishing many similar numeric pages is not itself proof of usefulness. Keep user value and accuracy as the primary requirements. Keyword Volume/KD/rank are estimates of the competitor's October 31, 2026 results, **not forecasts** for this website. SEO canonical and sitemap eligibility are controlled by the conservative 15/77 numeric indexing policy, separate from the 92 approved functional numeric routes.
 
 ## Internal layout
 
@@ -58,7 +58,7 @@ Publishing many similar numeric pages is not itself proof of usefulness. Keep us
 - `src/data/seeds.json`: 92 approved numeric pages and keyword evidence
 - `scripts/build.mjs`: build HTML, metadata, canonical, sitemap, robots, legal pages
 - `scripts/audit.mjs`: static SEO integrity audit
-- `scripts/release-audit.mjs`: all-page link graph, orphan, numeric result and canonical audit; JSON report in `dist/release-audit-report.json`\n- `scripts/deep-audit.mjs`: generated HTML link crawl and content similarity warnings; report at `dist/quality-report.json`
+- `scripts/release-audit.mjs`: all-page link graph, orphan, numeric result and canonical audit; JSON report retained privately in `qa-reports/release-audit-report.json` after `npm run build`\n- `scripts/deep-audit.mjs`: generated HTML link crawl and content similarity warnings; report retained privately at `qa-reports/quality-report.json` after `npm run build`
 - `tests/conversion.test.mjs`: precision, dimensions, and page mapping tests
 - `research/*`: full V2 plan and all uploaded keyword research data
 
@@ -67,7 +67,7 @@ This project is an independent implementation, not a copy of the competitor's si
 ## Content and performance quality gates (pre-domain)
 
 - A passing build is not a guarantee of Google indexing, AdSense eligibility, visual accessibility, or Core Web Vitals.
-- `npm run audit:performance` measures static CSS, JS and HTML asset sizes and writes `dist/performance-budget-report.json`; its gzip figures are local estimates, not measured production transfer sizes.
+- `npm run audit:performance` measures static CSS, JS and HTML asset sizes and writes `dist/performance-budget-report.json` when run standalone; `npm run build` archives it at `qa-reports/performance-budget-report.json`; its gzip figures are local estimates, not measured production transfer sizes.
 - The 92 approved numeric pages include a useful pre-rendered result, interactive calculator, reference comparisons and display-precision table; their high template similarity still requires editorial review. See [`research/NUMERIC-SEO-QUALITY-REVIEW.md`](research/NUMERIC-SEO-QUALITY-REVIEW.md).
 - In preview mode all pages remain `noindex`. Do **not** buy or connect a domain solely to clear CI checks; genuine real-browser checks can be run when an official domain is available.
 
@@ -136,3 +136,10 @@ On Cloudflare Pages, `CF_PAGES_BRANCH` controls a further safety gate: branches 
 GitHub Actions continues testing synthetic `https://qa.example.test` with explicit test-only approval. This is not a deployed real domain. Unit tests check incomplete, invalid and mismatched approval, as well as non-main branch previews. Real indexing, DNS verification and GSC visibility cannot be demonstrated by local CI.
 
 Official docs: https://developers.cloudflare.com/pages/configuration/headers/ ; https://developers.cloudflare.com/pages/configuration/build-configuration/ ; https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/ ; https://developers.google.com/search/docs/crawling-indexing/block-indexing.
+
+## Current SEO evidence and public deployment hygiene (2026-11-02)
+
+- `scripts/seo-editorial-gate.mjs` reconciles all 92 numeric query records with the original 600-row **competitor** Semrush export and emits a 130-page review table. It distinguishes unverified generic-converter demand from numeric observations; no ExactUnit traffic claim.
+- The numeric indexing policy remains **15 pilot / 77 noindex**; see `research/SEO-EDITORIAL-DECISIONS-V4-20261102.md`. Generic query Volume for **23** of 38 directions is not established by the approved numeric evidence.
+- `scripts/segregate-qa-reports.mjs` requires 11 QA files, removes them from the publicly deployed `dist/` directory, and blocks accidental research CSV/internal audit JSON exposure. GitHub Actions archives `qa-reports/` instead.
+- The public Cloudflare probe checks that internal audit exports return **404** and independently verifies the deployed commit SHA and preview noindex. A stale live deployment can temporarily show prior behavior; do not claim success until the live SHA matches the main branch.
