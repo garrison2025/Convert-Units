@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
-import {units} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
