@@ -50,7 +50,7 @@ const reviewed=seeds.map(item=>{
   editorialRisk:peerCount>=10?'high duplication cluster':peerCount>=2?'similar intent cluster':'single value in direction',
   indexDecision:'unreviewed — do not infer index eligibility',
   source:'approved V2 Semrush competitor keyword dataset'
- });
+ };
 }).sort((a,b)=>b.competitorSearchVolumeUS-a.competitorSearchVolumeUS||b.competitorTrafficEstimate-a.competitorTrafficEstimate);
 const groups=[...bySlug].map(([slug,items])=>({
  slug,pageCount:items.length,
