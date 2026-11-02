@@ -28,6 +28,8 @@ const shots=[
  {file:'numeric-mobile-375.png',route:'/convert/lbs-to-kg/149/',mobile:375,width:1250,height:1000},
  {file:'category-mass-desktop.png',route:'/category/mass/',width:1440,height:950},
  {file:'category-mass-mobile-375.png',route:'/category/mass/',mobile:375,width:1250,height:1000},
+ {file:'time-minutes-desktop.png',route:'/convert/minutes-to-hours/',width:1440,height:950},
+ {file:'time-minutes-mobile-375.png',route:'/convert/minutes-to-hours/',mobile:375,width:1250,height:1000},
  {file:'batch-desktop.png',route:'/batch-converter/',width:1440,height:950},
  {file:'batch-mobile-375.png',route:'/batch-converter/',mobile:375,width:1250,height:1000}
 ];
