@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
+import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
 
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url),'utf8'));
@@ -34,4 +34,22 @@ test('fix malformed spacing and abbreviated raw Semrush search phrases',()=>{
  const mass=seeds.find(s=>s.keyword==='149 lbs to kg');
  assert.equal(numericHeading(mass,pairFor(mass.slug)),'149 pounds to kilograms');
  assert.match(numericTitle(mass,pairFor(mass.slug)),/67\.585263 kg$/);
+});
+
+test('all 38 direction meta descriptions accurately distinguish rounded versus exact results',()=>{
+ const descriptions=new Set();
+ for(const p of pairs){
+  const result=directionMetaDescription(p);
+  assert.ok(result.startsWith(p.title+': 1 '),p.slug);
+  assert.match(result,/ (?:=|≈) /,p.slug);
+  assert.ok(result.includes('local batch converter'),p.slug);
+  assert.ok(result.length<190,p.slug+' description too long: '+result.length);
+  assert.ok(!descriptions.has(result),'duplicate meta description '+p.slug);
+  descriptions.add(result);
+ }
+ assert.equal(descriptions.size,38);
+ const kgToLbs=pairs.find(x=>x.slug==='kg-to-lbs');
+ assert.match(directionMetaDescription(kgToLbs),/1 kg ≈ 2\.204622622 lb/);
+ const lbToKg=pairs.find(x=>x.slug==='lbs-to-kg');
+ assert.match(directionMetaDescription(lbToKg),/1 lb = 0\.45359237 kg/);
 });
