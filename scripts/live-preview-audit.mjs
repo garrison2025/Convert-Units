@@ -23,10 +23,14 @@ const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/convert/kg-to-lbs/'
 async function probe(route){
  const url=site+route;
  try{
-  const r=await fetch(url,{signal:AbortSignal.timeout(15000),redirect:privateReports.includes(route)?'manual':'follow',headers:{'User-Agent':'ExactUnit-ReadOnly-QA/1.0'}});
+  const started=Date.now();
+  const r=await fetch(url,{signal:AbortSignal.timeout(15000),redirect:privateReports.includes(route)?'manual':'follow',headers:{'User-Agent':'ExactUnit-ReadOnly-QA/1.0','Accept-Encoding':'gzip, br'}});
   const body=(await r.text()).slice(0,800000);
   const destination=new URL(r.url);
-  const record={route,url:r.url,status:r.status,ok:r.ok,redirectLocation:r.headers.get('location'),bytes:Buffer.byteLength(body),contentType:r.headers.get('content-type'),xRobotsTag:r.headers.get('x-robots-tag'),body};
+  const record={route,url:r.url,status:r.status,ok:r.ok,redirectLocation:r.headers.get('location'),
+    bytes:Buffer.byteLength(body),contentType:r.headers.get('content-type'),contentEncoding:r.headers.get('content-encoding'),
+    cacheControl:r.headers.get('cache-control'),elapsedMs:Date.now()-started,
+    xRobotsTag:r.headers.get('x-robots-tag'),body};
   if(destination.hostname!=='convert-units-bwa.pages.dev')record.error='Unexpected external redirect host; verification is invalid';
   checks.push(record);
   return record;
@@ -71,7 +75,7 @@ if(deployment.ok){try{buildInfo=JSON.parse(deployment.body);}catch{}}
 const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.buildCommit.toLowerCase():null;
 let revision='not checked';
 if(expectedSha)revision=!deployedSha?'missing remote commit marker':deployedSha===expectedSha?'matches main commit':'different from main commit';
-const assetStatuses=checks.filter(x=>x.route.startsWith('/assets/')).map(x=>({route:x.route,ok:x.ok,status:x.status}));
+const assetStatuses=checks.filter(x=>x.route.startsWith('/assets/')).map(x=>({route:x.route,ok:x.ok,status:x.status,contentEncoding:x.contentEncoding,cacheControl:x.cacheControl}));
 function isBlockedRetiredReport(c){
  if(!c||c.error)return false;
  if(c.status===403||c.status===404||c.status===410)return true;
@@ -102,7 +106,7 @@ const report={
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
  codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
- responses:checks.map(({route,url,status,ok,bytes,contentType,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,xRobotsTag,error,redirectLocation}))
+ responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };
 fs.writeFileSync(path.join(out,'preview-audit.json'),JSON.stringify(report,null,2)+'\n');
 console.log('CLOUDFLARE PREVIEW AUDIT:',JSON.stringify({status,expectedSha,deployedSha,codeChecks:report.codeChecks,responses:report.responses},null,2));
