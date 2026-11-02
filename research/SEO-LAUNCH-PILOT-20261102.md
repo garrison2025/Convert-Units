@@ -94,3 +94,15 @@ The competitor keyword appendix also includes terms for which a direct numeric a
 | hpa to mmhg | 320 | 4 | 42 | A direct pressure conversion with possible immediate-answer competition |
 
 These values come from the original competitor TSV (one observed row per example); they are not forecasts or US Google top-ten verification. The first three queries suggest one coherent, density-aware information need rather than three independently justified SEO pages. **Do not publish a generic `kg to mL` or `mL to mg` numerical answer without a density input.** If future US SERP research confirms sufficiently independent click intent, a density-aware calculator and a well-sourced explanation may provide more value than another mass number page. No extra tool was added in this optimization pass.
+
+## 2026-11-02 additional SEO fixes — natural search titles and verified crawl paths
+
+- Replaced raw historical keyword strings as numeric H1 labels with readable unit names. For instance, `50kpa to atm` becomes **50 kilopascals to standard atmospheres** in the H1; the HTML title gives the actual conversion and the snippet uses approximate wording when the display is rounded. Original Semrush strings remain unchanged in the keyword dataset.
+- Added static HTML link-graph testing. It scans actual anchor links from the homepage, verifies each intended indexable URL is reachable within three clicks and each chosen numeric answer is linked from its parent tool. It found **/universal-converter/ was orphaned**; the sitewide navigation and directory now link directly to the page.
+- Verified crawl results: **90 intended indexable pages, zero orphans, maximum click depth two, and no links from indexable pages to suppressed numeric results**. These are local build findings, not verified Google crawler behavior.
+- An explicit override from curated to all numeric pages now also requires `NUMERIC_INDEX_CONFIRMATION=REVIEWED_ALL_92`. Default index selection stays at 26 numeric / 66 suppressed pages.
+- Each build writes `dist/seo-url-inventory.csv`, covering every generated HTML route with title, H1, description, robots, canonical, intended index status, static link depth, in/out link counts and original keyword where available. Download from CI artifacts `exactunit-quality-reports`.
+- Sitemap `lastmod` is intentionally omitted until a reliable significant page-update timestamp exists, rather than inserting CI run time as a misleading "freshness" claim.
+- Technical QA does not demonstrate ranking, Google indexation, Search Console clicks, AdSense approval or real mobile network performance.
+
+Sources: Google Search Central [link crawling](https://developers.google.com/search/docs/crawling-indexing/links-crawlable), [title links](https://developers.google.com/search/docs/appearance/title-link), [snippets](https://developers.google.com/search/docs/appearance/snippet), [canonical guidance](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), and [sitemap dates](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap).
