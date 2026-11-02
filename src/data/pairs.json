@@ -225,6 +225,15 @@
     "title": "Seconds to Minutes"
   },
   {
+    "id": 38,
+    "category": "时间",
+    "slug": "seconds-to-hours",
+    "from": "seconds",
+    "to": "hours",
+    "url": "/convert/seconds-to-hours/",
+    "title": "Seconds to Hours"
+  },
+  {
     "id": 26,
     "category": "时间",
     "slug": "milliseconds-to-seconds",
