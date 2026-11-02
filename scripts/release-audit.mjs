@@ -25,6 +25,9 @@ const allRoutes=new Set(pages.keys());
 const canonicalRoutes=new Set([...allRoutes].filter(p=>p!=='/404/'));
 const titleSeen=new Map(), descriptionSeen=new Map(), inbound=new Map([...allRoutes].map(r=>[r,0]));
 const seedPaths=new Set(seeds.map(s=>s.url));
+const bundledStyle=path.join(dist,'assets','styles.css');
+if(!fs.existsSync(bundledStyle)||fs.statSync(bundledStyle).size<10000)fail('Required combined CSS is absent or unexpectedly small');
+
 const extract=(html,regex)=>regex.exec(html)?.[1]??'';
 const plain=(html)=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&(?:[a-z]+|#\d+);/gi,' ').replace(/\s+/g,' ').trim();
 assert.equal(pairs.length,37);
@@ -76,6 +79,9 @@ for(const [route,html] of pages){
   for(const match of html.matchAll(/<(?:script|link)\b[^>]*?(?:src|href)="(\/assets\/[^"]+)"/gi)){
     if(!fs.existsSync(path.join(dist,match[1].slice(1))))fail(route+': missing asset '+match[1]);
   }
+  if(!html.includes('<link rel="stylesheet" href="/assets/styles.css">'))fail(route+': missing optimized single CSS bundle');
+  if(route==='/universal-converter/'&&(!html.includes('data-unit-find')||!html.includes('data-unit-results')))fail('Universal converter missing alias search');
+  if(route==='/all-converters/'&&!html.includes('data-search='))fail('Converter directory missing alias search data');
   if(html.includes('data-converter')&&!html.includes('data-print-converter'))fail(route+': converter missing print-table control');
   if(html.includes('data-converter')&&!html.includes('data-multi-results'))fail(route+': live converter missing same-value multi-unit table');
   if(html.includes('data-multi-results')&&!html.includes('Other unit equivalents'))fail(route+': multi-unit comparison is not labeled');
