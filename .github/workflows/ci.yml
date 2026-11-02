@@ -33,6 +33,7 @@ jobs:
           path: |
             dist/keyword-evidence-review.csv
             dist/keyword-evidence-review.json
+            dist/seo-content-audit.json
             dist/release-audit-report.json
             dist/quality-report.json
             dist/performance-budget-report.json
