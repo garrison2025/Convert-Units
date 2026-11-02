@@ -412,6 +412,40 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-output]').textContent.includes('44.958'),'17.7 inches must equal 44.958 centimeters');
      break;
    }
+   case 'speed-four-330':{
+     const panel=q('[data-speed-summary]'),input=q('[data-value]');
+     const kmh=q('[data-speed-unit="kmh"]'),mph=q('[data-speed-unit="mph"]');
+     const ms=q('[data-speed-unit="m-s"]'),kn=q('[data-speed-unit="knot"]');
+     ok(Boolean(panel&&!panel.hidden&&kmh&&mph&&ms&&kn),'330kmh existing numeric page SSR four correct speed units');
+     ok(kmh.textContent==='= 330 km/h','exact original speed stays exact');
+     ok(mph.textContent==='≈ 205.052493 mph','330kmh to mph uses exact statute-mile factor');
+     ok(panel.textContent.includes('signed velocity component'),'caution negative speed is not a magnitude');
+     let copied='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async s=>{copied=s;}}});
+     q('[data-copy-speed]').click();await new Promise(r=>setTimeout(r,0));
+     ok(copied.includes('Speed unit conversion: 330 km/h')&&copied.includes('mph: ≈ 205.052493'),'copy all four speed values');
+     ok(copied.includes('legal speed limit'),'copied reading must not imply legal compliance');
+     input.value='100';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(mph.textContent==='≈ 62.137119 mph','changing speed recomputes four units');
+     q('[data-swap]').click();
+     ok(q('[data-from]').value==='mph','swapping switches speed source');
+     input.value='60';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(kmh.textContent==='= 96.56064 km/h','60mph converts to 96.56064kmh');
+     ok(ms.textContent==='= 26.8224 m/s','60mph converts to 26.8224m/s');
+     input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'invalid source clears stale speed values');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'existing numeric page remains preview noindex');
+     break;
+   }
+   case 'speed-four-reverse':{
+     const panel=q('[data-speed-summary]'),input=q('[data-value]');
+     ok(Boolean(panel&&!panel.hidden),'mph-to-kmh direction SSR four-unit speed readout');
+     input.value='70';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-speed-unit="kmh"]').textContent==='= 112.65408 km/h','70mph converts to 112.65408kmh');
+     q('[data-to]').value='knot';q('[data-to]').dispatchEvent(new Event('change',{bubbles:true}));
+     ok(q('[data-speed-unit="mph"]').textContent==='= 70 mph','changing output target does not alter the source speed');
+     break;
+   }
    case 'engineering-speed':{
      const panel=q('[data-engineering-reference="speed"]');
      ok(Boolean(panel&&panel.textContent.includes('96.56064 km/h')&&panel.textContent.includes('26.8224 m/s')),
@@ -521,6 +555,8 @@ const suites=[
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'engineering-length',url:'/convert/in-to-cm/'},
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
+ {name:'speed-four-330',url:'/convert/kmh-to-mph/330/'},
+ {name:'speed-four-reverse',url:'/convert/mph-to-kmh/'},
  {name:'engineering-torque',url:'/convert/ft-lbf-to-nm/'},
  {name:'torque-four-400',url:'/convert/ft-lbf-to-nm/400/'},
  {name:'torque-four-reverse',url:'/convert/nm-to-ft-lbf/'},
@@ -530,7 +566,7 @@ const suites=[
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
