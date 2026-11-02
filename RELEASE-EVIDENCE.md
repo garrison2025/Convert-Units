@@ -74,3 +74,17 @@ Scope: **source code, unit data, test suite and generated-page audits only**. Th
 - **SEO outstanding risk:** 1,646 / 1,646 comparable same-direction numeric page pairs were above the 0.95 normalized-token similarity threshold (build run 41368965006). The similarity report now includes per-direction clusters. See `research/NUMERIC-SEO-QUALITY-REVIEW.md`. This is an editorial warning, not proof of a Google penalty or a completed content audit.
 - Real-browser UX, mobile overflow, Core Web Vitals, custom domain, real GSC and AdSense reviews remain intentionally unverified until appropriate testing is possible. User has not bought the official domain. Do not infer an official site address from the temporary Cloudflare `pages.dev` preview.
 
+
+
+## 2026-11-02 — responsive browser and keyword evidence pass
+
+- Pure Chromium smoke tests run in GitHub Actions against a localhost server, with no official domain or paid API. The injected test script is never written to deployable `dist/`.
+- **10 / 10 real Chromium scenarios passed**: homepage calculation and suggestions; selectable-column CSV with a malformed row; universal temperature and reset; numeric result and linked table; absolute-zero and reciprocal-fuel invalid input; four page families at effective 320 / 375 / 768 CSS-pixel widths.
+- A genuine **57 px horizontal overflow at 320 px** on `/convert/lbs-to-kg/149/` was found and corrected by changing the mobile tool grid to `minmax(0,1fr)` and ensuring scrolling tables do not force the entire page wider. All responsive checks subsequently passed.
+- **33 / 33 Node tests passed** in the latest verified build; includes CSV decimal-comma ambiguity fail-closed behavior, source-specific CSV line errors, real mass/time practical equivalents and formula edge cases.
+- CSV auto-detection now explicitly rejects ambiguous numeric comma input such as `1,5` rather than silently treating it as two columns. Files with known CSV separators can use the explicit delimiter control. Recognized CSV headers also enforce consistent column counts. Decimal-comma localization is not claimed to be implemented.
+- The 92 numeric pages now provide real compound UK mass equivalents where relevant and clock-style elapsed-duration representations for time pages; numerical formulas come from the shared conversion engine. This is practical functionality, not a claim that these pages no longer share near-identical templates.
+- Each build validates 92 source-backed numeric keywords and outputs `dist/keyword-evidence-review.csv` plus `dist/keyword-evidence-review.json`, grouped across 15 direction families, with competitor-only US volume, KD, competitor landing URL, ranking and traffic estimates. **One original record, `1.8 kilograms in pounds`, has source rank 0 and is marked unverified rather than treated as a real organic search position.**
+- GitHub Actions archives the source review CSV/JSON and SEO/performance audit JSON for 7 days as `exactunit-quality-reports`. This does not change indexing behavior or site runtime costs.
+- Verified latest passing CI: https://github.com/garrison2025/Convert-Units/actions/runs/41370958165 (commit `987c78b940e1e68150accd4f6b5b19b5c5d5dc38`); GitHub artifact ID `13109445317`.
+- **Still pending:** editorial decision for highly similar numeric pages (1,646 / 1,646 same-direction comparable pairs flagged), real device/browser diversity beyond CI, measured Core Web Vitals and official custom-domain / AdSense / GSC status. The Cloudflare preview remains `noindex`.
