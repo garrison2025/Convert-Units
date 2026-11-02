@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {resolveNumericIndexMode} from '../src/seo-index-policy.mjs';
 
 const read=path=>JSON.parse(fs.readFileSync(new URL(path,import.meta.url),'utf8'));
 const pairs=read('../src/data/pairs.json');
@@ -44,4 +45,14 @@ test('top mass clusters are capped rather than mechanically indexing every numbe
   assert.equal(all.length,total);
   assert.equal(chosen.length,4);
  }
+});
+
+
+test('all 92 numeric pages require an explicit human indexing override',()=>{
+ assert.equal(resolveNumericIndexMode(),'curated');
+ assert.equal(resolveNumericIndexMode('curated'),'curated');
+ assert.throws(()=>resolveNumericIndexMode('all'),/REVIEWED_ALL_92/);
+ assert.throws(()=>resolveNumericIndexMode('all','yes'),/REVIEWED_ALL_92/);
+ assert.equal(resolveNumericIndexMode('all','REVIEWED_ALL_92'),'all');
+ assert.throws(()=>resolveNumericIndexMode('sitemap-everything'),/curated or all/);
 });
