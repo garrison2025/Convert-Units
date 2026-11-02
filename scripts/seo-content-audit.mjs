@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -61,8 +62,12 @@ for(const seed of seeds){
  const html=checkMarkup(seed.url,false);
  const title=getTitle(html);
  const h1=decode(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1].replace(/<[^>]*>/g,'')||'');
- if(!title.toLowerCase().includes(seed.keyword.toLowerCase()))errors.push(seed.url+': original source keyword omitted from title');
- if(h1.toLowerCase()!==seed.keyword.toLowerCase())errors.push(seed.url+': H1 does not match source search intent');
+ const pair=pairList.find(p=>p.slug===seed.slug);
+ if(!pair){errors.push(seed.url+': parent pair is missing');continue;}
+ if(title!==numericTitle(seed,pair)+' | ExactUnit')errors.push(seed.url+': title does not match natural, calculated query intent');
+ if(h1!==numericHeading(seed,pair))errors.push(seed.url+': H1 does not name actual measurement and units');
+ const desc=meta(html,'description');
+ if(desc!==numericDescription(seed,pair))errors.push(seed.url+': descriptive snippet is inconsistent with the numeric answer');
  if(!html.includes('data-precision-table'))errors.push(seed.url+': useful rounding comparison missing');
  if(!html.includes('CONVERSION RESULT'))errors.push(seed.url+': answer-first content missing');
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
