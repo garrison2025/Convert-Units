@@ -78,6 +78,7 @@ for(const feature of [
  'Batch unit converter for CSV and spreadsheets',
  'data-batch-column','data-batch-delimiter','data-batch-file',
  'data-batch-from-column','data-batch-to-column','data-batch-example',
+ 'For knots (speed)', 'for kilonewtons (force)', 'is rejected rather than guessed',
  'The export preserves original spreadsheet columns',
  'row-specific units',
  'everything runs locally'
