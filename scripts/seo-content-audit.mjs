@@ -77,7 +77,7 @@ const batchHtml=checkMarkup('/batch-converter/',true);
 for(const feature of [
  'Batch unit converter for CSV and spreadsheets',
  'data-batch-column','data-batch-delimiter','data-batch-file',
- 'data-batch-from-column','data-batch-to-column',
+ 'data-batch-from-column','data-batch-to-column','data-batch-example',
  'The export preserves original spreadsheet columns',
  'row-specific units',
  'everything runs locally'
@@ -85,6 +85,7 @@ for(const feature of [
 const appSource=fs.readFileSync(path.join(root,'src/assets/app.mjs'),'utf8');
 if(!/convertBatchToCsv\(table,from\.value,to\.value,\{/.test(appSource))
  errors.push('Browser script must use tested source-preserving batch conversion, not a second CSV implementation.');
+if(!appSource.includes("[data-batch-example]"))errors.push('Visible mixed-unit CSV example is not wired in the browser.');
 
 checkMarkup('/universal-converter/',true);
 const result={
