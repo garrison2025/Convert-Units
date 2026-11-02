@@ -310,6 +310,25 @@ async function smokeScenario(SCENARIO){
      ok(panel.hidden,'invalid negative physical volume must not show misleading comparison');
      break;
    }
+   case 'temperature-three-scale':{
+     const input=q('[data-value]'),panel=q('[data-temperature-triple]');
+     const c=q('[data-temperature-unit="celsius"]'),f=q('[data-temperature-unit="fahrenheit"]'),k=q('[data-temperature-unit="kelvin"]');
+     ok(panel&&!panel.hidden&&c&&f&&k,'SSR three-scale temperature answers are visible');
+     ok(c.textContent==='= 37.9 °C'&&f.textContent==='= 100.22 °F'&&k.textContent==='= 311.05 K','37.9°C three scales must match NIST');
+     ok(panel.textContent.includes('Temperature differences use a different rule'),'temperature interval caveat missing');
+     let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async v=>{written=v;}}});
+     q('[data-copy-temperature]').click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written.includes('Absolute temperature: 37.9 °C')&&written.includes('K: = 311.05'),'copied three-scale values must match input');
+     ok(written.includes('differences do not use the +32 offset'),'copied reading keeps correct interval warning');
+     input.value='36.6';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(f.textContent==='= 97.88 °F'&&k.textContent==='= 309.75 K','live 36.6°C result correct');
+     q('[data-swap]').click();input.value='32';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(c.textContent==='= 0 °C'&&k.textContent==='= 273.15 K','Fahrenheit swap correct');
+     input.value='-460';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'below absolute zero should hide scale panel');
+     break;
+   }
    case 'temperature':{
      const value=q('[data-value]');
      value.value='-40';value.dispatchEvent(new Event('input',{bubbles:true}));
@@ -396,11 +415,12 @@ const suites=[
  {name:'fluid-ounce-us-uk',url:'/convert/ml-to-us-fl-oz/355/'},
  {name:'kg-to-lbs-mixed',url:'/convert/kg-to-lbs/240/'},
  {name:'pressure-50',url:'/convert/kpa-to-atm/50/'},{name:'pressure-108',url:'/convert/kpa-to-psi/108/'},
+ {name:'temperature-three-scale',url:'/convert/celsius-to-fahrenheit/37.9/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
