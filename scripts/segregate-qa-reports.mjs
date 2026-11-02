@@ -30,14 +30,29 @@ for(const name of reportNames){
 fs.rmSync(qa,{recursive:true,force:true});
 fs.mkdirSync(qa,{recursive:true});
 for(const name of reportNames)fs.renameSync(path.join(dist,name),path.join(qa,name));
+/* Cloudflare Pages retains previously uploaded assets at edge locations for
+ * a period after deployment. _redirects takes precedence even when the old
+ * CSV/JSON asset still exists, and prevents serving historical QA exports.
+ * 302 avoids permanently caching any intermediate route choice.
+ */
+const denyRules=reportNames.map(name=>'/'+name+' /404/ 302');
+fs.writeFileSync(path.join(dist,'_redirects'),[
+ '# Retired audit-export paths. Cloudflare Pages redirects apply even to assets.',
+ ...denyRules,''
+].join('\n'));
+
 const exposed=fs.readdirSync(dist).filter(name=>
  name.endsWith('.csv')||
  (name.endsWith('.json')&&name!=='build-info.json')||
  /audit|evidence|review|report/i.test(name));
 if(exposed.length)throw Error('Sensitive internal QA files remain in deployment output: '+exposed.join(', '));
+const redirectFile=fs.readFileSync(path.join(dist,'_redirects'),'utf8');
+for(const name of reportNames)
+ if(!redirectFile.includes('/'+name+' /404/ 302'))
+  throw Error('Historical QA file not blocked by Pages redirect: '+name);
 if(!fs.existsSync(path.join(dist,'sitemap.xml'))||
  !fs.existsSync(path.join(dist,'robots.txt'))||
  !fs.existsSync(path.join(dist,'build-info.json')))
  throw Error('Required public SEO metadata was incorrectly removed.');
 console.log('PUBLIC ASSET BOUNDARY: moved '+reportNames.length+
- ' internal audit reports out of dist and into qa-reports; 0 review files exposed.');
+ ' internal audit reports out of dist and into qa-reports; 0 review files exposed; historical static paths redirected.');
