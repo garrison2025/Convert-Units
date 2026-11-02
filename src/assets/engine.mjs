@@ -172,3 +172,13 @@ export function parseBatchLines(input,maxRows=1000){
   if(data.length>maxRows)throw new RangeError('Maximum '+maxRows+' data rows per batch.');
   return data;
 }
+
+
+/** CSV text-cell escaping. Preserve negative numeric inputs but neutralize formulas. */
+export function escapeCsvCell(value){
+ const raw=String(value);
+ const isNegativeNumber=/^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw);
+ const suspicious=/^[=+@\t\r]/.test(raw)||(raw.startsWith('-')&&!isNegativeNumber);
+ const safe=suspicious?"'"+raw:raw;
+ return /[\r\n,"]/.test(safe)?'"'+safe.replace(/"/g,'""')+'"':safe;
+}
