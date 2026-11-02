@@ -3,7 +3,7 @@
  * Not SEO filler: content is based on the actual dimension and its units.
  * No invented medical advice, use cases, rankings or author credentials.
  */
-import {units,dimensions,convert,formatNumber,formula,displayRelation} from './assets/engine.mjs';
+import {units,dimensions,convert,formatNumber,formula,displayRelation,feetInchesReadout} from './assets/engine.mjs';
 
 const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 
@@ -112,34 +112,58 @@ export function engineeringReference(pair){
  const numeric=(n,id)=>esc(formatNumber(n,6))+' '+esc(units[id].symbol);
  const value=(source,from,to)=>numeric(convert(source,from,to),to);
  const table=(heading,subtitle,columns,rows,footnote)=>
-  '<section class="card engineering-reference" data-engineering-reference="'+dim+'">'+
+  '<section class="card engineering-reference" data-engineering-reference="'+dim+'" data-engineering-source="'+esc(pair.from)+'">'+
   '<h2>'+esc(heading)+'</h2><p>'+esc(subtitle)+'</p>'+
   '<div class="reference-scroll"><table class="number-table reference-table"><thead><tr>'+
   columns.map(x=>'<th scope="col">'+esc(x)+'</th>').join('')+
   '</tr></thead><tbody>'+rows.map(cells=>'<tr>'+cells.map((x,i)=>i===0?'<th scope="row">'+x+'</th>':'<td>'+x+'</td>').join('')+'</tr>').join('')+
   '</tbody></table></div><p class="hint">'+esc(footnote)+'</p></section>';
  if(dim==='length'){
+  if(pair.from==='m'){
+   const meters=[0.5,1,1.75,2,3];
+   return table('Meters to feet and fractional inches',
+    'One metric measurement shown as decimal feet and as whole feet plus inches; choose the representation you actually need.',
+    ['Meters','Decimal feet','Feet and inches (nearest 1/16 in)'],
+    meters.map(n=>{const mix=feetInchesReadout(n,'m');return [numeric(n,'m'),value(n,'m','ft'),esc(mix.fractionalRelation+' '+mix.fractional)];}),
+    '1 international foot = exactly 0.3048 m. Mixed feet/inches are rounded to the nearest 1/16 inch for display, not measurement accuracy.');
+  }
+  if(pair.from==='ft'){
+   const feet=[1,3,5.5,6,10];
+   return table('Feet to meters and centimeters',
+    'Decimal feet are not a feet-and-inches notation. For example, 5.5 ft means 5 ft 6 in.',
+    ['Decimal feet','Meters','Centimeters'],
+    feet.map(n=>[numeric(n,'ft'),value(n,'ft','m'),value(n,'ft','cm')]),
+    '1 international foot = exactly 0.3048 m; a fractional foot must be multiplied by 12 to find its inches.');
+  }
+  if(pair.from==='cm'){
+   const centimeters=[1,2.54,5,10,30];
+   return table('Centimeters to decimal and fractional inches',
+    'The decimal-inch value and the nearest 1/16-inch ruler mark are different display formats.',
+    ['Centimeters','Decimal inches','Nearest 1/16 inch'],
+    centimeters.map(n=>{const mix=feetInchesReadout(n,'cm');return [numeric(n,'cm'),value(n,'cm','in'),esc(mix.fractionalRelation+' '+mix.fractional)];}),
+    '1 international inch = exactly 2.54 cm. Fractional ruler marks are rounded for reading; use decimal inches for subsequent calculations.');
+  }
   const fractions=[['1/16',1/16],['1/8',1/8],['1/4',1/4],['1/2',1/2],['1',1]];
   return table('Fractional inches to metric lengths',
-   'Fractional ruler marks are exact fractions of the international inch, not decimal-looking measurements.',
+   'Inch ruler marks are exact fractions, not decimal-looking measurements.',
    ['Inches on a ruler','Millimeters','Centimeters'],
    fractions.map(([fraction,n])=>[esc(fraction)+' in',value(n,'in','mm'),value(n,'in','cm')]),
    'One international inch is exactly 25.4 mm. A fraction such as 1/8 inch is 0.125 inch, not 0.8 inch.');
  }
  if(dim==='speed'){
-  const source=60;
-  return table('One speed in four common units',
-   'A fixed 60 mph reference shows the same speed in road, scientific and nautical units.',
-   ['Reference speed','km/h','m/s','Knots'],
-   [[numeric(source,'mph'),value(source,'mph','kmh'),value(source,'mph','m-s'),value(source,'mph','knot')]],
-   'One international mile is 1,609.344 m; one nautical mile is 1,852 m. The figures are unit equivalents, not safety recommendations.');
+  const from=pair.from,n=from==='kmh'?100:60;
+  return table(from==='kmh'?'100 km/h across four speed units':'60 mph across four speed units',
+   'One value is converted from the source unit of this page into the alternative road, SI and nautical units.',
+   ['Source speed',from==='kmh'?'mph':'km/h','m/s','Knots'],
+   [[numeric(n,from),value(n,from,from==='kmh'?'mph':'kmh'),value(n,from,'m-s'),value(n,from,'knot')]],
+   'One international statute mile = 1,609.344 m; one nautical mile = 1,852 m. Equivalents are not safety or legal-speed advice.');
  }
  if(dim==='torque'){
-  const source=100;
-  return table('Torque-wrench unit cross-check',
-   'A fixed 100 ft·lbf reference also shows inch-pound-force and kilogram-force-meter values.',
-   ['Foot-pound-force','Newton-meters','Inch-pound-force','Kilogram-force meters'],
-   [[numeric(source,'ft-lbf'),value(source,'ft-lbf','nm'),value(source,'ft-lbf','in-lbf'),value(source,'ft-lbf','kgf-m')]],
+  const from=pair.from,n=100;
+  return table(from==='nm'?'100 newton-meters in other torque units':'100 foot-pound-force in other torque units',
+   'The source torque is expressed in three additional units without rounding intermediate calculations.',
+   ['Source torque',from==='nm'?'Foot-pound-force':'Newton-meters','Inch-pound-force','Kilogram-force meters'],
+   [[numeric(n,from),value(n,from,from==='nm'?'ft-lbf':'nm'),value(n,from,'in-lbf'),value(n,from,'kgf-m')]],
    'A foot-pound-force is exactly 12 inch-pound-force. This is torque, not energy or pound mass. Use the manufacturer specification for tightening.');
  }
  return '';
