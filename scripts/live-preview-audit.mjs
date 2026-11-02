@@ -19,7 +19,7 @@ fs.mkdirSync(out,{recursive:true});
 
 const checks=[];
 const privateReports=['/keyword-evidence-review.csv','/seo-editorial-review.csv','/quality-report.json'];
-const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/convert/kg-to-lbs/','/convert/kg-to-lbs/240/','/convert/seconds-to-hours/14400/','/category/mass/','/category/temperature/','/convert/minutes-to-hours/','/convert/seconds-to-hours/','/assets/styles.css','/assets/app.mjs','/build-info.json',...privateReports];
+const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/convert/kg-to-lbs/','/convert/kg-to-lbs/240/','/convert/seconds-to-hours/14400/','/category/mass/','/category/temperature/','/convert/minutes-to-hours/','/convert/seconds-to-hours/','/convert/ml-to-us-fl-oz/','/convert/ml-to-us-fl-oz/355/','/assets/styles.css','/assets/app.mjs','/build-info.json',...privateReports];
 async function probe(route){
  const url=site+route;
  try{
@@ -46,13 +46,14 @@ const home=get('/'),batch=get('/batch-converter/'),tool=get('/convert/lbs-to-kg/
 const reverseTool=get('/convert/kg-to-lbs/'),numeric=get('/convert/kg-to-lbs/240/'),exactTime=get('/convert/seconds-to-hours/14400/');
 const massCategory=get('/category/mass/'),temperatureCategory=get('/category/temperature/');
 const minuteTool=get('/convert/minutes-to-hours/'),secondTool=get('/convert/seconds-to-hours/');
+const fluidTool=get('/convert/ml-to-us-fl-oz/'),fluid355=get('/convert/ml-to-us-fl-oz/355/');
 const deployment=get('/build-info.json');
-const allReachable=[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool].every(c=>c.ok&&!c.error);
+const allReachable=[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool,fluidTool,fluid355].every(c=>c.ok&&!c.error);
 function protectsPreview(c){
  return /<meta\s+name="robots"\s+content="[^"]*noindex/i.test(c.body)||
   /(?:^|,)\s*noindex\b/i.test(c.xRobotsTag||'');
 }
-const noindexSafe=allReachable&&[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool].every(protectsPreview);
+const noindexSafe=allReachable&&[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool,fluidTool,fluid355].every(protectsPreview);
 const hasV5=allReachable&&home.body.includes('data-output-number')&&
  home.body.includes('data-copy-number')&&batch.body.includes('data-batch-advanced')&&
  batch.body.includes('data-batch-input');
@@ -83,6 +84,13 @@ const hasV13TimeSEO=allReachable&&
  secondTool.body.includes('data-elapsed-duration')&&
  secondTool.body.includes('0:00:05')&&
  !tool.body.includes('data-elapsed-duration');
+const hasV14Ounces=allReachable&&
+ fluidTool.body.includes('data-fluid-oz-compare')&&
+ fluidTool.body.includes('US and UK fluid ounces are different')&&
+ fluid355.body.includes('data-fluid-oz-compare')&&
+ fluid355.body.includes('≈ 12.004 US fl oz')&&
+ fluid355.body.includes('≈ 12.4943 UK fl oz')&&
+ !tool.body.includes('data-fluid-oz-compare');
 let buildInfo=null;
 if(deployment.ok){try{buildInfo=JSON.parse(deployment.body);}catch{}}
 const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.buildCommit.toLowerCase():null;
@@ -109,7 +117,7 @@ else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
 else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
-else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO)status='VERIFIED_PREVIOUS_VERSION';
+else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
@@ -117,7 +125,7 @@ else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,assetStatuses,qaReportExposure,qaReportsNotPublic},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };
