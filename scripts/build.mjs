@@ -109,6 +109,9 @@ fs.writeFileSync(path.join(dist,'favicon.svg'),`<svg xmlns="http://www.w3.org/20
 fs.writeFileSync(path.join(dist,'robots.txt'),IS_PRODUCTION?`User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`:`User-agent: *\nAllow: /\n# Preview noindex provided by meta and HTTP header.\n`);
 fs.writeFileSync(path.join(dist,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${allUrls.map(u=>`<url><loc>${E(toUrl(u))}</loc></url>`).join('')}</urlset>`);
 fs.writeFileSync(path.join(dist,'_headers'),`/assets/*\n  Cache-Control: public, max-age=604800\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n${IS_PRODUCTION?'':'  X-Robots-Tag: noindex, nofollow\n'}`);
+// Cloudflare's official host-matching headers prevent production Pages mirrors and
+// branch previews from being indexed even when SITE_URL points at a real domain.
+fs.appendFileSync(path.join(dist,'_headers'),'\\nhttps://:project.pages.dev/*\\n  X-Robots-Tag: noindex\\nhttps://:version.:project.pages.dev/*\\n  X-Robots-Tag: noindex\\n'.replaceAll('\\\\n','\\n'));
 // Cloudflare Pages serves /404.html for missing routes (real 404 status).
 fs.copyFileSync(path.join(dist,'404','index.html'),path.join(dist,'404.html'));
 const adsPublisher=process.env.ADSENSE_PUBLISHER_ID||'';
