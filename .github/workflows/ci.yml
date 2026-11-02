@@ -58,3 +58,15 @@ jobs:
             dist/performance-budget-report.json
           if-no-files-found: error
           retention-days: 7
+
+      - name: Check public Cloudflare Pages preview from a networked runner (read-only)
+        env:
+          EXPECTED_MAIN_SHA: ${{ github.event_name == 'push' && github.sha || '' }}
+        run: node scripts/live-preview-audit.mjs
+      - name: Upload observed Cloudflare preview status (never substitute for local QA)
+        uses: actions/upload-artifact@v4
+        with:
+          name: exactunit-live-preview-audit
+          path: qa-live-preview/preview-audit.json
+          if-no-files-found: error
+          retention-days: 7
