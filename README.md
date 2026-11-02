@@ -32,12 +32,12 @@ The site also includes an accessibility statement and runs preview plus syntheti
 - Build command: `npm run build`
 - Output directory: `dist`
 - Node version: `22`
-- **Build variable `SITE_URL`: configure only after binding the official custom domain** (the exact `https://` origin, no trailing slash). Do not use Cloudflare's automatic `*.pages.dev` hostname as the production domain.
+- **Build variable `SITE_URL`**: once a real custom domain is bound to Cloudflare Pages, enter its bare HTTPS origin. **SITE_URL alone never activates indexing.** Do not enter `*.pages.dev` as the official domain.
 - Optional `ADSENSE_PUBLISHER_ID`: a valid `pub-` followed by 16 digits, after approved AdSense setup. Ads scripts are deliberately NOT auto-enabled; publisher must configure consent management, real ad units and privacy disclosures independently.
 
-**Temporary preview mode:** When `SITE_URL` is missing or points to `*.pages.dev`, the website remains fully functional but automatically emits `noindex`, omits canonical and OG URLs, and generates an empty sitemap. It does not treat Cloudflare's generated hostname as the official site. `robots.txt` allows crawling so search engines can read the `noindex` directive.
+**Temporary preview mode:** If `SITE_URL` is absent, points to `*.pages.dev`, has not been explicitly approved for indexing, or Cloudflare builds a non-`main` branch, the site still works but emits `noindex`, omits canonical and OG URLs, and has an empty sitemap. The generated `robots.txt` lets crawlers see `noindex`.
 
-**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 79 curated indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
+**Official domain mode:** Only after connecting and verifying a genuine custom domain, set all three Cloudflare Pages **production** variables: `SITE_URL=https://your-real-domain.example`, `SEO_PUBLIC_HOST=your-real-domain.example` (exact matching hostname), and `SEO_INDEX_APPROVED=I_APPROVE_PUBLIC_INDEXING`. Only this explicit, host-bound approval on `main` activates canonicals, the 79-URL sitemap and indexable robots meta. An unapproved `SITE_URL` alone remains noindexed. Partial or mismatched approvals fail the build rather than exposing wrong canonicals. Then verify live headers and GSC, and use Cloudflare Bulk Redirects where appropriate to avoid duplicate Pages aliases.
 
 Do not submit the temporary Pages subdomain or its preview sitemap to Google Search Console.
 
@@ -85,7 +85,7 @@ The approved V2 research contains 37 originally planned tools and 92 keyword-spe
 
 By default `NUMERIC_INDEX_MODE=curated`: all 92 numeric pages remain available, but only the **15 URLs explicitly listed in** `src/data/numeric-seo-policy.json` are eligible for `index,follow` and inclusion in production sitemap. The remaining 77 have `noindex,follow`, no self-canonical tag and no sitemap entry. This is a conservative pilot to reduce same-template exposure, **not a guarantee that selected pages will rank**. Do not set `NUMERIC_INDEX_MODE=all` without reviewing source intent, duplication and post-launch data. Preview builds remain globally noindexed regardless of this flag.
 
-Google's source guidance on [canonicalization](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) and [scaled content abuse](https://developers.google.com/search/docs/essentials/spam-policies) informed the technical policy. A unique numeric result is not necessarily an independently valuable page. Once an official domain is purchased, set `SITE_URL` to its HTTPS origin, check GSC index coverage and Search Performance by query/page, and revisit the pilot whitelist based on real clicks and usefulness.
+Google's source guidance on [canonicalization](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) and [scaled content abuse](https://developers.google.com/search/docs/essentials/spam-policies) informed the technical policy. A unique numeric result is not necessarily an independently valuable page. Once a genuine custom domain is connected and explicitly approved with the three-variable launch gate, check GSC index coverage and Search Performance by query/page, and revisit the pilot based on real clicks and usefulness.
 
 **Current source-backed index policy:** [`research/SEO-PILOT-V3-20261102.md`](research/SEO-PILOT-V3-20261102.md) (15 values, 77 suppressed). The earlier 26-value experiment is retained only as historical decision context.
 
@@ -126,3 +126,13 @@ The public [batch search and competitor evidence report](research/SEO-SERP-WORKF
 The static `scripts/seo-content-audit.mjs` checks **all 157 generated HTML routes** for HTML/JSON-LD consistency. In the synthetic official-domain build, every index-candidate page must match canonical URL, WebPage name and description, Open Graph metadata, and actual visible breadcrumb hierarchy. The home page has a truthful WebSite schema, and the 40 dedicated/universal/batch tools have accurate free WebApplication markup. No user ratings or reviews are fabricated; **Google software-app rich-result eligibility is not claimed** because Google lists real review/rating data among its requirements.
 
 Numeric HTML answers, copy text and SEO descriptions now use a meaningful `≈` for rounded results and `=` only when the display agrees with the calculated value; no invented claim of absolute measurement precision. The historical current policy remains **79 candidate index URLs** including 15 numeric values, while 77 additional value routes are available but excluded from indexing. For full scope, limitations and source links see [structured-data and mathematical-accuracy QA](research/GOOGLE-STRUCTURED-DATA-QA-20261102.md).
+
+## Cloudflare release gate and preview-host protection (2026-11-02)
+
+**Safe by default:** A plausible `SITE_URL` is not enough to permit public indexing. Only `SITE_URL`, an identical `SEO_PUBLIC_HOST`, and `SEO_INDEX_APPROVED=I_APPROVE_PUBLIC_INDEXING` together allow an indexable build. This is a human approval switch, **not** a credential or proof of domain ownership.
+
+On Cloudflare Pages, `CF_PAGES_BRANCH` controls a further safety gate: branches other than `main` are forcibly noindexed even if variables are inherited. The two official Pages hostname-specific `_headers` rules continue to add `X-Robots-Tag: noindex` on generated previews. Configure a verified custom domain first; then enter approval variables in the **production** environment, not preview.
+
+GitHub Actions continues testing synthetic `https://qa.example.test` with explicit test-only approval. This is not a deployed real domain. Unit tests check incomplete, invalid and mismatched approval, as well as non-main branch previews. Real indexing, DNS verification and GSC visibility cannot be demonstrated by local CI.
+
+Official docs: https://developers.cloudflare.com/pages/configuration/headers/ ; https://developers.cloudflare.com/pages/configuration/build-configuration/ ; https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/ ; https://developers.google.com/search/docs/crawling-indexing/block-indexing.
