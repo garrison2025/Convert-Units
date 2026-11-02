@@ -320,13 +320,24 @@ export function parseBatchTable(input,{column=1,delimiter='auto',maxRows=1000}={
 export function resolveUnitLabel(input){
   const raw=String(input??'').trim();
   if(!raw)throw new RangeError('A row unit is missing.');
-  if(Object.hasOwn(units,raw))return raw;
-  const key=Object.keys(units).find(id=>id.toLowerCase()===raw.toLowerCase());
-  if(key)return key;
-  const symbols=Object.keys(units).filter(id=>units[id].symbol===raw);
-  if(symbols.length===1)return symbols[0];
-  const names=Object.keys(units).filter(id=>units[id].name.toLowerCase()===raw.toLowerCase());
-  if(names.length===1)return names[0];
+  // Always examine BOTH internal IDs and published physical symbols before
+  // choosing a unit. For example "kn" is the knot symbol but also the old
+  // internal ID for kilonewton (whose actual SI symbol is "kN").
+  // Silently prioritizing the ID can turn a speed into a force.
+  const ids=Object.keys(units);
+  const exact=ids.filter(id=>id===raw||units[id].symbol===raw||units[id].name===raw);
+  const lower=raw.toLowerCase();
+  const matches=exact.length?exact:ids.filter(id=>
+    id.toLowerCase()===lower||
+    units[id].symbol.toLowerCase()===lower||
+    units[id].name.toLowerCase()===lower
+  );
+  if(matches.length===1)return matches[0];
+  if(matches.length>1){
+    if(matches.includes('knot')&&matches.includes('kn'))
+      throw new RangeError('Ambiguous unit "'+raw+'": use "knot" for speed (knots) or "kN" for kilonewtons (force).');
+    throw new RangeError('Ambiguous unit "'+raw+'": use an exact, unambiguous unit ID or symbol.');
+  }
   throw new RangeError('Unknown unit "'+raw+'". Use an ExactUnit unit ID or its exact symbol.');
 }
 
