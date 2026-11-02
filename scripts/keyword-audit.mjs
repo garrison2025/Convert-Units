@@ -12,7 +12,7 @@ const plan=fs.readFileSync(path.join(root,'research/SEO-PLAN-V2.md'),'utf8');
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
 const failures=[];
-if(seeds.length!==92||pairs.length!==37)failures.push('Approved V2 inventory differs from 92 numeric / 37 pair pages');
+if(seeds.length!==92||pairs.length!==38)failures.push('Approved V2 inventory differs from 92 numeric / 38 pair pages');
 const urls=new Set(),keywords=new Set();
 const bySlug=new Map();
 for(const item of seeds){
