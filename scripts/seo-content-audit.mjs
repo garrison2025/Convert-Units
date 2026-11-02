@@ -9,7 +9,8 @@ import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
 import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,speedFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
-import {relatedDirectionLinks} from '../src/seo-guides.mjs';
+import {relatedDirectionLinks,rankedRelatedDirections} from '../src/seo-guides.mjs';
+import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -126,6 +127,21 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ const intent=intentAnswers(pair,pairList);
+ if(intent){
+  if(!html.includes(intent)||!html.includes('data-intent-answers="'+pair.slug+'"'))
+   errors.push(pair.url+': source-derived, contextual practical answers or relevant related link missing');
+ }else if(html.includes('data-intent-answers=')){
+  errors.push(pair.url+': unapproved template answers leaked onto unrelated core tool');
+ }
+ const expectedAside=rankedRelatedDirections(pair,pairList,6);
+ if(expectedAside.length){
+  const start=html.indexOf('<div class="mini-card"><h3>More ');
+  const aside=html.slice(start,start+2300);
+  const found=aside.match(/<a class="chip" href="([^"]+)"/);
+  if(start<0||!found||found[1]!==expectedAside[0].url)
+   errors.push(pair.url+': first related link is not the highest-intent neighbor');
+ }
  const dimension=units[pair.from].dimension;
  if(['length','speed','torque'].includes(dimension)){
   if(!html.includes('data-engineering-reference="'+dimension+'"')||
