@@ -36,6 +36,8 @@ const shots=[
  {file:'pressure-50-mobile-375.png',route:'/convert/kpa-to-atm/50/',mobile:375,width:1250,height:1000},
  {file:'kg-to-lbs-desktop.png',route:'/convert/kg-to-lbs/240/',width:1440,height:950},
  {file:'kg-to-lbs-mobile-375.png',route:'/convert/kg-to-lbs/240/',mobile:375,width:1250,height:1000},
+ {file:'celsius-37-9-desktop.png',route:'/convert/celsius-to-fahrenheit/37.9/',width:1440,height:950},
+ {file:'celsius-37-9-mobile-375.png',route:'/convert/celsius-to-fahrenheit/37.9/',mobile:375,width:1250,height:1000},
  {file:'batch-desktop.png',route:'/batch-converter/',width:1440,height:950},
  {file:'batch-mobile-375.png',route:'/batch-converter/',mobile:375,width:1250,height:1000}
 ];
