@@ -20,7 +20,7 @@ export function calculationDetails(p,v,result){return `<ol class="calc-steps"><l
 export function precisionComparison(pair,value){
  const target=convert(value,pair.from,pair.to);
  const sourceUnit=units[pair.from],targetUnit=units[pair.to];
- const rows=[2,4,6,9].map(d=>'<tr><th scope="row">'+d+' decimal places</th><td>'+esc(formatNumber(target,d))+' '+esc(targetUnit.symbol)+'</td></tr>').join('');
+ const rows=[2,4,6,9].map(d=>'<tr><th scope="row">Up to '+d+' decimal places</th><td>'+esc(formatNumber(target,d))+' '+esc(targetUnit.symbol)+'</td></tr>').join('');
  return '<h2>How precise should this result be?</h2>'+
   '<p class="reference-caption">These are different display roundings of the same calculation for '+
   esc(formatNumber(value,9))+' '+esc(sourceUnit.symbol)+'. Do not mistake the number of shown decimals for the measurement’s accuracy.</p>'+
