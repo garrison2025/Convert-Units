@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -134,6 +134,16 @@ for(const pair of pairList){
  }else if(html.includes('data-elapsed-duration')){
   errors.push(pair.url+': irrelevant elapsed time panel leaked to non-time converter');
  }
+ if(['ml-to-us-fl-oz','us-fl-oz-to-ml'].includes(pair.slug)){
+  const calculated=fluidOunceComparison(5,pair.from);
+  if(!html.includes('data-fluid-oz-compare')||
+     !html.includes('data-fluid-us')||!html.includes('data-fluid-uk')||
+     !html.includes(calculated.us.relation+' '+calculated.us.shown)||
+     !html.includes(calculated.uk.relation+' '+calculated.uk.shown))
+    errors.push(pair.url+': missing faithful US/UK fluid ounce comparison from the shared engine');
+ }else if(html.includes('data-fluid-oz-compare')){
+  errors.push(pair.url+': unit-system comparison leaked to unrelated tool');
+ }
  if(pair.slug==='lbs-to-kg'){
   if(!html.includes('data-mixed-kg')||!html.includes('data-mixed-kg-result')||!html.includes('Rounded to the nearest gram'))
     errors.push(pair.url+': helpful live kilograms-plus-grams readout missing');
@@ -175,6 +185,13 @@ for(const seed of seeds){
   errors.push(seed.url+': value-specific rounded reverse-conversion panel is missing or shown when no loss occurs');
  if(expectedRoundingPanel&&!html.includes(expectedRoundingPanel))
   errors.push(seed.url+': round-trip error explanation does not match shared engine calculation');
+ if(seed.url==='/convert/ml-to-us-fl-oz/355/'){
+  const calc=fluidOunceComparison(355,'ml');
+  if(!html.includes('data-fluid-oz-compare')||
+     !html.includes(calc.us.relation+' '+calc.us.shown)||
+     !html.includes(calc.uk.relation+' '+calc.uk.shown))
+   errors.push(seed.url+': 355 mL US and UK fluid ounce first-load comparison inaccurate');
+ }
  if(!html.includes('data-precision-table'))errors.push(seed.url+': useful rounding comparison missing');
  if(!html.includes('CONVERSION RESULT'))errors.push(seed.url+': answer-first content missing');
  if(info.mode==='production'&&!indexedSeed(seed)&&/<link rel="canonical"/i.test(html))errors.push(seed.url+': excluded numeric page has canonical');
