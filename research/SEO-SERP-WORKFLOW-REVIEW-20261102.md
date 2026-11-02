@@ -45,3 +45,19 @@ The batch tool now implements the key competitor workflow in addition to preserv
 ## Additional source-evidence gate: batch queries
 
 The approved `research/semrush-us-600.tsv` dataset contains 600 historical competitor keyword rows. A text search of every row for `batch`, `csv`, `spreadsheet` and `bulk` finds **zero matches**. This is **absence of evidence in this one competitor export**, not evidence of zero Google search volume and not a green light to invent volume, KD or ranking numbers. Existing public competitor batch-tool pages establish real functionality, not measurable search demand. Research and launch decisions must wait for a more relevant batch-converter competitor's real natural ranking queries and U.S. device-specific Google SERP inspection.
+
+## 2026-11-02 public competitor recheck and safety regression
+
+The following are **actual public tool URLs**, not estimated Google organic keywords or verified top-ten rankings:
+
+| Competitor | Public batch-tool URL | Observed public feature |
+|---|---|---|
+| Convematik | https://convematik.com/batch-converter | Browser-facing CSV with `value,from,to` source columns, extra column preservation, per-row error result and a stated 100-row limit |
+| Unitly | https://unitly.tooleek.com/en/batch-converter | One-column browser-local conversion with up to 200 inputs, a decimal separator selector, CSV download and copy-ready output |
+| Exact Units | https://universalunitconverter.net/tools/batch/ | Per-line source unit labels such as `5 kg`, fractional inputs, configurable result display and a local CSV export |
+
+Publicly accessible HTML confirms the features described here, but **does not verify which non-brand queries bring these tools organic visits**. A source-grounded keyword shortlist must come from Semrush/Ahrefs organic rankings for these specific domains and landing URLs, plus Google US SERP inspection. No search volume, KD, rank or clicks are inferred from the feature comparison.
+
+The current ExactUnit build provides an explicit `value/from/to` CSV workflow with up to 1,000 logical rows and original-column-preserving output. One concrete data-integrity fix this iteration: the abbreviation `kn` matches both the **knot** symbol and the old internal ID for kilonewton; the previous parser could incorrectly pick a force unit for a speed field. The parser now rejects that ambiguity, instructs the user to enter `knot` for speed or `kN` for force, and retains the original failed CSV label. The site includes an in-page explanation, automated checks for all unit aliases and real-browser validation. No new indexable URLs, paid APIs, or backend services were introduced.
+
+Research gates still open: fixed-region US Google desktop/mobile results for the target expressions and *actual organic keyword rankings* for the three established competitor domains. Based on existing evidence alone, we **cannot** rank the potential value of a further standalone batch SEO page or claim revenue opportunity.
