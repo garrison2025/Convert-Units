@@ -54,7 +54,7 @@ test('storage, cooking, area, flow and density do not mix up physical definition
   assert.throws(()=>convert(1,'nm','mm'),/same physical dimension/);
 });
 test('numeric input safety, malformed values and scientific notation',()=>{
-  for(const value of ['', '   ', 'not-a-number', 'NaN','Infinity','1,200',null,undefined,1e19]){
+  for(const value of ['', '   ', 'not-a-number', 'NaN','Infinity','1,200','0x10','0b101','0o10','1_000','1e','1.2.3',true,[],null,undefined,1e19]){
     assert.throws(()=>convert(value,'kg','lbs'),/valid number/);
   }
   eq(convert('1e-3','kg','g'),1);
