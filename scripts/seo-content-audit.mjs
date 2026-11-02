@@ -26,7 +26,7 @@ const indexedSeed=s=>info.numericIndexMode==='all'||pilot.has(s.url);
 const pairByUrl=new Map(pairList.map(p=>[p.url,p]));
 const seedByUrl=new Map(seeds.map(s=>[s.url,s]));
 const schemaStats={webPages:0,breadcrumbs:0,webApplications:0,webSites:0,
- softwareRichResultEligibility:'not claimed: Google's software-app rich results require authentic review or aggregateRating in addition to the app name and offer price'};
+ softwareRichResultEligibility:"not claimed: Google software app rich results require authentic review or aggregateRating in addition to the app name and offer price"};
 function expectedBreadcrumbRoutes(route){
  if(route==='/')return [];
  const pair=pairByUrl.get(route);
