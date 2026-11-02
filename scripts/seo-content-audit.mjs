@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -144,6 +144,15 @@ for(const pair of pairList){
  }else if(html.includes('data-fluid-oz-compare')){
   errors.push(pair.url+': unit-system comparison leaked to unrelated tool');
  }
+ if(units[pair.from].dimension==='pressure'){
+  const rows=pressureFourUnitComparison(5,pair.from);
+  if(!html.includes('data-pressure-summary')||!html.includes('data-copy-pressure')||
+    !html.includes('Gauge vs absolute: these are unit changes only.')||
+    rows.some(x=>!html.includes(x.relation+' '+x.shown+' '+x.symbol)))
+   errors.push(pair.url+': real static 4-unit pressure results or reference warning missing');
+ }else if(html.includes('data-pressure-summary')){
+  errors.push(pair.url+': pressure readout leaked onto unrelated unit category');
+ }
  if(pair.slug==='lbs-to-kg'){
   if(!html.includes('data-mixed-kg')||!html.includes('data-mixed-kg-result')||!html.includes('Rounded to the nearest gram'))
     errors.push(pair.url+': helpful live kilograms-plus-grams readout missing');
@@ -191,6 +200,12 @@ for(const seed of seeds){
      !html.includes(calc.us.relation+' '+calc.us.shown)||
      !html.includes(calc.uk.relation+' '+calc.uk.shown))
    errors.push(seed.url+': 355 mL US and UK fluid ounce first-load comparison inaccurate');
+ }
+ if(['50kpa to atm','108 kpa to psi'].includes(seed.keyword)){
+  const rows=pressureFourUnitComparison(seed.value,pair.from);
+  if(!html.includes('data-pressure-summary')||
+     rows.some(x=>!html.includes(x.relation+' '+x.shown+' '+x.symbol)))
+   errors.push(seed.url+': real 50/108kPa static pressure comparison missing');
  }
  if(!html.includes('data-precision-table'))errors.push(seed.url+': useful rounding comparison missing');
  if(!html.includes('CONVERSION RESULT'))errors.push(seed.url+': answer-first content missing');
