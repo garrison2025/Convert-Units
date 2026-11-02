@@ -6,8 +6,11 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "npm test && npm run build && node scripts/audit.mjs",
-    "dev": "npm run build && npx --yes serve dist"
+    "check": "npm test && npm run build && npm run audit:seo",
+    "dev": "npm run build && npx --yes serve dist",
+    "audit:seo": "node scripts/audit.mjs && node scripts/release-audit.mjs"
   },
-  "engines": {"node": ">=20"}
+  "engines": {
+    "node": ">=20"
+  }
 }
