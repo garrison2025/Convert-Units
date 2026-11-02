@@ -6,7 +6,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 - **38** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
-- **156** public static page routes in total (38 tools plus 92 numeric pages, 16 categories and site pages; 90 are initial production-indexable candidates under the curated policy) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
+- **156** public static page routes in total (38 tools plus 92 numeric pages, 16 categories and site pages; 79 are initial production-indexable candidates under the curated policy) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
 - Batch converter: on-device calculations for up to 1,000 rows, 1–20 selectable value columns, CSV/TSV/semicolon delimiter detection, per-line errors, local CSV/TXT files, sanitized CSV export and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
@@ -37,7 +37,7 @@ The site also includes an accessibility statement and runs preview plus syntheti
 
 **Temporary preview mode:** When `SITE_URL` is missing or points to `*.pages.dev`, the website remains fully functional but automatically emits `noindex`, omits canonical and OG URLs, and generates an empty sitemap. It does not treat Cloudflare's generated hostname as the official site. `robots.txt` allows crawling so search engines can read the `noindex` directive.
 
-**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 90 curated indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
+**Official domain mode:** Once your domain is connected, set Cloudflare Pages `SITE_URL` to its final HTTPS origin and redeploy. Canonical tags, sitemap, robots.txt and 79 curated indexable URLs will automatically use that domain. Remove any previously configured incorrect `SITE_URL`. Verify the production domain resolves; redirect or disable the duplicate Pages subdomain where supported.
 
 Do not submit the temporary Pages subdomain or its preview sitemap to Google Search Console.
 
@@ -83,11 +83,11 @@ Browser smoke checks are not measurements of live Cloudflare performance, Lighth
 
 The approved V2 research contains 37 originally planned tools and 92 keyword-specific results. A missing parent tool for the already-approved `seconds-to-hours/14400/` query has been added, so there are now **38 tools**. Source demand should not be confused with traffic to this site.
 
-By default `NUMERIC_INDEX_MODE=curated`: all 92 numeric pages remain available, but only the **26 URLs explicitly listed in** `src/data/numeric-seo-policy.json` are eligible for `index,follow` and inclusion in production sitemap. The remaining 66 have `noindex,follow`, no self-canonical tag and no sitemap entry. This is a conservative pilot to reduce same-template exposure, **not a guarantee that selected pages will rank**. Do not set `NUMERIC_INDEX_MODE=all` without reviewing source intent, duplication and post-launch data. Preview builds remain globally noindexed regardless of this flag.
+By default `NUMERIC_INDEX_MODE=curated`: all 92 numeric pages remain available, but only the **15 URLs explicitly listed in** `src/data/numeric-seo-policy.json` are eligible for `index,follow` and inclusion in production sitemap. The remaining 77 have `noindex,follow`, no self-canonical tag and no sitemap entry. This is a conservative pilot to reduce same-template exposure, **not a guarantee that selected pages will rank**. Do not set `NUMERIC_INDEX_MODE=all` without reviewing source intent, duplication and post-launch data. Preview builds remain globally noindexed regardless of this flag.
 
 Google's source guidance on [canonicalization](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) and [scaled content abuse](https://developers.google.com/search/docs/essentials/spam-policies) informed the technical policy. A unique numeric result is not necessarily an independently valuable page. Once an official domain is purchased, set `SITE_URL` to its HTTPS origin, check GSC index coverage and Search Performance by query/page, and revisit the pilot whitelist based on real clicks and usefulness.
 
-Detailed source-backed SEO pilot, 26 selected keywords, indexing rules and real-world validation checklist: [`research/SEO-LAUNCH-PILOT-20261102.md`](research/SEO-LAUNCH-PILOT-20261102.md).
+**Current source-backed index policy:** [`research/SEO-PILOT-V3-20261102.md`](research/SEO-PILOT-V3-20261102.md) (15 values, 77 suppressed). The earlier 26-value experiment is retained only as historical decision context.
 
 After binding a real domain, configure a Cloudflare Bulk Redirect from the default `*.pages.dev` production host to the official domain when practical. Until then the generated `_headers` blocks indexing on both Pages project aliases and preview hosts, including during synthetic-production builds. Cloudflare reference: https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/
 
@@ -97,10 +97,14 @@ Every **38** directional calculator page has a static, source-linked explanation
 
 The zero-dependency `scripts/seo-content-audit.mjs` runs automatically on both preview and synthetic production builds and validates static HTML, expected content, original keyword phrasing, numeric answers and JSON-LD. The CI artifacts contain `seo-content-audit.json`. For reproducible external evidence and the *limitations* of public web search, see [competitor landing page spot-check](research/GOOGLE-SEO-SERP-SPOTCHECK-20261102.md).
 
-No live Google US rankings, Googlebot indexing, GSC clicks, AdSense revenue or actual field Core Web Vitals are claimed. The 26 numeric pilot still needs individual usefulness review and source-confirmed search demand. Cloudflare preview remains `noindex` until an official domain has been configured.
+No live Google US rankings, Googlebot indexing, GSC clicks, AdSense revenue or actual field Core Web Vitals are claimed. The 15 numeric pilot still needs individual usefulness review and source-confirmed search demand. Cloudflare preview remains `noindex` until an official domain has been configured.
 
 ## Crawl depth, search titles and safe indexing
 
-The `scripts/seo-crawl-audit.mjs` gate tests actual static links, 3-click reachability from the homepage and inbound parent links to all 26 selected values. It exports `dist/seo-crawl-audit.json` and `dist/seo-url-inventory.csv` listing each page's title, H1, description, robots, canonical, click depth and proposed index status in GitHub Actions artifacts.
+The `scripts/seo-crawl-audit.mjs` gate tests actual static links, 3-click reachability from the homepage and inbound parent links to all 15 selected values. It exports `dist/seo-crawl-audit.json` and `dist/seo-url-inventory.csv` listing each page's title, H1, description, robots, canonical, click depth and proposed index status in GitHub Actions artifacts.
 
 Source keywords remain unchanged in research data; human-readable SEO page titles and snippet copy come from `src/seo-meta.mjs`. Enabling `NUMERIC_INDEX_MODE=all` now also requires `NUMERIC_INDEX_CONFIRMATION=REVIEWED_ALL_92` after editorial review. This is only a safety mechanism, not a Google quality guarantee.
+
+## 2026-11-02 V3 — one indexed numeric answer per direction
+
+The active policy now selects only **15 representative numeric answers**, one per conversion direction, using original competitor keyword evidence and not invented traffic forecasts. The other **77** numeric answers remain functional but are not part of the future production sitemap. Total eligible production URLs under the default policy: **79**. Automated review prevents two values in the same direction from being indexed in the curated mode. See [active V3 SEO rollout document](research/SEO-PILOT-V3-20261102.md) for all 15 examples and the 11 formerly selected values now excluded. The 26/66/90 figures in earlier dated reports describe the previous experiment, not the active release configuration.
