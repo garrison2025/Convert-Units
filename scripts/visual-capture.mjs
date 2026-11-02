@@ -38,7 +38,7 @@ const server=http.createServer((req,res)=>{
   res.end('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Local visual QA — not deployed</title><style>*{box-sizing:border-box}body{margin:0;background:#e2e7f0;font-family:system-ui,sans-serif}.frame{width:max-content;margin:20px auto;background:#fff;border:7px solid #1b2331;border-radius:27px;overflow:hidden;box-shadow:0 16px 50px #111a3138}iframe{display:block;border:0;background:white}</style></head><body><div class="frame"><iframe title="Mobile site at '+width+' pixels" src="'+route+'" width="'+width+'" height="870"></iframe></div></body></html>');
   return;
  }
- const relative=decodeURIComponent(url.pathname).replace(/^\\/+/, '');
+ const relative=decodeURIComponent(url.pathname).slice(1);
  const target=path.resolve(dist,!relative||relative.endsWith('/')?path.join(relative,'index.html'):relative);
  if(!target.startsWith(dist+path.sep)||!fs.existsSync(target)||!fs.statSync(target).isFile()){res.writeHead(404).end('Not found');return;}
  const ext=path.extname(target);
