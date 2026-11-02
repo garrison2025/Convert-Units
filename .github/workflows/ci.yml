@@ -25,6 +25,8 @@ jobs:
       - name: Validate production canonical, sitemap and full-site links with a synthetic custom origin
         env:
           SITE_URL: https://qa.example.test
+          SEO_PUBLIC_HOST: qa.example.test
+          SEO_INDEX_APPROVED: I_APPROVE_PUBLIC_INDEXING
         run: npm run build
       - name: Upload small QA reports for manual SEO review
         uses: actions/upload-artifact@v4
