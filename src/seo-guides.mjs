@@ -101,6 +101,50 @@ export function categoryExplanation(dim){
   '<h3>How to verify a conversion</h3><p>'+esc(item.check)+'</p>'+
   '<p class="hint">Source definitions: <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST Guide to the SI</a>. See <a href="/methodology/">our conversion methodology</a> for calculation and rounding details.</p></section>';
 }
+
+/**
+ * Source-computed practical cross-checks on existing length, speed and torque
+ * direction pages. Fixed references do not change the live user's input and
+ * never create additional numerical SEO URLs.
+ */
+export function engineeringReference(pair){
+ const dim=units[pair.from]?.dimension;
+ const numeric=(n,id)=>esc(formatNumber(n,6))+' '+esc(units[id].symbol);
+ const value=(source,from,to)=>numeric(convert(source,from,to),to);
+ const table=(heading,subtitle,columns,rows,footnote)=>
+  '<section class="card engineering-reference" data-engineering-reference="'+dim+'">'+
+  '<h2>'+esc(heading)+'</h2><p>'+esc(subtitle)+'</p>'+
+  '<div class="reference-scroll"><table class="number-table reference-table"><thead><tr>'+
+  columns.map(x=>'<th scope="col">'+esc(x)+'</th>').join('')+
+  '</tr></thead><tbody>'+rows.map(cells=>'<tr>'+cells.map((x,i)=>i===0?'<th scope="row">'+x+'</th>':'<td>'+x+'</td>').join('')+'</tr>').join('')+
+  '</tbody></table></div><p class="hint">'+esc(footnote)+'</p></section>';
+ if(dim==='length'){
+  const fractions=[['1/16',1/16],['1/8',1/8],['1/4',1/4],['1/2',1/2],['1',1]];
+  return table('Fractional inches to metric lengths',
+   'Fractional ruler marks are exact fractions of the international inch, not decimal-looking measurements.',
+   ['Inches on a ruler','Millimeters','Centimeters'],
+   fractions.map(([fraction,n])=>[esc(fraction)+' in',value(n,'in','mm'),value(n,'in','cm')]),
+   'One international inch is exactly 25.4 mm. A fraction such as 1/8 inch is 0.125 inch, not 0.8 inch.');
+ }
+ if(dim==='speed'){
+  const source=60;
+  return table('One speed in four common units',
+   'A fixed 60 mph reference shows the same speed in road, scientific and nautical units.',
+   ['Reference speed','km/h','m/s','Knots'],
+   [[numeric(source,'mph'),value(source,'mph','kmh'),value(source,'mph','m-s'),value(source,'mph','knot')]],
+   'One international mile is 1,609.344 m; one nautical mile is 1,852 m. The figures are unit equivalents, not safety recommendations.');
+ }
+ if(dim==='torque'){
+  const source=100;
+  return table('Torque-wrench unit cross-check',
+   'A fixed 100 ft·lbf reference also shows inch-pound-force and kilogram-force-meter values.',
+   ['Foot-pound-force','Newton-meters','Inch-pound-force','Kilogram-force meters'],
+   [[numeric(source,'ft-lbf'),value(source,'ft-lbf','nm'),value(source,'ft-lbf','in-lbf'),value(source,'ft-lbf','kgf-m')]],
+   'A foot-pound-force is exactly 12 inch-pound-force. This is torque, not energy or pound mass. Use the manufacturer specification for tightening.');
+ }
+ return '';
+}
+
 export function directionExplanation(pair,allPairs){
  const from=units[pair.from],to=units[pair.to];
  if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Unknown or incompatible conversion pair');
@@ -121,7 +165,7 @@ export function directionExplanation(pair,allPairs){
    '<p>'+esc(item.check)+'</p>'+
    (reverse?'<p>Need the other direction? <a href="'+esc(reverse.url)+'">Convert '+esc(to.symbol)+' to '+esc(from.symbol)+'</a>.</p>':'')+
    '<p class="hint">Reference: <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST conversion factors</a>. Calculation and display rounding are separate. <a href="/methodology/">See how we calculate</a>.</p>'+
-   '</section>';
+   '</section>'+engineeringReference(pair);
 }
 
 /**
