@@ -177,8 +177,9 @@ export function parseBatchLines(input,maxRows=1000){
 /** CSV text-cell escaping. Preserve negative numeric inputs but neutralize formulas. */
 export function escapeCsvCell(value){
  const raw=String(value);
- const isNegativeNumber=/^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw);
- const suspicious=/^[=+@\t\r]/.test(raw)||(raw.startsWith('-')&&!isNegativeNumber);
+ const trimmed=raw.trimStart();
+ const isNegativeNumber=/^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(trimmed);
+ const suspicious=/^[=+@]/.test(trimmed)||/^[\t\r]/.test(raw)||(trimmed.startsWith('-')&&!isNegativeNumber);
  const safe=suspicious?"'"+raw:raw;
  return /[\r\n,"]/.test(safe)?'"'+safe.replace(/"/g,'""')+'"':safe;
 }
