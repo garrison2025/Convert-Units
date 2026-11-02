@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -126,6 +126,14 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ if(units[pair.from].dimension==='time'){
+  const initial=elapsedDurationReadout(5,pair.from);
+  if(!initial||!html.includes('data-elapsed-duration')||!html.includes('data-elapsed-clock')||
+     !html.includes('data-copy-elapsed')||!html.includes(initial.clock))
+   errors.push(pair.url+': missing or incorrect prerendered duration + copy control');
+ }else if(html.includes('data-elapsed-duration')){
+  errors.push(pair.url+': irrelevant elapsed time panel leaked to non-time converter');
+ }
  if(pair.slug==='lbs-to-kg'){
   if(!html.includes('data-mixed-kg')||!html.includes('data-mixed-kg-result')||!html.includes('Rounded to the nearest gram'))
     errors.push(pair.url+': helpful live kilograms-plus-grams readout missing');
