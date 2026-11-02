@@ -47,6 +47,25 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-batch-result]').value==='','stale results must be cleared');
      break;
    }
+   case 'batch-mixed':{
+     const rowFrom=q('[data-batch-from-column]'),rowTo=q('[data-batch-to-column]');
+     ok(Boolean(rowFrom&&rowTo),'row-specific CSV unit columns must appear in the browser');
+     q('[data-batch-column]').value='2';
+     q('[data-batch-input]').value='label,value,from,to\\nparcel,149,lb,kg\\nclock,60000,ms,s\\ninvalid,50,kg,s';
+     q('[data-batch-delimiter]').value='comma';
+     rowFrom.value='3';rowTo.value='4';
+     q('[data-process]').click();
+     const content=q('[data-batch-result]').value;
+     ok(content.includes('Line 2: 149 lb')&&content.includes('67.58526313'),'mixed mass value');
+     ok(content.includes('Line 3: 60000 ms')&&content.includes('60 s'),'mixed elapsed duration value');
+     ok(content.includes('Line 4:')&&content.includes('Error:'),'incompatible units must produce row error');
+     ok(q('[data-batch-status]').textContent.includes('Converted 2 of 3'),'mixed row summary');
+     ok(q('[data-batch-status]').textContent.includes('each row'),'unit column mode described');
+     rowTo.value='';
+     q('[data-process]').click();
+     ok(q('[data-batch-status]').textContent.includes('two different'),'partial column selection must fail clearly');
+     break;
+   }
    case 'universal':{
      const dimension=q('[data-dimension]');
      dimension.value='temperature';dimension.dispatchEvent(new Event('change',{bubbles:true}));
@@ -118,7 +137,7 @@ async function smokeScenario(SCENARIO){
   }
 }
 const suites=[
- {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},
+ {name:'homepage',url:'/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'universal',url:'/universal-converter/'},{name:'number',url:'/convert/lbs-to-kg/149/'},
  {name:'temperature',url:'/convert/celsius-to-fahrenheit/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
