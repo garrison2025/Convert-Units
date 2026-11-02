@@ -30,6 +30,8 @@ const shots=[
  {file:'category-mass-mobile-375.png',route:'/category/mass/',mobile:375,width:1250,height:1000},
  {file:'time-minutes-desktop.png',route:'/convert/minutes-to-hours/',width:1440,height:950},
  {file:'time-minutes-mobile-375.png',route:'/convert/minutes-to-hours/',mobile:375,width:1250,height:1000},
+ {file:'volume-355-desktop.png',route:'/convert/ml-to-us-fl-oz/355/',width:1440,height:950},
+ {file:'volume-355-mobile-375.png',route:'/convert/ml-to-us-fl-oz/355/',mobile:375,width:1250,height:1000},
  {file:'batch-desktop.png',route:'/batch-converter/',width:1440,height:950},
  {file:'batch-mobile-375.png',route:'/batch-converter/',mobile:375,width:1250,height:1000}
 ];
