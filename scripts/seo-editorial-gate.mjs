@@ -115,6 +115,11 @@ const sourcePathDisagreements=keywordRows.flatMap(r=>{
   competitorLandingValue:landing,competitorLandingURL:r.sourceUrl,
   note:'Observed mismatch only; not proof of incorrect Semrush data or search intent. Do not generate numeric URL from this mapping.'};
 });
+// Forbid a future seed selection from silently using one of the raw rows whose
+// queried numeric value differs from the competitor's ranking landing path.
+const divergentKeywordSet=new Set(sourcePathDisagreements.map(x=>x.keyword.toLowerCase()));
+const taintedNumericSeeds=seeds.filter(s=>divergentKeywordSet.has(s.keyword.toLowerCase()));
+if(taintedNumericSeeds.length)failures.push('Approved numeric seeds coincide with ambiguous competitor landing numbers: '+taintedNumericSeeds.map(x=>x.url).join(', '));
 writeCsv('seo-source-landing-review.csv',sourcePathDisagreements,
  ['sourceRow','keyword','queryLeadingNumber','competitorLandingValue','competitorLandingURL','note']);
 const totalNumericSupportedDirections=pairRows.filter(p=>p.siblingNumericPages>0).length;
@@ -127,9 +132,10 @@ const report={
  numericNoindex:valueRows.filter(x=>x.editorialDisposition==='KEEP_FUNCTIONAL_NOINDEX').length,
  converterDirectionsWithApprovedNumericEvidence:totalNumericSupportedDirections,
  converterDirectionsWithoutApprovedNumericEvidence:pairRows.length-totalNumericSupportedDirections,
- numberOfIndexedSiblingPairs:0,
+ pilotSameDirectionPairs:0,
  numericSourceReconciled:valueRows.filter(x=>x.sourceReconciliation.startsWith('exact')).length,
  rawCompetitorLandingNumberMismatches:sourcePathDisagreements.length,
+ approvedSeedsOverlappingRawLandingMismatches:taintedNumericSeeds.length,
  note:'This is a zero-invention content planning and release safety inventory. Generic converter keyword demand and Google SERP user-intent divergence remain unverified. No index policy or URL has been changed.',
  failures
 };
