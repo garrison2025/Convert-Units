@@ -304,7 +304,7 @@ export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColum
 
   if(!table||!Array.isArray(table.rows))throw new TypeError('A parsed batch table is required.');
   if(!units[fromUnit]||!units[toUnit]||units[fromUnit].dimension!==units[toUnit].dimension){
-    throw new RangeError('Choose two compatible default units.');
+    throw new RangeError('Choose two compatible units for the default selection.');
   }
   const mixed=fromColumn!==null||toColumn!==null;
   if(mixed && (!Number.isInteger(Number(fromColumn))||!Number.isInteger(Number(toColumn))
