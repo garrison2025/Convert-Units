@@ -1,4 +1,4 @@
-import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchFirstCell} from './engine.mjs';
+import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchFirstCell,parseBatchLines} from './engine.mjs';
 const el=(s,root=document)=>root.querySelector(s);
 const all=(s,root=document)=>[...root.querySelectorAll(s)];
 const fmt=(x,d=6)=>formatNumber(x,d);
@@ -93,10 +93,7 @@ const batch=el('[data-batch]');if(batch){const dimension=el('[data-batch-dimensi
 function changeDim(){const d=dimension.value;const arr=dimensionUnits(d);from.innerHTML=options(d,d==='mass'?'lbs':arr[0].id);to.innerHTML=options(d,d==='mass'?'kg':arr[1]?.id??arr[0].id);}
 from.addEventListener('change',()=>{if(units[from.value].dimension!==units[to.value].dimension){to.innerHTML=options(units[from.value].dimension,dimensionUnits(units[from.value].dimension).find(x=>x.id!==from.value)?.id??from.value);}});
 dimension.addEventListener('change',changeDim);changeDim();
-function process(){const lines=values.value.split(/\r?\n/).filter(s=>s.trim());if(!lines.length){csv='';out.value='';status.textContent='Enter one number per line.';return;}
-let isHeader=false;try{isHeader=/^(?:value|input|amount|number)$/i.test(parseBatchFirstCell(lines[0]));}catch{ /* Malformed first row is reported as a row error, not an uncaught exception. */ }
-const inputLines=isHeader?lines.slice(1):lines;
-if(inputLines.length>1000){csv='';out.value='';status.textContent='Maximum 1000 data rows per batch.';return;}const rows=[['Input','From','Result','To','Status']];let ok=0;for(const line of inputLines){let field='';try{field=parseBatchFirstCell(line);const result=convert(field,from.value,to.value);rows.push([field,units[from.value].symbol,fmt(result,9),units[to.value].symbol,'OK']);ok++;}catch(e){rows.push([field,units[from.value].symbol,'',units[to.value].symbol,e.message]);}}
+function process(){let inputLines;try{inputLines=parseBatchLines(values.value);}catch(e){csv='';out.value='';status.textContent=e.message;return;}if(!inputLines.length){csv='';out.value='';status.textContent='Enter one number per line.';return;}const rows=[['Input','From','Result','To','Status']];let ok=0;for(const line of inputLines){let field='';try{field=parseBatchFirstCell(line);const result=convert(field,from.value,to.value);rows.push([field,units[from.value].symbol,fmt(result,9),units[to.value].symbol,'OK']);ok++;}catch(e){rows.push([field,units[from.value].symbol,'',units[to.value].symbol,e.message]);}}
 csv=rows.map(r=>r.map(safeCsv).join(',')).join('\r\n');out.value=rows.slice(1).map(r=>r[0]+' '+r[1]+' → '+(r[2]?r[2]+' '+r[3]:'Error: '+r[4])).join('\n');status.textContent=`Converted ${ok} of ${inputLines.length} rows. All calculations remain in your browser.`;}
 for(const field of [dimension,from,to,values])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
 el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
