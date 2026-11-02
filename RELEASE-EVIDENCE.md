@@ -150,3 +150,12 @@ Scope: **source code, unit data, test suite and generated-page audits only**. Th
 ## 2026-11-02 — parent-child SEO similarity audit
 
 The active index strategy is unchanged: 15 numeric candidates and 77 noindex numeric routes. Newly added `parentChildOverlap` reporting compares each selected value page with its parent calculator, not merely with other numeric values. The first local normalized-token Jaccard measurements range **0.3687–0.3965**, with all 15 compared. The metric describes our HTML body token overlap only; Google does not publish or use this threshold as an index eligibility test. See [CI run 41377830896](https://github.com/garrison2025/Convert-Units/actions/runs/41377830896). Source-preserving CSV workflow and accurate numerical output are documented in the section above.
+
+## 2026-11-02 — mixed-unit CSV workflow extension
+
+- Introduced optional per-row input CSV unit columns. Users may leave both blank for a fixed pair or explicitly select *two different* one-based columns (1–20) holding source and target labels. Exact known IDs/symbols are resolved locally. Each row validates its physical dimension, rather than silently falling back to the page's default pair.
+- A mixed sample is provided in the batch page: `label,value,from,to` followed by four rows across mass, speed, temperature and elapsed time. It fills the correct column selectors and calculates instantly.
+- The source CSV columns and headings are retained in the download; the appended result, actual per-row source/target symbols and error/status fields are machine readable. Incompatible, missing or unknown units cause individual errors while other rows continue processing. Invalid unit labels are not misleadingly reported as the default units.
+- Regression tests cover all these cases, and a local headless Chromium scenario checks the visible sample, mixed dimensions, error handling and partial-selector validation.
+- No additional SEO pages, paid services, remote API, database or forced domain purchase. Existing canonical/index policy remains **79 future production URL candidates / 15 selected numeric / 77 suppressed numeric**, with the temporary Pages preview `noindex`.
+- Limitation: CSV quoting is supported within a physical record, but **quoted fields containing embedded newlines are not yet supported**. Unit names must match supported IDs or exact symbols, and the batch cap remains 1,000 data rows. This release supersedes earlier notes saying per-row differing unit pairs were unsupported.
