@@ -51,8 +51,14 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - Retain the brand's existing indexed routes and launch guard. Browser smoke verifies details disclosure and order. Real screenshot inspection is still a separate release gate.
 
 ## V5 screenshot-based fixes and evidence (2026-11-02)
-- Source of evidence: seven real headless Chromium screenshots of **the locally generated static build** at 1440px desktop and 320px / 375px mobile; screenshots are uploaded to a 7-day GitHub Actions artifact `exactunit-visual-qa` and are not published in `dist/`.
+- Source of evidence: eight real headless Chromium screenshots of **the locally generated static build** at 1440px desktop and 320px / 375px mobile; screenshots are uploaded to a 7-day GitHub Actions artifact `exactunit-visual-qa` and are not published in `dist/`.
 - Observed issue at 320px: the numeric result wrapped *mid-number*. At widths of 360px or less, place the target-unit selector above a full-width output, keep numerical glyphs in their own non-wrapping element, and compact preset chips.
 - Observed issue on desktop batch page: optional column/delimiter/mixed-unit configuration obscured the actual input textarea below the first screen. Collapse those controls by default, expose the sample input and adjacent Convert action early, and show correctly calculated example output on first load.
 - Interaction consistency: conversion title follows swap/from/to changes; **both** copy variants use the visible decimal precision; reset restores the original pair.
 - Browser checks should assert one-line numbers at 320/375px, accessible disclosures, batch input layout, and real sample conversion. Screenshot presence is not a human visual pass; live Cloudflare deployment and real-device testing remain separate gates.
+
+### Final V5 layout review
+- The desktop batch view now displays the sample input, actual results, and **Convert values** primary action together in a 1440×950 screenshot.
+- The 375px mobile batch view moves source/target selection into one row, exposes the source textarea within the first phone frame, and retains native accessible CSV-options disclosure.
+- Result values on the 320px homepage no longer split the numeric digits across two lines; the narrow target selector moves above the answer. Existing 375px layout stays two-column.
+- A successful Chromium workflow is a build/functional/automated-layout gate, not a replacement for real-user/device testing or independent Cloudflare live deployment verification.
