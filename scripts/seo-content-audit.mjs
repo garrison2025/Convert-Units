@@ -126,6 +126,23 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ const dimension=units[pair.from].dimension;
+ if(['length','speed','torque'].includes(dimension)){
+  if(!html.includes('data-engineering-reference="'+dimension+'"')||
+    !html.includes('class="number-table reference-table"'))
+   errors.push(pair.url+': source-derived engineering reference table missing');
+  if(dimension==='length'&&(!html.includes('1/16 in')||!html.includes('1.5875 mm')||
+    !html.includes('2.54 cm')))
+   errors.push(pair.url+': exact fractional-inch reference missing or wrong');
+  if(dimension==='speed'&&(!html.includes('60 mph')||!html.includes('96.56064 km/h')||
+    !html.includes('26.8224 m/s')||!html.includes('kn')))
+   errors.push(pair.url+': four-unit speed reference missing or wrong');
+  if(dimension==='torque'&&(!html.includes('100 ft·lbf')||!html.includes('1,200 in·lbf')||
+    !html.includes('kgf·m')||!html.includes('manufacturer specification')))
+   errors.push(pair.url+': engineering torque reference inaccurate or incomplete');
+ }else if(html.includes('data-engineering-reference=')){
+  errors.push(pair.url+': engineering reference leaked onto unrelated tool');
+ }
  if(units[pair.from].dimension==='time'){
   const initial=elapsedDurationReadout(5,pair.from);
   if(!initial||!html.includes('data-elapsed-duration')||!html.includes('data-elapsed-clock')||
