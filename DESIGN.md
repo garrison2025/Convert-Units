@@ -81,3 +81,8 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - All 92 numeric answer pages replace a redundant "related measurements" parent self-link with up to four semantically related **existing directional converter** links. Reverse directions are first where available; category navigation remains a fallback. None links to the 77 deliberately noindex numeric siblings.
 - The static SEO audit independently asserts accurate server-rendered snippets and related conversion links on every numeric and directional page. Node tests enforce the same 38-direction snippets and related pair validity.
 - The page count (157), 15/77 numeric indexing policy, and existing `pages.dev` noindex remain unchanged. Official domain selection is deferred.
+
+## V9: numeric pilot competitor observations and rounding-impact utility (2026-11-02)
+- Read-only public web checks for all 15 curated numerical queries are in `research/SEO-15-SERP-EVIDENCE-20261102.json` and the user-facing review `research/SEO-15-PILOT-SERP-REVIEW-V5-20261102.md`: 13 observed exact-value competitor pages and 2 generic converter pages mentioning the value. These are not fixed US Google SERP positions.
+- The value-specific `roundTripPrecisionNote()` panel appears on curated candidate pages **only when** rounding a converted answer to at most 2 decimal places produces a nontrivial reverse-calculation difference. It calculates this against the same tested engine and disappears for genuinely unaffected values, rather than inventing page-filler prose.
+- The full 157-route audit validates source-matched panel contents; all 92 numeric routes remain functional, but the 77 nonpilot routes stay noindex and do not get new indexable content. No new URLs, paid API or domain actions.
