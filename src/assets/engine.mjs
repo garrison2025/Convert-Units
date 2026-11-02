@@ -427,3 +427,36 @@ export function kgAndWholeGrams(valueKg){
  const grams=total%1000;
  return {kilograms,grams,label:formatNumber(kilograms,0)+' kg '+grams+' g'};
 }
+
+
+/**
+ * A second, human-readable expression of a measured time duration.
+ * Unlike wall-clock time, the hours field never wraps after 24 hours.
+ * Input and calculation use the same conversion engine as decimal results.
+ * The output is to millisecond precision, with an honest approximation
+ * marker when that formatting discards meaningful sub-millisecond digits.
+ */
+export function elapsedDurationReadout(value,fromUnit){
+ const unit=units[fromUnit];
+ const n=Number(value);
+ if(!unit||unit.dimension!=='time'||!Number.isFinite(n)||n<0)return null;
+ let seconds;
+ try{seconds=convert(n,fromUnit,'seconds');}catch{return null;}
+ if(!Number.isFinite(seconds)||seconds<0||seconds>Number.MAX_SAFE_INTEGER/1000)return null;
+ const totalMilliseconds=Math.round(seconds*1000);
+ if(!Number.isSafeInteger(totalMilliseconds)||totalMilliseconds===0&&seconds>0)return null;
+ const h=Math.floor(totalMilliseconds/3600000);
+ const m=Math.floor((totalMilliseconds%3600000)/60000);
+ const sec=Math.floor((totalMilliseconds%60000)/1000);
+ const ms=totalMilliseconds%1000;
+ const pad=v=>String(v).padStart(2,'0');
+ const clock=String(h)+':'+pad(m)+':'+pad(sec)+(ms?'.'+String(ms).padStart(3,'0'):'');
+ const errorSeconds=Math.abs(totalMilliseconds/1000-seconds);
+ const exact=errorSeconds<=4*Number.EPSILON*Math.max(1,Math.abs(seconds));
+ const parts=[
+  h?String(h)+' h':null,
+  m?String(m)+' min':null,
+  sec||ms?String(sec)+(ms?'.'+String(ms).padStart(3,'0'):'')+' s':null
+ ].filter(Boolean).join(' ')||'0 s';
+ return {clock,parts,approximate:!exact};
+}
