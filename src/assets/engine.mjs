@@ -545,3 +545,30 @@ export function temperatureThreeScaleReadout(value,fromUnit){
   return result;
  }catch{return null;}
 }
+
+
+/** Convert a length to readable feet/inches without mistaking display rounding for precision. */
+export function feetInchesReadout(value,fromUnit){
+ const unit=units[fromUnit],n=Number(value);
+ if(!unit||unit.dimension!=='length'||!Number.isFinite(n))return null;
+ try{
+  const feet=fromUnit==='ft'?n:convert(n,fromUnit,'ft');
+  if(Math.abs(feet)>1e9)return null;
+  const inches=Math.abs(feet)*12, sign=feet<0?'−':'';
+  const hundredths=Math.round(inches*100);
+  const decimalFeet=Math.floor(hundredths/1200),decimalInches=(hundredths%1200)/100;
+  const sixteenths=Math.round(inches*16);
+  const fractionalFeet=Math.floor(sixteenths/192),remainder=sixteenths%192;
+  const wholeInches=Math.floor(remainder/16),numerator=remainder%16;
+  const gcd=(a,b)=>b?gcd(b,a%b):a;
+  const divisor=numerator?gcd(numerator,16):1;
+  const fraction=numerator?' '+(numerator/divisor)+'/'+(16/divisor):'';
+  const tolerance=4*Number.EPSILON*Math.max(1,inches);
+  return {
+   decimal:sign+formatNumber(decimalFeet,0)+' ft '+decimalInches.toFixed(2)+' in',
+   fractional:sign+formatNumber(fractionalFeet,0)+' ft '+wholeInches+fraction+' in',
+   decimalRelation:Math.abs(inches-hundredths/100)<=tolerance?'=':'≈',
+   fractionalRelation:Math.abs(inches-sixteenths/16)<=tolerance?'=':'≈'
+  };
+ }catch{return null;}
+}

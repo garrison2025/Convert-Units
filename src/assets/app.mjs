@@ -1,10 +1,10 @@
-import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchTable,convertBatchToCsv,displayRelation,kgAndWholeGrams,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout} from './engine.mjs';
+import {units,convert,formatNumber,formula,dimensionUnits,validateValue,parseBatchTable,convertBatchToCsv,displayRelation,kgAndWholeGrams,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from './engine.mjs';
 const el=(s,root=document)=>root.querySelector(s);
 const all=(s,root=document)=>[...root.querySelectorAll(s)];
 const fmt=(x,d=6)=>formatNumber(x,d);
 function options(dimension,active){return dimensionUnits(dimension).map(u=>`<option value="${u.id}" ${u.id===active?'selected':''}>${u.symbol}</option>`).join('');}
 function download(filename,text,type='text/csv;charset=utf-8'){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
-function initConverter(root){const from=el('[data-from]',root),to=el('[data-to]',root),input=el('[data-value]',root),output=el('[data-output]',root),explain=el('[data-explain]',root),error=el('[data-error]',root),precision=el('[data-precision]',root),detail=el('[data-raw]',root),multi=el('[data-multi-results]',root),actionStatus=el('[data-action-status]',root),directionLabel=el('[data-direction-label]',root),outputNumber=el('[data-output-number]',root),outputUnit=el('[data-output-unit]',root),mixedKg=el('[data-mixed-kg]',root),mixedKgResult=el('[data-mixed-kg-result]',root),elapsed=el('[data-elapsed-duration]',root),elapsedClock=el('[data-elapsed-clock]',root),elapsedWords=el('[data-elapsed-words]',root),elapsedNote=el('[data-elapsed-note]',root),fluidPanel=el('[data-fluid-oz-compare]',root),fluidUS=el('[data-fluid-us]',root),fluidUK=el('[data-fluid-uk]',root),pressurePanel=el('[data-pressure-summary]',root),pressureUnits=el('[data-pressure-units]',root),imperialMass=el('[data-lb-oz-readout]',root),imperialMassValue=el('[data-lb-oz-result]',root),temperaturePanel=el('[data-temperature-triple]',root),temperatureValues=el('[data-temperature-values]',root);if(!from||!to||!input)return;
+function initConverter(root){const from=el('[data-from]',root),to=el('[data-to]',root),input=el('[data-value]',root),output=el('[data-output]',root),explain=el('[data-explain]',root),error=el('[data-error]',root),precision=el('[data-precision]',root),detail=el('[data-raw]',root),multi=el('[data-multi-results]',root),actionStatus=el('[data-action-status]',root),directionLabel=el('[data-direction-label]',root),outputNumber=el('[data-output-number]',root),outputUnit=el('[data-output-unit]',root),mixedKg=el('[data-mixed-kg]',root),mixedKgResult=el('[data-mixed-kg-result]',root),elapsed=el('[data-elapsed-duration]',root),elapsedClock=el('[data-elapsed-clock]',root),elapsedWords=el('[data-elapsed-words]',root),elapsedNote=el('[data-elapsed-note]',root),fluidPanel=el('[data-fluid-oz-compare]',root),fluidUS=el('[data-fluid-us]',root),fluidUK=el('[data-fluid-uk]',root),pressurePanel=el('[data-pressure-summary]',root),pressureUnits=el('[data-pressure-units]',root),imperialMass=el('[data-lb-oz-readout]',root),imperialMassValue=el('[data-lb-oz-result]',root),temperaturePanel=el('[data-temperature-triple]',root),temperatureValues=el('[data-temperature-values]',root),feetPanel=el('[data-feet-inches]',root),feetDecimal=el('[data-feet-decimal]',root),feetFraction=el('[data-feet-fraction]',root);if(!from||!to||!input)return;
 let last=0;let initialFrom=from.value, initialTo=to.value;const initialValue=input.value;
 const setUnits=(dimension,newFrom,newTo)=>{if(from.dataset.lock==='true')return;from.innerHTML=options(dimension,newFrom);to.innerHTML=options(dimension,newTo);};
 function calculate(){if(actionStatus)actionStatus.textContent='';if(directionLabel)directionLabel.textContent=units[from.value].name+' → '+units[to.value].name;try{const n=validateValue(input.value),result=convert(n,from.value,to.value);last=result;const decimals=Number(precision?.value??6);if(outputNumber&&outputUnit){outputNumber.textContent=fmt(result,decimals);outputUnit.textContent=units[to.value].symbol;}else output.textContent=fmt(result,decimals)+' '+units[to.value].symbol;output.setAttribute('aria-label',`Result: ${fmt(result,decimals)} ${units[to.value].name}`);if(detail){const precise=fmt(result,Math.max(decimals,9));const relation=displayRelation(result,precise);detail.textContent=`${n} ${units[from.value].symbol} ${relation==='='?'equals':'is approximately'} ${precise} ${units[to.value].symbol}`;}
@@ -14,6 +14,11 @@ if(imperialMass){
  const mixed=from.value==='kg'&&to.value==='lbs'?kgToPoundsOunces(n):null;
  imperialMass.hidden=!mixed;
  if(mixed&&imperialMassValue)imperialMassValue.textContent=mixed.relation+' '+mixed.label;
+}
+if(feetPanel){
+ const mixed=feetInchesReadout(n,from.value);
+ feetPanel.hidden=!mixed;
+ if(mixed){feetDecimal.textContent=mixed.decimalRelation+' '+mixed.decimal;feetFraction.textContent=mixed.fractionalRelation+' '+mixed.fractional;}
 }
 if(elapsed){
  const duration=elapsedDurationReadout(n,from.value);
@@ -48,11 +53,22 @@ if(elapsed){
    if(element)element.textContent=v.relation+' '+v.shown+' '+v.symbol;
   }
  }
-}if(explain)explain.textContent=formula(from.value,to.value);if(multi){const alternatives=dimensionUnits(units[from.value].dimension).filter(u=>u.id!==from.value).slice(0,5);multi.innerHTML=alternatives.map(u=>{let shown='Out of range';try{shown=fmt(convert(n,from.value,u.id),decimals)+' '+u.symbol;}catch{}return '<tr><th scope="row">'+u.name+' ('+u.symbol+')</th><td>'+shown+'</td></tr>';}).join('');}error.textContent='';}catch(e){if(outputNumber&&outputUnit){outputNumber.textContent='—';outputUnit.textContent='';}else output.textContent='—';if(detail)detail.textContent='Enter a valid number to see the result.';if(mixedKg)mixedKg.hidden=true;if(imperialMass)imperialMass.hidden=true;if(elapsed)elapsed.hidden=true;if(fluidPanel)fluidPanel.hidden=true;if(pressurePanel)pressurePanel.hidden=true;if(temperaturePanel)temperaturePanel.hidden=true;error.textContent=e.message;if(multi)multi.textContent='';last=NaN;}}
+}if(explain)explain.textContent=formula(from.value,to.value);if(multi){const alternatives=dimensionUnits(units[from.value].dimension).filter(u=>u.id!==from.value).slice(0,5);multi.innerHTML=alternatives.map(u=>{let shown='Out of range';try{shown=fmt(convert(n,from.value,u.id),decimals)+' '+u.symbol;}catch{}return '<tr><th scope="row">'+u.name+' ('+u.symbol+')</th><td>'+shown+'</td></tr>';}).join('');}error.textContent='';}catch(e){if(outputNumber&&outputUnit){outputNumber.textContent='—';outputUnit.textContent='';}else output.textContent='—';if(detail)detail.textContent='Enter a valid number to see the result.';if(mixedKg)mixedKg.hidden=true;if(imperialMass)imperialMass.hidden=true;if(feetPanel)feetPanel.hidden=true;if(elapsed)elapsed.hidden=true;if(fluidPanel)fluidPanel.hidden=true;if(pressurePanel)pressurePanel.hidden=true;if(temperaturePanel)temperaturePanel.hidden=true;error.textContent=e.message;if(multi)multi.textContent='';last=NaN;}}
 all('[data-preset]',root).forEach(btn=>btn.addEventListener('click',()=>{input.value=btn.dataset.preset;calculate();input.focus();}));
 all('[data-swap]',root).forEach(btn=>btn.addEventListener('click',()=>{const f=from.value;from.value=to.value;to.value=f;calculate();}));
 from.addEventListener('change',()=>{const u=units[from.value],v=units[to.value];if(u.dimension!==v.dimension){const choices=dimensionUnits(u.dimension);to.innerHTML=options(u.dimension,choices.find(x=>x.id!==from.value)?.id??from.value);}else{to.innerHTML=options(u.dimension,to.value);}calculate();});
 to.addEventListener('change',calculate);input.addEventListener('input',calculate);precision?.addEventListener('change',calculate);
+all('[data-copy-feet-inches]',root).forEach(btn=>btn.addEventListener('click',async()=>{
+ if(!feetPanel||feetPanel.hidden)return;
+ const mixed=feetInchesReadout(input.value,from.value);
+ if(!mixed)return;
+ const text='Decimal feet + inches: '+mixed.decimalRelation+' '+mixed.decimal+'\n'+
+  'Nearest 1/16 inch: '+mixed.fractionalRelation+' '+mixed.fractional+
+  '\nFractional inches are rounded; retain the original value for calculations.';
+ try{await navigator.clipboard.writeText(text);
+  if(actionStatus)actionStatus.textContent='Feet and inches copied.';
+ }catch{if(actionStatus)actionStatus.textContent='Clipboard unavailable; select the displayed results.';}
+}));
 all('[data-copy-temperature]',root).forEach(btn=>btn.addEventListener('click',async()=>{
  if(!temperaturePanel||temperaturePanel.hidden)return;
  const rows=temperatureThreeScaleReadout(input.value,from.value);
