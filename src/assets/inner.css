@@ -193,3 +193,15 @@
  .pair-key-fact .pair-key-kicker{width:100%}
  .pair-key-fact a{margin-left:0}
 }
+
+/* V9: real, value-dependent rounding impact, not generic SEO filler. */
+.inner-page .roundtrip-panel{
+ margin-top:22px;padding:19px 20px;
+ border-radius:14px;background:#f5f8ff;
+ border:1px solid #dce6fa;
+}
+.inner-page .roundtrip-panel h2{font-size:clamp(1.05rem,2.3vw,1.3rem);margin:0 0 9px}
+.inner-page .roundtrip-panel p{font-size:.88rem;line-height:1.68;margin:0;overflow-wrap:anywhere}
+.inner-page .roundtrip-panel strong{font-variant-numeric:tabular-nums;white-space:normal}
+.inner-page .roundtrip-panel p.hint{font-size:.78rem;color:#63728e;margin-top:10px}
+@media(max-width:620px){.inner-page .roundtrip-panel{padding:15px 13px}}
