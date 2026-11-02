@@ -23,10 +23,10 @@ const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/assets/styles.css',
 async function probe(route){
  const url=site+route;
  try{
-  const r=await fetch(url,{signal:AbortSignal.timeout(15000),redirect:'follow',headers:{'User-Agent':'ExactUnit-ReadOnly-QA/1.0'}});
+  const r=await fetch(url,{signal:AbortSignal.timeout(15000),redirect:privateReports.includes(route)?'manual':'follow',headers:{'User-Agent':'ExactUnit-ReadOnly-QA/1.0'}});
   const body=(await r.text()).slice(0,800000);
   const destination=new URL(r.url);
-  const record={route,url:r.url,status:r.status,ok:r.ok,bytes:Buffer.byteLength(body),contentType:r.headers.get('content-type'),xRobotsTag:r.headers.get('x-robots-tag'),body};
+  const record={route,url:r.url,status:r.status,ok:r.ok,redirectLocation:r.headers.get('location'),bytes:Buffer.byteLength(body),contentType:r.headers.get('content-type'),xRobotsTag:r.headers.get('x-robots-tag'),body};
   if(destination.hostname!=='convert-units-bwa.pages.dev')record.error='Unexpected external redirect host; verification is invalid';
   checks.push(record);
   return record;
@@ -57,7 +57,20 @@ const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.b
 let revision='not checked';
 if(expectedSha)revision=!deployedSha?'missing remote commit marker':deployedSha===expectedSha?'matches main commit':'different from main commit';
 const assetStatuses=checks.filter(x=>x.route.startsWith('/assets/')).map(x=>({route:x.route,ok:x.ok,status:x.status}));
-const qaReportExposure=privateReports.filter(route=>get(route)?.ok&&!get(route)?.error);
+function isBlockedRetiredReport(c){
+ if(!c||c.error)return false;
+ if(c.status===403||c.status===404||c.status===410)return true;
+ if([301,302,303,307,308].includes(c.status)&&c.redirectLocation){
+  try{return new URL(c.redirectLocation,c.url).pathname==='/404/';}catch{return false;}
+ }
+ return false;
+}
+const qaReportsNotPublic=privateReports.every(route=>isBlockedRetiredReport(get(route)));
+const qaReportExposure=privateReports.filter(route=>{
+ const c=get(route);
+ return c?.ok&&!isBlockedRetiredReport(c)&&
+  /^(text\/csv|application\/(?:json|octet-stream))\b/i.test(c.contentType||'');
+});
 let status;
 if(!allReachable)status='INCONCLUSIVE_UNREACHABLE';
 else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
@@ -66,14 +79,15 @@ else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOU
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
 else if(!hasV6)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
+else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
 else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,assetStatuses,qaReportExposure,qaReportsNotPublic:qaReportExposure.length===0&&privateReports.every(route=>get(route)?.status===404)},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
- responses:checks.map(({route,url,status,ok,bytes,contentType,xRobotsTag,error})=>({route,url,status,ok,bytes,contentType,xRobotsTag,error}))
+ responses:checks.map(({route,url,status,ok,bytes,contentType,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,xRobotsTag,error,redirectLocation}))
 };
 fs.writeFileSync(path.join(out,'preview-audit.json'),JSON.stringify(report,null,2)+'\n');
 console.log('CLOUDFLARE PREVIEW AUDIT:',JSON.stringify({status,expectedSha,deployedSha,codeChecks:report.codeChecks,responses:report.responses},null,2));
