@@ -25,7 +25,7 @@ for(const pair of pairs){
  const h1=unescape((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]||'').replace(/<[^>]*>/g,''));
  const description=unescape(html.match(/<meta name="description" content="([^"]*)"/i)?.[1]||'');
  if(!title.startsWith(pair.title+' Converter'))issue.push('title lacks exact direction');
- if(!h1.startsWith(pair.title+' Converter'))issue.push('H1 fails to name tool direction');
+ if(h1!==pair.title)issue.push('H1 is not the exact descriptive direction title');
  if(description!==directionMetaDescription(pair))issue.push('meta description is stale or not source-calculated');
  if(titles.has(title))issue.push('duplicate title');titles.add(title);
  if(descriptions.has(description))issue.push('duplicate description');descriptions.add(description);
