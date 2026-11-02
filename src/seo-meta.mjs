@@ -3,7 +3,7 @@
  * Search-volume research informs which query to serve, but the SERP text must
  * accurately describe the page, rather than copy malformed keyword spacing.
  */
-import {units,convert,formatNumber} from './assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation} from './assets/engine.mjs';
 
 export function numericHeading(seed,pair){
  const from=units[pair.from],to=units[pair.to];
@@ -13,11 +13,11 @@ export function numericHeading(seed,pair){
 export function numericTitle(seed,pair){
  const from=units[pair.from],to=units[pair.to];
  const result=formatNumber(convert(seed.value,pair.from,pair.to),9);
- return seed.valueText+' '+from.symbol+' to '+to.symbol+' = '+result+' '+to.symbol;
+ return seed.valueText+' '+from.symbol+' to '+to.symbol+' '+displayRelation(convert(seed.value,pair.from,pair.to),result)+' '+result+' '+to.symbol;
 }
 export function numericDescription(seed,pair){
  const from=units[pair.from],to=units[pair.to];
  const result=formatNumber(convert(seed.value,pair.from,pair.to),9);
- return numericHeading(seed,pair)+': '+seed.valueText+' '+from.symbol+' ≈ '+result+' '+to.symbol+
+ return numericHeading(seed,pair)+': '+seed.valueText+' '+from.symbol+' '+displayRelation(convert(seed.value,pair.from,pair.to),result)+' '+result+' '+to.symbol+
   '. Verify the formula, adjust precision and compare nearby values in the free calculator.';
 }
