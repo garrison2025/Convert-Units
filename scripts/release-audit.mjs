@@ -82,6 +82,7 @@ for(const [route,html] of pages){
   if(!html.includes('<link rel="stylesheet" href="/assets/styles.css">'))fail(route+': missing optimized single CSS bundle');
   if(route==='/universal-converter/'&&(!html.includes('data-unit-find')||!html.includes('data-unit-results')))fail('Universal converter missing alias search');
   if(route==='/all-converters/'&&!html.includes('data-search='))fail('Converter directory missing alias search data');
+  if(route==='/batch-converter/'&&(!html.includes('data-batch-column')||!html.includes('data-batch-delimiter')))fail('Batch converter missing selected-column or delimiter controls');
   if(html.includes('data-converter')&&!html.includes('data-print-converter'))fail(route+': converter missing print-table control');
   if(html.includes('data-converter')&&!html.includes('data-multi-results'))fail(route+': live converter missing same-value multi-unit table');
   if(html.includes('data-multi-results')&&!html.includes('Other unit equivalents'))fail(route+': multi-unit comparison is not labeled');
@@ -94,6 +95,7 @@ for(const [route,html] of pages){
     const visible=plain(extract(html,/<main id="main">([\s\S]*?)<\/main>/i));
     if(!visible.includes(expected)||!visible.includes(s.valueText))fail(route+': prerendered numerical result missing');
     if(!html.includes('data-copy-answer')||!html.includes('data-load-value'))fail(route+': missing value interaction');
+    if(!html.includes('data-precision-table')||!html.includes('Do not mistake the number of shown decimals'))fail(route+': missing useful precision reference');
     if(Object.values(units).filter(u=>u.dimension===units[pair.from].dimension).length>2 && !html.includes('Same value in other units'))fail(route+': other compatible unit equivalents missing');
     if(!html.includes('data-answer="'+expectedAnswer.replaceAll('&','&amp;')+'"'))fail(route+': copy answer mismatches computation');
     if(!title.includes(s.valueText)||!h1.includes(s.valueText))fail(route+': SEO metadata mismatches URL value');
