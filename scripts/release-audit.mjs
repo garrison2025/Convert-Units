@@ -13,16 +13,6 @@ const pilot=new Set(numericPolicy.pilotIndexUrls);
 const info=JSON.parse(fs.readFileSync(path.join(dist,'build-info.json'),'utf8'));
 const failures=[], warnings=[];
 const fail=(message)=>failures.push(message);
-const eligibleValuePages=seeds.filter(s=>!unindexableNumeric.has(s.url));
-const byDirection=new Map();
-for(const seed of eligibleValuePages){
- const count=(byDirection.get(seed.slug)||0)+1;
- byDirection.set(seed.slug,count);
- if(info.numericIndexMode==='curated'&&count>1)fail('Curated SEO index collision: more than one numeric value for '+seed.slug);
-}
-if(info.numericIndexMode==='curated'&&numericPolicy.strategy==='one-numeric-value-per-direction-launch'&&eligibleValuePages.length!==15)
- fail('Curated SEO pilot should contain exactly 15 selected numeric pages, got '+eligibleValuePages.length);
-
 const normalize=(p)=>p==='/'?'/':p.endsWith('/')?p:p+'/';
 const walk=(dir)=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>{
   const full=path.join(dir,e.name);
@@ -36,6 +26,16 @@ const pages=new Map(htmlFiles.map(f=>{
 const allRoutes=new Set(pages.keys());
 const unindexableNumeric=new Set(seeds.filter(s=>info.numericIndexMode!=='all'&&!pilot.has(s.url)).map(s=>s.url));
 const canonicalRoutes=new Set([...allRoutes].filter(p=>p!=='/404/'&&!unindexableNumeric.has(p)));
+const eligibleValuePages=seeds.filter(s=>!unindexableNumeric.has(s.url));
+const byDirection=new Map();
+for(const seed of eligibleValuePages){
+ const count=(byDirection.get(seed.slug)||0)+1;
+ byDirection.set(seed.slug,count);
+ if(info.numericIndexMode==='curated'&&count>1)fail('Curated SEO index collision: more than one numeric value for '+seed.slug);
+}
+if(info.numericIndexMode==='curated'&&numericPolicy.strategy==='one-numeric-value-per-direction-launch'&&eligibleValuePages.length!==15)
+ fail('Curated SEO pilot should contain exactly 15 selected numeric pages, got '+eligibleValuePages.length);
+
 const titleSeen=new Map(), descriptionSeen=new Map(), inbound=new Map([...allRoutes].map(r=>[r,0]));
 const seedPaths=new Set(seeds.map(s=>s.url));
 const bundledStyle=path.join(dist,'assets','styles.css');
