@@ -15,7 +15,7 @@ const seen=new Set();for(const url of routes){if(seen.has(url))throw Error('dupl
 assert.ok(fs.existsSync(new URL('assets/styles.css',root)),'Missing consolidated CSS');for(const fragment of ['.inner-page','.multi-unit-panel','@media print'])assert.ok(fs.readFileSync(new URL('assets/styles.css',root),'utf8').includes(fragment),'Missing CSS fragment: '+fragment);assert.equal(pairs.length,38);assert.equal(seeds.length,92);const xml=fs.readFileSync(new URL('sitemap.xml',root),'utf8');assert.ok(xml.includes('<urlset'));assert.ok(!xml.includes('https://convert-units.pages.dev'),'Sitemap contains obsolete domain');
 const robots=fs.readFileSync(new URL('robots.txt',root),'utf8');if(build.mode==='production'){
  assert.ok(robots.includes(`Sitemap: ${build.site}/sitemap.xml`),'robots.txt sitemap origin mismatch');
- for(const url of routes){const can=new URL(url,build.site).toString();assert.ok(xml.includes(can.replaceAll('&','&amp;')),url+' missing sitemap');}
+ for(const url of routes.filter(x=>!excluded.has(x))){const can=new URL(url,build.site).toString();assert.ok(xml.includes(can.replaceAll('&','&amp;')),url+' missing sitemap');}
  for(const url of excluded)assert.ok(!xml.includes(new URL(url,build.site).toString()),url+' excluded URL appears in sitemap');
 }else{
  assert.ok(!robots.includes('Sitemap:'),'Preview should not publish sitemap URL');
