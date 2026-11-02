@@ -90,3 +90,11 @@ Google's source guidance on [canonicalization](https://developers.google.com/sea
 Detailed source-backed SEO pilot, 26 selected keywords, indexing rules and real-world validation checklist: [`research/SEO-LAUNCH-PILOT-20261102.md`](research/SEO-LAUNCH-PILOT-20261102.md).
 
 After binding a real domain, configure a Cloudflare Bulk Redirect from the default `*.pages.dev` production host to the official domain when practical. Until then the generated `_headers` blocks indexing on both Pages project aliases and preview hosts, including during synthetic-production builds. Cloudflare reference: https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/
+
+## Google SEO content quality (2026-11-02)
+
+Every **38** directional calculator page has a static, source-linked explanation of its measurement caveats, conversion factors, reverse direction when available and independently computed one- and ten-unit checks. All **16** category pages have a substantive measurement definition and verification note. The batch converter page documents the actual CSV workflow, ambiguity protection and current limitations. About and Methodology disclose how results are generated, tested and verified, without invented certification.
+
+The zero-dependency `scripts/seo-content-audit.mjs` runs automatically on both preview and synthetic production builds and validates static HTML, expected content, original keyword phrasing, numeric answers and JSON-LD. The CI artifacts contain `seo-content-audit.json`. For reproducible external evidence and the *limitations* of public web search, see [competitor landing page spot-check](research/GOOGLE-SEO-SERP-SPOTCHECK-20261102.md).
+
+No live Google US rankings, Googlebot indexing, GSC clicks, AdSense revenue or actual field Core Web Vitals are claimed. The 26 numeric pilot still needs individual usefulness review and source-confirmed search demand. Cloudflare preview remains `noindex` until an official domain has been configured.
