@@ -26,6 +26,8 @@ const shots=[
  {file:'converter-desktop.png',route:'/convert/lbs-to-kg/',width:1440,height:950},
  {file:'converter-mobile-375.png',route:'/convert/lbs-to-kg/',mobile:375,width:1250,height:1000},
  {file:'numeric-mobile-375.png',route:'/convert/lbs-to-kg/149/',mobile:375,width:1250,height:1000},
+ {file:'category-mass-desktop.png',route:'/category/mass/',width:1440,height:950},
+ {file:'category-mass-mobile-375.png',route:'/category/mass/',mobile:375,width:1250,height:1000},
  {file:'batch-desktop.png',route:'/batch-converter/',width:1440,height:950},
  {file:'batch-mobile-375.png',route:'/batch-converter/',mobile:375,width:1250,height:1000}
 ];
