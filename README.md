@@ -7,7 +7,7 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - **37** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
 - **92** accurately prerendered numeric SEO results, one canonical URL per approved search intent.
 - **154** SEO-ready static pages in total (indexable only once the confirmed custom domain is configured) (homepage, categories, tools, approved numeric pages, batch converter, and policy/methodology pages).
-- Batch converter: on-device multi-line calculations, up to 500 numbers, local CSV/TXT file selection, CSV download and print.
+- Batch converter: on-device multi-line calculations, up to 1,000 numbers, local CSV/TXT file selection, CSV download and print.
 - No account, database, backend, cron, third-party APIs, external fonts, or mandatory cookie scripts.
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
@@ -20,7 +20,7 @@ Requires Node 20+.
 npm run check
 ```
 
-The command runs conversion tests, static builds, and crawlable HTML audits. Site is generated in `dist/`. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
+The command runs conversion tests, static builds, internal-link crawling, metadata uniqueness and numeric-page similarity review. Site is generated in `dist/`. For local preview, serve `dist/` with any static HTTP server (do not open `index.html` via `file://` because ECMAScript modules require HTTP).
 
 ## Cloudflare Pages (Git integration)
 
@@ -55,7 +55,7 @@ Publishing many similar numeric pages is not itself proof of usefulness. Keep us
 - `src/data/pairs.json`: 37 verified tool routes
 - `src/data/seeds.json`: 92 approved numeric pages and keyword evidence
 - `scripts/build.mjs`: build HTML, metadata, canonical, sitemap, robots, legal pages
-- `scripts/audit.mjs`: static SEO integrity audit
+- `scripts/audit.mjs`: static SEO integrity audit\n- `scripts/deep-audit.mjs`: generated HTML link crawl and content similarity warnings; report at `dist/quality-report.json`
 - `tests/conversion.test.mjs`: precision, dimensions, and page mapping tests
 - `research/*`: full V2 plan and all uploaded keyword research data
 
