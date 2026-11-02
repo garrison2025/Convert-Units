@@ -572,3 +572,17 @@ export function feetInchesReadout(value,fromUnit){
   };
  }catch{return null;}
 }
+
+/** Identical torque expressed in four units; no tightening recommendation or energy conversion. */
+export function torqueFourUnitComparison(value,fromUnit){
+ const source=units[fromUnit];
+ if(!source||source.dimension!=='torque')return null;
+ try{
+  const n=validateValue(value);
+  return ['nm','ft-lbf','in-lbf','kgf-m'].map(id=>{
+   const raw=id===fromUnit?n:convert(n,fromUnit,id);
+   const shown=formatNumber(raw,6);
+   return {unit:id,symbol:units[id].symbol,shown,relation:displayRelation(raw,shown)};
+  });
+ }catch{return null;}
+}

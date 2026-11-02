@@ -423,6 +423,38 @@ async function smokeScenario(SCENARIO){
      ok(table.textContent.includes('m/s')&&table.textContent.includes('kn'),'speed comparison includes SI and nautical units');
      break;
    }
+   case 'torque-four-400':{
+     const panel=q('[data-torque-summary]'),input=q('[data-value]'),nm=q('[data-torque-unit="nm"]'),
+      ft=q('[data-torque-unit="ft-lbf"]'),inch=q('[data-torque-unit="in-lbf"]'),kgf=q('[data-torque-unit="kgf-m"]');
+     ok(Boolean(panel&&!panel.hidden&&nm&&ft&&inch&&kgf),'400-ft-lbf existing numeric page prerenders all torque units');
+     ok(nm.textContent==='≈ 542.327179 N·m','N·m magnitude must be correct');
+     ok(ft.textContent==='= 400 ft·lbf','source input remains exact');
+     ok(inch.textContent==='= 4,800 in·lbf','foot to inch ratio must be 12');
+     ok(panel.textContent.includes('not manufacturer tightening specifications'),'never imply recommended tightening torque');
+     let clipboard='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async t=>{clipboard=t;}}});
+     q('[data-copy-torque]').click();await new Promise(r=>setTimeout(r,0));
+     ok(clipboard.includes('400 ft·lbf')&&clipboard.includes('in·lbf: = 4,800'),'copy all four');
+     ok(clipboard.includes('manufacturer tightening specifications'),'copy safety note');
+     input.value='10';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(inch.textContent==='= 120 in·lbf','live input updates torque panel');
+     q('[data-swap]').click();
+     ok(q('[data-from]').value==='nm','swap changes unit to N·m');
+     input.value='1';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(nm.textContent==='= 1 N·m','source unit swap updates panel');
+     input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(panel.hidden,'invalid input hides stale torque readouts');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview numeric SEO page remains noindex');
+     break;
+   }
+   case 'torque-four-reverse':{
+     const panel=q('[data-torque-summary]'),input=q('[data-value]');
+     ok(panel&&!panel.hidden,'nm-to-ft-lbf must have visible torque panel');
+     input.value='9.80665';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-torque-unit="kgf-m"]').textContent==='= 1 kgf·m','metric kilogram-force-meter equivalence correct');
+     ok(q('[data-torque-unit="nm"]').textContent==='= 9.80665 N·m','metric source amount correct');
+     break;
+   }
    case 'engineering-torque':{
      const panel=q('[data-engineering-reference="torque"]');
      ok(Boolean(panel&&panel.textContent.includes('1,200 in·lbf')),
@@ -490,13 +522,15 @@ const suites=[
  {name:'engineering-length',url:'/convert/in-to-cm/'},
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
  {name:'engineering-torque',url:'/convert/ft-lbf-to-nm/'},
+ {name:'torque-four-400',url:'/convert/ft-lbf-to-nm/400/'},
+ {name:'torque-four-reverse',url:'/convert/nm-to-ft-lbf/'},
  {name:'feet-inches-m',url:'/convert/m-to-ft/'},
  {name:'feet-inches-ft',url:'/convert/ft-to-m/'},
  {name:'feet-inches-8849',url:'/convert/m-to-ft/8849/'},
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
