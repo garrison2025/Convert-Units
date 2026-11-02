@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines}from'../src/assets/engine.mjs';
+import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,escapeCsvCell}from'../src/assets/engine.mjs';
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,37);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,37);});
@@ -105,4 +105,14 @@ test('nonzero microscopic inputs are rejected rather than rounded down to zero',
   assert.throws(()=>convert(x,'kg','g'),/below supported numerical precision/);
  }
  assert.equal(convert('0e-400','kg','g'),0);
+});
+
+
+test('exported CSV escapes spreadsheet formulas but preserves real negative numbers',()=>{
+ assert.equal(escapeCsvCell('-12.5'),'-12.5');
+ assert.equal(escapeCsvCell('-1e-3'),'-1e-3');
+ assert.equal(escapeCsvCell('=1+1'),"'=1+1");
+ assert.equal(escapeCsvCell('@SUM(1,1)'),"\"'@SUM(1,1)\"");
+ assert.equal(escapeCsvCell('-SUM(1,1)'),"\"'-SUM(1,1)\"");
+ assert.equal(escapeCsvCell('"1,200"'),'"\"\"1,200\"\""');
 });
