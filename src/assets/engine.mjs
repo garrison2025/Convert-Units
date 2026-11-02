@@ -128,6 +128,13 @@ export function formatNumber(value,digits=6){
  if(n!==0&&(Math.abs(n)<1e-6||Math.abs(n)>=1e13))return n.toExponential(Math.min(d,9)).replace(/\.?0+e/,'e');
  return new Intl.NumberFormat('en-US',{maximumFractionDigits:d,minimumFractionDigits:0,useGrouping:true}).format(n);
 }
+/** A displayed rounded answer is an approximation, even with an exact source factor. */
+export function displayRelation(unrounded,displayText){
+ const original=Number(unrounded);
+ const shown=Number(String(displayText).replaceAll(',',''));
+ if(!Number.isFinite(original)||!Number.isFinite(shown))throw new RangeError('A finite numeric conversion result is required.');
+ return original===shown?'=':'≈';
+}
 export function formula(from,to){
  const a=units[from],b=units[to];
  if(!a||!b)return '';
