@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison} from '../src/assets/engine.mjs';
+import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,kgToPoundsOunces} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks} from '../src/seo-guides.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
@@ -153,6 +153,15 @@ for(const pair of pairList){
  }else if(html.includes('data-pressure-summary')){
   errors.push(pair.url+': pressure readout leaked onto unrelated unit category');
  }
+ if(pair.slug==='kg-to-lbs'){
+  const expected=kgToPoundsOunces(5);
+  if(!html.includes('data-lb-oz-readout')||!html.includes('data-lb-oz-result')||
+      !html.includes(expected.relation+' '+expected.label)||
+      !html.includes('Mass ounces, rounded to the nearest 0.1 oz'))
+    errors.push(pair.url+': calculated, source-rendered lb-plus-oz result missing or inaccurate');
+ }else if(html.includes('data-lb-oz-readout')){
+  errors.push(pair.url+': irrelevant pounds/ounces readout on other converter');
+ }
  if(pair.slug==='lbs-to-kg'){
   if(!html.includes('data-mixed-kg')||!html.includes('data-mixed-kg-result')||!html.includes('Rounded to the nearest gram'))
     errors.push(pair.url+': helpful live kilograms-plus-grams readout missing');
@@ -200,6 +209,12 @@ for(const seed of seeds){
      !html.includes(calc.us.relation+' '+calc.us.shown)||
      !html.includes(calc.uk.relation+' '+calc.uk.shown))
    errors.push(seed.url+': 355 mL US and UK fluid ounce first-load comparison inaccurate');
+ }
+ if(pair.slug==='kg-to-lbs'){
+  const expected=kgToPoundsOunces(seed.value);
+  if(!expected||!html.includes('data-lb-oz-readout')||
+     !html.includes(expected.relation+' '+expected.label))
+    errors.push(seed.url+': pounds-plus-ounces value not prerendered from source engine');
  }
  if(['50kpa to atm','108 kpa to psi'].includes(seed.keyword)){
   const rows=pressureFourUnitComparison(seed.value,pair.from);
