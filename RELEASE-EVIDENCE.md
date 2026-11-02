@@ -100,3 +100,16 @@ Scope: **source code, unit data, test suite and generated-page audits only**. Th
 - This is a technical SEO and pilot-risk reduction pass, **not evidence of ranking improvement, organic search clicks or Google approval**. 26 pages remain internally similar and require editorial/usefulness review, US SERP verification and eventual GSC measurement. The historical V2 37-tool plan remains preserved as source evidence.
 
 - Latest SEO pilot duplicate-content diagnostic: **17/17** comparable indexable numeric page pairs still meet the >=0.95 normalized-token overlap threshold; total source pages: **1,646/1,646** comparable pairs. This is a quality-review warning, not a Google judgment or ranking prediction. Verified CI: https://github.com/garrison2025/Convert-Units/actions/runs/41372934999.
+
+## 2026-11-02 — Google SEO content and credibility pass
+
+- Public search spot-check documented in `research/GOOGLE-SEO-SERP-SPOTCHECK-20261102.md`. Public search results contain established per-value calculator pages for 149 lb → kg and 240 kg → lb, as well as mature bulk/spreadsheet workflows. This is **not** a Google US desktop/mobile top-10 ranking audit.
+- Added `src/seo-guides.mjs`: real, specific dimension definitions, caveats and source links for all **16 category pages**, plus tested 1-unit and 10-unit numerical cross-checks, conversion formula and reverse conversion links for all **38 directional pages**. No invented author, review, endorsement or speculative numeric scenarios.
+- Improved batch landing page H1, document description, explicit CSV input example, selected-column handling explanation, decimal-comma ambiguity protection, error rows, local privacy and limitations (one unit pair per batch; original supplementary source columns not preserved).
+- Changed directional page titles/descriptions to clear query-intent titles and real one-unit results; fixed a stale 37-tools directory description to 38.
+- About and methodology now explain how results and programmatic pages are generated, public code/test evidence and the difference between automated QA and independent measurement certification.
+- New `scripts/seo-content-audit.mjs` checks all 38 pair pages, 16 category pages, 92 numeric pages, honest JSON-LD and indexability in **both preview and synthetic production builds**; CI archives `dist/seo-content-audit.json` with keyword and release reports.
+- Expanded real Chromium responsive tests to also cover a category page and directional converter at 320/375/768px; this checks overflow, **not** real mobile network Core Web Vitals.
+- Verified GitHub Actions run: https://github.com/garrison2025/Convert-Units/actions/runs/41374327814 — **40/40 Node tests**, **12/12 local Chromium browser scenarios**, static SEO content audit **0 errors**, deep static audit **157 HTML routes / 0 technical errors / 50 editorial warnings**, production simulation **90 index-eligible URLs**; three local CSS+JS assets total approximately **23.1 KiB individually gzip compressed**.
+- The 26 selected numeric pages still include highly templated result pages: earlier release check found **17/17** same-direction pilot pairs above normalized 0.95 token similarity. This has not been solved merely by better parent/category content. Google's actual indexing or ranking remains unverified; no domain has been bought and the preview stays noindex.
+
