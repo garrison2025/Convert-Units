@@ -260,7 +260,8 @@ test('mixed-row CSV does not silently fall back for unknown units or partial col
  const out=convertBatchToCsv(table,'lbs','kg',{fromColumn:2,toColumn:3});
  assert.equal(out.converted,1);
  assert.deepEqual(out.invalid,[3,4]);
- assert.match(out.csv,/Unknown unit "bogus"/);
+ assert.match(out.csv,/Unknown unit/);
+ assert.match(out.csv,/bogus,kg,3,,bogus,kg/);
  assert.match(out.csv,/A row unit is missing/);
  assert.throws(()=>convertBatchToCsv(table,'lbs','kg',{fromColumn:2}),/two different/);
  assert.throws(()=>convertBatchToCsv(table,'lbs','kg',{fromColumn:2,toColumn:2}),/two different/);
