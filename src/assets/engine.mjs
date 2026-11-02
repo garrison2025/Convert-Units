@@ -586,3 +586,17 @@ export function torqueFourUnitComparison(value,fromUnit){
   });
  }catch{return null;}
 }
+
+/** Four speed-unit equivalents calculated from the unrounded user input. */
+export function speedFourUnitComparison(value,fromUnit){
+ const source=units[fromUnit];
+ if(!source||source.dimension!=='speed')return null;
+ try{
+  const n=validateValue(value);
+  return ['kmh','mph','m-s','knot'].map(id=>{
+   const raw=id===fromUnit?n:convert(n,fromUnit,id);
+   const shown=formatNumber(raw,6);
+   return {unit:id,symbol:units[id].symbol,shown,relation:displayRelation(raw,shown)};
+  });
+ }catch{return null;}
+}
