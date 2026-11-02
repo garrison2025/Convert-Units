@@ -236,6 +236,14 @@ async function smokeScenario(SCENARIO){
          ok(doc.querySelector('.hero .tool-more-actions')&&!doc.querySelector('.hero .tool-more-actions').open,
            'mobile calculator keeps extended controls folded');
        }
+       if(location.pathname==='/batch-converter/'&&width<=375){
+         const from=doc.querySelector('[data-batch-from]').getBoundingClientRect();
+         const to=doc.querySelector('[data-batch-to]').getBoundingClientRect();
+         const input=doc.querySelector('[data-batch-input]').getBoundingClientRect();
+         ok(Math.abs(from.top-to.top)<4,'mobile batch source and target units must sit in one compact row');
+         ok(input.top<790,'mobile batch input must be visible in the first phone viewport ('+input.top+'px)');
+         ok(!doc.querySelector('[data-batch-advanced]').open,'advanced settings remain folded on mobile');
+       }
        if(width<=375&&(location.pathname==='/'||location.pathname==='/convert/lbs-to-kg/')){
          const numeric=doc.querySelector('[data-output-number]');
          ok(Boolean(numeric),'conversion result needs a separate numeric span');
