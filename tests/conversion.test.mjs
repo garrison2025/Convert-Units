@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,escapeCsvCell}from'../src/assets/engine.mjs';
+import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,parseBatchTable,escapeCsvCell}from'../src/assets/engine.mjs';
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,37);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,37);});
@@ -116,4 +116,58 @@ test('exported CSV escapes spreadsheet formulas but preserves real negative numb
  assert.equal(escapeCsvCell('@SUM(1,1)'),"\"'@SUM(1,1)\"");
  assert.equal(escapeCsvCell('-SUM(1,1)'),"\"'-SUM(1,1)\"");
  assert.equal(escapeCsvCell('"1,200"'),'"\"\"1,200\"\""');
+});
+
+
+test('real CSV and spreadsheet batches: selected column, quoted thousands and source line numbers',()=>{
+ const c=parseBatchTable('name,value,notes\nshirt,"1,200",item\nbag,149,item',{column:2});
+ assert.equal(c.delimiter,'comma');
+ assert.equal(c.headerSkipped,true);
+ assert.deepEqual(c.rows.map(r=>({line:r.line,value:r.value,error:r.error})),[
+  {line:2,value:'1200',error:null},{line:3,value:'149',error:null}
+ ]);
+ eq(convert(c.rows[0].value,'lbs','kg'),544.310844);
+ const t=parseBatchTable('name\tvalue\napple\t2.5\npear\t-1.2',{column:2});
+ assert.equal(t.delimiter,'tab');assert.deepEqual(t.rows.map(r=>r.value),['2.5','-1.2']);
+ const semi=parseBatchTable('key;number;note\nx;48.5;ok',{column:2});
+ assert.equal(semi.delimiter,'semicolon');assert.equal(semi.rows[0].value,'48.5');
+});
+
+test('batch parser retains errors on individual rows without dropping subsequent valid values',()=>{
+ const d=parseBatchTable('Value,Note\n10,ok\n"bad,quote\n25,ok',{delimiter:'comma'});
+ assert.equal(d.headerSkipped,true);
+ assert.equal(d.rows.length,3);
+ assert.equal(d.rows[0].value,'10');
+ assert.match(d.rows[1].error,/Unclosed/);
+ assert.equal(d.rows[2].value,'25');
+ assert.deepEqual(d.rows.map(r=>r.line),[2,3,4]);
+ const missing=parseBatchTable('1\n2,3',{column:2,delimiter:'comma'});
+ assert.match(missing.rows[0].error,/Column 2 is missing/);
+ assert.equal(missing.rows[1].value,'3');
+});
+
+test('auto delimiter does not truncate standalone thousands-grouped measurements',()=>{
+ const a=parseBatchTable('1,200\n2,500');
+ assert.equal(a.delimiter,'lines');
+ assert.deepEqual(a.rows.map(r=>r.value),['1200','2500']);
+ const q=parseBatchTable('"1,200"\n"3,400"');
+ assert.deepEqual(q.rows.map(r=>r.value),['1200','3400']);
+});
+
+test('batch limits, header and tabular input validation',()=>{
+ assert.deepEqual(parseBatchTable(''),{rows:[],delimiter:'lines',headerSkipped:false});
+ assert.throws(()=>parseBatchTable('3',{column:21}),/Choose an input column/);
+ assert.throws(()=>parseBatchTable('3',{column:0}),/Choose an input column/);
+ assert.throws(()=>parseBatchTable('3',{delimiter:'pipe'}),/Unknown file delimiter/);
+ assert.throws(()=>parseBatchTable('3\n4\n5',{maxRows:2}),/Maximum 2/);
+ const valid=parseBatchTable('Value\n0\n-12.5');
+ assert.equal(valid.rows.length,2);
+});
+
+test('browser entry script imports the same tested CSV batch implementation it invokes',()=>{
+ const source=fs.readFileSync(new URL('../src/assets/app.mjs',import.meta.url),'utf8');
+ assert.match(source,/import\s*\{[^}]*parseBatchTable[^}]*\}\s*from\s*['"]\.\/engine\.mjs['"]/);
+ assert.match(source,/parseBatchTable\(values\.value/);
+ assert.match(source,/data-batch-column/);
+ assert.match(source,/data-batch-delimiter/);
 });
