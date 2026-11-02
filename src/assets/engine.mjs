@@ -322,11 +322,14 @@ export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColum
   let converted=0;
   for(const row of table.rows){
     let result='',message='OK';
-    let sourceUnit=fromUnit,targetUnit=toUnit;
+    // In mixed mode keep raw row labels even if validation fails; never
+    // misreport the default page selector as the source of a failed row.
+    let sourceUnit=mixed?String(row.cells?.[Number(fromColumn)-1]??'').trim():fromUnit;
+    let targetUnit=mixed?String(row.cells?.[Number(toColumn)-1]??'').trim():toUnit;
     if(mixed){
       try{
-        sourceUnit=resolveUnitLabel(row.cells?.[Number(fromColumn)-1]);
-        targetUnit=resolveUnitLabel(row.cells?.[Number(toColumn)-1]);
+        sourceUnit=resolveUnitLabel(sourceUnit);
+        targetUnit=resolveUnitLabel(targetUnit);
       }catch(e){message=e.message;}
     }
     if(row.error)message=row.error;
