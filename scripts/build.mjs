@@ -4,6 +4,7 @@ import {measurementNote,answerBanner,referenceValues,calculationDetails,precisio
 import {categoryExplanation,directionExplanation} from '../src/seo-guides.mjs';
 import {numericHeading,numericTitle,numericDescription} from '../src/seo-meta.mjs';
 import {resolveNumericIndexMode} from '../src/seo-index-policy.mjs';
+import {resolveSitePublication} from '../src/seo-launch-policy.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
@@ -13,13 +14,14 @@ if(launchPilot.size!==numericPolicy.pilotIndexUrls.length||![...launchPilot].eve
 const numericIndexMode=resolveNumericIndexMode(process.env.NUMERIC_INDEX_MODE,process.env.NUMERIC_INDEX_CONFIRMATION);
 const numericIndexable=(url)=>numericIndexMode==='all'||launchPilot.has(url);
 const dist=path.join(root,'dist');fs.rmSync(dist,{recursive:true,force:true});fs.mkdirSync(dist,{recursive:true});
-// Only the confirmed custom domain is an indexable production address.
-const configuredOrigin=(process.env.SITE_URL||'').trim().replace(/\/+$/,'');
-if(configuredOrigin&&!/^https:\/\/[^/?#]+$/.test(configuredOrigin))throw Error('SITE_URL must be an HTTPS origin only.');
-const configuredHost=configuredOrigin?new URL(configuredOrigin).hostname.toLowerCase():'';
-const IS_PRODUCTION=Boolean(configuredOrigin&&configuredHost!=='pages.dev'&&!configuredHost.endsWith('.pages.dev'));
-const SITE=IS_PRODUCTION?configuredOrigin:null;
-if(!IS_PRODUCTION)console.warn('PREVIEW BUILD: no confirmed custom domain; pages are noindex.');
+// Fail closed: SITE_URL alone NEVER activates Google indexing. The domain
+// must have explicit, host-bound SEO approval, and branch previews stay noindex.
+const publication=resolveSitePublication({
+ siteUrl:process.env.SITE_URL,approvedHost:process.env.SEO_PUBLIC_HOST,
+ approval:process.env.SEO_INDEX_APPROVED,pagesBranch:process.env.CF_PAGES_BRANCH
+});
+const {isProduction:IS_PRODUCTION,site:SITE}=publication;
+if(!IS_PRODUCTION)console.warn('PREVIEW / SAFE MODE:',publication.reason,'— every page is noindex.');
 const DIM_ICONS={mass:'⚖',length:'↔',volume:'◧',temperature:'°',pressure:'◉',torque:'⟳',time:'◷',speed:'⇢',area:'▦',force:'⇧',storage:'▤',density:'◈',power:'ϟ',acceleration:'↗',fuel:'⛽',flow:'≋'};
 const titleFor=(p)=>p.title||`${units[p.from].name} to ${units[p.to].name}`;
 const E=(s)=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
