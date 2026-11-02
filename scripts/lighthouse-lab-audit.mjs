@@ -9,6 +9,7 @@
  */
 import fs from 'node:fs';
 import http from 'node:http';
+import {gzipSync} from 'node:zlib';
 import path from 'node:path';
 import {spawn,spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
@@ -39,9 +40,19 @@ const server=http.createServer((req,res)=>{
   if(!local.startsWith(dist+path.sep)&&local!==dist)throw Error('Out-of-root path');
   if(!relative||relative.endsWith('/'))local=path.join(local,'index.html');
   if(!fs.existsSync(local)||!fs.statSync(local).isFile()){res.writeHead(404).end('Not found');return;}
-  res.writeHead(200,{'Content-Type':contentTypes[path.extname(local)]||'application/octet-stream',
-   'Cache-Control':'no-store'});
-  res.end(fs.readFileSync(local));
+  const type=contentTypes[path.extname(local)]||'application/octet-stream';
+  const body=fs.readFileSync(local);
+  // Cloudflare automatically compresses eligible text responses. Our original
+  // localhost server did not: Lighthouse incorrectly proposed "Enable text
+  // compression" as if this were a production defect. Model text gzip on the
+  // test origin so that lab opportunities focus on real page behavior.
+  const compressed=/\bgzip\b/i.test(req.headers['accept-encoding']||'')&&
+   /^(?:text\/|application\/(?:json|javascript))/.test(type);
+  res.writeHead(200,{
+   'Content-Type':type,'Cache-Control':'no-store',
+   'Vary':'Accept-Encoding',...(compressed?{'Content-Encoding':'gzip'}:{})
+  });
+  res.end(compressed?gzipSync(body):body);
  }catch{
   res.writeHead(400).end('Invalid route');
  }
@@ -111,7 +122,7 @@ try{
  const summary={
   observedAt:new Date().toISOString(),measurement:'Chrome Lighthouse lab, controlled emulated device/network',
   isCruxFieldData:false,fieldDataStatus:'NOT_MEASURED',fieldLcpP75:null,fieldInpP75:null,fieldClsP75:null,
-  caution:'Local lab results are not real-user Core Web Vitals, and Total Blocking Time is not INP. Scores vary by hardware and CPU.',
+  caution:'Local lab results are not real-user Core Web Vitals, and Total Blocking Time is not INP. Scores vary by hardware and CPU. Local text files use gzip when requested, reflecting compression but not actual Cloudflare CDN latency.',
   thresholdsContext:{goodLcpMs:2500,goodClsBelow:0.1,goodInpMs:200,
    note:'Google thresholds refer to real-user p75; compare lab results as diagnostic observations only.'},
   lighthouseVersion:result[0]?.lighthouseVersion,caseCount:result.length,results:result
