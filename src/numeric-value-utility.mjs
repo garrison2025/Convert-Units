@@ -36,7 +36,7 @@ export function sourceRoundingScenarioHtml(seed,pair){
   :'The two boundaries round to different whole-unit target answers ('+
     esc(formatNumber(s.roundedLower,0))+' or '+esc(formatNumber(s.roundedUpper,0))+
     ' '+esc(to.symbol)+'). Retain decimals if that difference matters.';
- return '<section class="practical-equivalence" data-source-rounding-scenario="'+esc(seed.url)+
+ return '<section class="source-rounding-scenario" data-source-rounding-scenario="'+esc(seed.url)+
   '" data-whole-result-stable="'+(s.stable?'yes':'no')+'">'+
   '<h2>If '+esc(seed.valueText)+' '+esc(from.symbol)+' was rounded at the source</h2>'+
   '<p class="reference-caption">The stated input converts to '+rel(s.central)+' <strong>'+
