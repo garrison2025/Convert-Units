@@ -382,3 +382,16 @@
 
 /* V38: readable status label even in the 320px homepage demo. */
 @media(max-width:620px){.home-page .tool-head .small{font-size:.73rem;line-height:1.25;padding:4px 6px}}
+
+/* V38: batch first-action density matches standalone converters on phones. */
+@media(max-width:620px){
+ .batch-page .crumb{margin:10px 0 8px;line-height:1.35}
+ .batch-page .page-top{padding:0 0 5px;margin-bottom:12px}
+ .batch-page .page-top .eyebrow{margin-bottom:5px}
+ .batch-page .page-title h1{font-size:clamp(1.88rem,8.3vw,2.32rem);line-height:1.07;margin:0 0 6px}
+ .batch-page .page-title p{font-size:.87rem;line-height:1.46;margin:0}
+ .batch-page [data-batch]{padding:16px}
+ .batch-page .batch-grid[style*="margin:17px"]{margin:11px 0!important}
+ .batch-page [data-batch-input]{min-height:165px}
+ .batch-page [data-process]{min-height:46px}
+}
