@@ -10,6 +10,7 @@ import {numericHeading,numericTitle,numericDescription,directionMetaDescription}
 import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,speedFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {homeReferenceFacts} from '../src/home-reference.mjs';
+import {standardsReferenceFacts} from '../src/standards-reference.mjs';
 import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from '../src/seo-guides.mjs';
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
@@ -365,6 +366,29 @@ for(const [route,alias] of [['/convert/lbs-to-kg/','lbs to kg'],['/convert/kg-to
  if(!html.includes('Unit notation:')||!html.includes('“'+alias+'”'))
   errors.push(route+': natural, factual common-notation explanation missing');
 }
+const methodology=checkMarkup('/methodology/',false);
+const standardsBlock=methodology.split('<section id="verified-conversion-facts"')[1]?.split('</section>')[0]||'';
+const geoFacts=standardsReferenceFacts(pairList);
+if(!standardsBlock||!methodology.includes('id="verified-conversion-heading"'))
+ errors.push('/methodology/: 16-category reference section absent from initial HTML');
+if((standardsBlock.match(/data-standard-dimension="/g)||[]).length!==16)
+ errors.push('/methodology/: a measurement type is missing from verified definitions');
+for(const f of geoFacts){
+ if(!standardsBlock.includes('data-standard-dimension="'+f.dimension+'"')||
+    !standardsBlock.includes('href="'+f.url+'"')||
+    !standardsBlock.includes(f.relation+' '+f.shown+' '+f.to)||
+    !standardsBlock.includes('href="'+f.sourceUrl+'"'))
+  errors.push('/methodology/: source-backed conversion fact or citation missing: '+f.dimension);
+}
+for(const p of pairList){
+ const content=read(p.url);
+ if(!content.includes('href="/methodology/#verified-conversion-facts"'))
+  errors.push(p.url+': direct source-definitions anchor missing');
+}
+if(!standardsBlock.includes('US versus UK fluid ounces')||
+   !standardsBlock.includes('Decimal versus binary storage')||
+   !standardsBlock.includes('Mass versus force'))
+ errors.push('/methodology/: unit-system disambiguation missing');
 const batchHtml=checkMarkup('/batch-converter/',true);
 for(const feature of [
  'Batch unit converter for CSV and spreadsheets',
