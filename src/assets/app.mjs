@@ -229,7 +229,7 @@ if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSugg
   homeInput.addEventListener('focus',update);
   homeInput.addEventListener('keydown',e=>{if(e.key==='Escape'){close();}if(e.key==='ArrowDown'&&hits.length){e.preventDefault();hits[0].focus();}});
   homeSuggestions.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){close();homeInput.focus();return;}
+    if(e.key==='Escape'){homeInput.focus();close();return;}
     if((e.key==='ArrowDown'||e.key==='ArrowUp')&&hits.length){
       const position=hits.indexOf(document.activeElement);
       if(position<0)return;
