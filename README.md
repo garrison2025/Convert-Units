@@ -13,6 +13,38 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - Do not create a second Pages project, change app code to use paid APIs, or auto-enable AdSense/GSC. Historical sections below were written before the domain was purchased and are retained as a development record.
 
 
+
+## V41 Google SEO: actual-domain rehearsal and publication checklist (2026-11-03)
+
+The live apex `https://convertunits.cc` is connected to the existing Cloudflare Pages project and currently resolves in **preview / noindex** mode. Its ownership and hosting are not in doubt; Google's permission to index is a **separate decision**.
+
+Completed in code:
+- The publication gate in `src/seo-launch-policy.mjs` now accepts public SEO approval **only** for `convertunits.cc` (not `www`, `qa.example.test`, typo hosts or any `pages.dev` mirror). Branch previews never publish.
+- GitHub CI performs a real-apex **local-only** production rehearsal. With controlled test variables, it builds 64 canonical/indexable site and tool URLs, excludes all 92 numeric pages pending independent specific approval, and verifies the sitemap and internal crawl links. This rehearsal is not deployed as the site's production build.
+- Homepage `WebSite` JSON-LD includes `name: ConvertUnits.cc` and honest `alternateName: ConvertUnits` when publication is allowed. Do not fabricate reviews or add FAQ rich-result markup for a generic utility site.
+- `scripts/official-domain-seo-audit.mjs` now observes the real apex, its live `robots.txt`, `sitemap.xml`, the contact page, approved core tools, withheld numeric URL and the Pages mirror. The resulting read-only audit artifact distinguishes live noindex mode from locally rehearsed production.
+
+**When the owner authorizes public search indexing**, configure **Production** environment variables under the existing Cloudflare Pages project (`convert-units-bwa` → Settings → Variables and Secrets). Exact values:
+```dotenv
+SITE_URL=https://convertunits.cc
+SEO_PUBLIC_HOST=convertunits.cc
+SEO_INDEX_APPROVED=I_APPROVE_PUBLIC_INDEXING
+```
+Do not add `SEO_NUMERIC_PUBLIC_HOST`, `SEO_NUMERIC_INDEX_APPROVED`, or `SEO_NUMERIC_APPROVED_URLS` without additional URL-specific approval. Do not enable advertising as a side effect. Trigger a new production deployment, then check:
+1. `https://convertunits.cc/build-info.json` reports `mode=production`, `site=https://convertunits.cc`, `indexablePages=64`, and `numericIndexablePages=0`.
+2. The homepage and core converter pages return `index,follow` and self-referencing canonical links on `https://convertunits.cc`; all 92 numeric pages remain `noindex` until separately approved.
+3. `https://convertunits.cc/sitemap.xml` lists 64 real apex canonical URLs, no `pages.dev` URLs or withheld numbers. `robots.txt` advertises that sitemap.
+4. The `convert-units-bwa.pages.dev` mirror remains protected by a **response-header** `X-Robots-Tag: noindex`. A Pages alias shares the same HTML, so this host-scoped header is essential.
+5. Add `www.convertunits.cc` in Cloudflare only as an alias and configure a permanent apex redirect preserving path/query, rather than serving two independent canonical sites.
+
+After those checks, add **Domain property** `convertunits.cc` in [Google Search Console](https://search.google.com/search-console) using its specific DNS TXT verification record, then submit `https://convertunits.cc/sitemap.xml` and inspect homepage plus the two mass-direction URLs. The owner must obtain the TXT verification token in GSC; none is included or invented by the app. Indexing and rankings are ultimately determined by Google, not by passing these technical checks.
+
+Official technical references:
+- [Google canonical URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls)
+- [Google sitemap requirements](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
+- [Google site names](https://developers.google.com/search/docs/appearance/site-names)
+- [Cloudflare Pages host-specific X-Robots-Tag](https://developers.cloudflare.com/pages/configuration/headers/)
+
 ## Delivered
 
 - **38** direction-specific calculators and **one universal converter** spanning **16** measurement categories.
