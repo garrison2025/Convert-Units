@@ -12,6 +12,14 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
 
+### Current US SEO research — V32 (2026-11-03)
+
+- **Use the supplied Semrush data; no new export or subscription required:** `research/SEO-38-DIRECTION-PRIORITY-V32-20261103.md` is the latest SEO research entrypoint.
+- Full row-level traceability: `research/SEMRUSH-162-STRICT-ROWS-BY-DIRECTION-V32-20261103.csv` maps all **162** V2 strictly validated ranking rows to **15** existing directions, **147** deduplicated numeric intents, **92** source-reconciled built numeric pages and **15** conditional numeric pilot URLs.
+- Page-level research: `research/SEO-38-DIRECTION-RESEARCH-MATRIX-V32-20261103.csv` covers **38/38** directional tools. Some nonstrict historical queries help describe generic directional demand, but their old V2 rejection reasons remain intact for numeric-page SEO.
+- **No deployment/index policy change:** the `*.pages.dev` preview remains `noindex`, the official domain is deferred, and the host-bound launch gates are untouched. Historical Semrush competitor estimates are not this website's traffic.
+
+
 ## Local build and tests
 
 Requires Node 20+.
