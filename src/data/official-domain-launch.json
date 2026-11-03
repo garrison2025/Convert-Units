@@ -1,0 +1,8 @@
+{
+  "officialOrigin": "https://convertunits.cc",
+  "ownerApprovedPublicIndex": true,
+  "approvalDate": "2026-11-03",
+  "request": "Fix SEO audit issues including blocked indexability, missing canonical URLs and sitemap on registered official domain",
+  "scope": "Cloudflare Pages main branch only, 64 core tools and informational pages; 92 numeric results independently noindex",
+  "numericIndexApproval": false
+}
