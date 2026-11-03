@@ -2,6 +2,10 @@
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
 
+## V51 homepage search accessibility (2026-11-04)
+
+Remove unsupported `aria-expanded` and unnecessary popup-control semantics from the native `type=search` homepage finder. Search suggestions remain ordinary keyboard-focusable links, not an ARIA combobox/listbox. Add a polite status line announcing result counts; retain input label, ArrowDown navigation, Escape/focus return, and form fallback. Regression tests include static HTML semantics and browser focus interaction; no design changes, JS dependency, API or new SEO URLs.
+
 ## V50 unbuilt keyword coverage & missing free units (2026-11-04)
 
 Three previously absent conversion choices (hPa ↔ conventional mmHg, mm³ ↔ mL, GB ↔ Gb) are now supported by the existing universal converter and browser-local CSV. Eight research-backed, computed keyword examples are rendered on existing tool directions; pressure, volume and storage hubs show direct conversion links and primary-source references, while density explains why mL ↔ mg requires a material-specific density. Source mismatch and target ambiguity remain explicit. All existing 38 tools, 16 categories, 92 numeric answer pages and 156 indexable official URLs remain unchanged. No paid API or new low-value SEO routes. See `research/V50-LONGTAIL-UNIT-GAPS-20261104.md` and regression tests.
