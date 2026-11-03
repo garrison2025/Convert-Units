@@ -39,7 +39,7 @@ function walk(dir){
  }
 }
 walk(dist);
-const indexableNumeric=new Set(seeds.filter(s=>build.numericIndexMode==='all'||pilot.has(s.url)).map(s=>s.url));
+const indexableNumeric=new Set(seeds.filter(s=>build.mode==='production'?(build.numericPublishedUrls||[]).includes(s.url):build.numericIndexMode==='all'||pilot.has(s.url)).map(s=>s.url));
 const indexable=new Set([...allRoutes].filter(route=>route!=='/404/'&&(route.split('/').filter(Boolean).length!==3||indexableNumeric.has(route))));
 const distances=new Map([['/',0]]),queue=['/'];
 for(let i=0;i<queue.length;i++){
