@@ -73,6 +73,32 @@ async function smokeScenario(SCENARIO){
      ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
      break;
    }
+   case 'v39-color-system':{
+     const css=getComputedStyle(document.documentElement),panel=q('[data-converter] .resultbox'),
+       number=q('[data-output-number]'),primary=q('[data-converter] .btn.primary');
+     ok(css.getPropertyValue('--primary').trim().toLowerCase()==='#176b8a',
+       'brand primary must use the approved ocean-teal design token');
+     ok(css.getPropertyValue('--canvas').trim().toLowerCase()==='#f6f9fa'&&
+        css.getPropertyValue('--result-bg').trim().toLowerCase()==='#e8f5f6',
+       'background and answer surface must share the V39 palette');
+     const RGB=v=>(v.match(/[\\d.]+/g)||[]).slice(0,3).map(Number);
+     const luminance=v=>{const rgb=RGB(v).map(c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
+     const contrast=(a,b)=>{const x=luminance(a),y=luminance(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05);};
+     const primaryStyle=getComputedStyle(primary),panelStyle=getComputedStyle(panel),numStyle=getComputedStyle(number);
+     ok(primaryStyle.backgroundColor==='rgb(23, 107, 138)',
+       'primary button must render ocean teal instead of the legacy bright blue');
+     ok(panelStyle.backgroundColor==='rgb(232, 245, 246)',
+       'answer background must render the soft-blue sea tint');
+     ok(numStyle.color==='rgb(20, 93, 115)',
+       'answer digits must render the high-contrast dark ocean tone');
+     ok(contrast(primaryStyle.color,primaryStyle.backgroundColor)>=4.5,
+       'primary button text must reach WCAG AA normal-text contrast');
+     ok(contrast(numStyle.color,panelStyle.backgroundColor)>=4.5,
+       'answer digits must reach WCAG AA normal-text contrast');
+     const background=getComputedStyle(document.body).backgroundColor;
+     ok(background==='rgb(246, 249, 250)','document uses warm off-white instead of legacy blue-gray');
+     break;
+   }
    case 'v38-swap-copy-feedback':{
      const tool=q('[data-converter]'),from=tool.querySelector('[data-from]'),
        to=tool.querySelector('[data-to]'),swap=tool.querySelector('[data-swap]'),
@@ -853,6 +879,8 @@ const suites=[
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
  {name:'seo-v33-generic-intent',url:'/convert/kn-to-lbf/'},
  {name:'seo-v33-generic-intent',url:'/convert/kw-to-hp/'},
+ {name:'v39-color-system',url:'/'},
+ {name:'v39-color-system',url:'/convert/lbs-to-kg/'},
  {name:'v38-swap-copy-feedback',url:'/convert/lbs-to-kg/'},
  {name:'motion-entrance',url:'/'},
  {name:'motion-interaction',url:'/'},
