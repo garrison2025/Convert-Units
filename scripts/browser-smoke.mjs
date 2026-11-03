@@ -399,6 +399,17 @@ async function smokeScenario(SCENARIO){
              '320px homepage quick-value presets should not spill into a second row');
          }
        }
+       const valuePanel=doc.querySelector('.numeric-intent-check');
+       if(valuePanel&&width<=375){
+         const cards=[...valuePanel.querySelectorAll('.numeric-insight-value')];
+         ok(cards.length>=2&&cards.length<=3,'pilot cross-check needs 2-3 usable source values');
+         const rect=valuePanel.getBoundingClientRect();
+         ok(rect.left>=-2&&rect.right<=visible+2,'value-specific panel must stay in the viewport at '+width);
+         ok(cards.every((item,i)=>!i||item.getBoundingClientRect().top>cards[i-1].getBoundingClientRect().top),
+           'value-specific units should stack vertically at narrow phone widths');
+         ok(valuePanel.querySelector('a')?.getAttribute('href')?.startsWith('/convert/'),
+           'numeric page must have a functional link back to its parent tool');
+       }
        iframe.remove();
      }
      break;
@@ -782,7 +793,10 @@ const suites=[
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/kw-to-hp/'},{name:'mobile',url:'/convert/us-cup-to-ml/'},{name:'mobile',url:'/convert/us-tbsp-to-us-tsp/'},{name:'mobile',url:'/convert/gb-to-mb/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/kw-to-hp/'},{name:'mobile',url:'/convert/us-cup-to-ml/'},{name:'mobile',url:'/convert/us-tbsp-to-us-tsp/'},{name:'mobile',url:'/convert/gb-to-mb/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'},
+ {name:'mobile',url:'/convert/kg-to-lbs/240/'},
+ {name:'mobile',url:'/convert/celsius-to-fahrenheit/37.9/'},
+ {name:'mobile',url:'/convert/ml-to-us-fl-oz/355/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
