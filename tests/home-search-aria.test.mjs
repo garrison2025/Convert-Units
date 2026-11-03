@@ -14,7 +14,7 @@ test('homepage finder is a native search input; not an invalid pseudo-combobox',
  assert.doesNotMatch(input,/\brole="combobox"/);
  assert.match(build,/<span data-suggestion-status role="status">Choose a tool to open<\/span>/);
  assert.match(build,/<a class="suggestion" data-quick-item/);
- assert.match(app,/status\.textContent=hits\.length===1/);
+ assert.match(app,/status\.textContent=hits\.length\?/);
  assert.doesNotMatch(app,/homeInput\.setAttribute\('aria-expanded'/);
  assert.match(chrome,/Down Arrow must move keyboard focus/);
  assert.match(chrome,/Escape from suggestions must close/);
