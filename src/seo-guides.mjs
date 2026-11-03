@@ -20,7 +20,7 @@ const context={
  },
  volume:{
   title:'US customary versus imperial volume',
-  advice:'A US fluid ounce measures volume, not the mass ounce. A US gallon is 3.785411784 liters; an imperial gallon is 4.54609 liters. Recipes and container labels must identify which convention is intended.',
+  advice:'A US fluid ounce measures volume, not the mass ounce. A US gallon is 3.785411784 liters; an imperial gallon is 4.54609 liters. Recipes and container labels must identify which convention is intended. Cubic millimeters (mm³) and milliliters (mL) are both volume: 1 mL = exactly 1,000 mm³.',
   check:'A US cup is 1/16 of a US liquid gallon, while a US tablespoon is one-half US fluid ounce. Volume cannot be converted to mass without a material density.'
  },
  temperature:{
@@ -30,7 +30,7 @@ const context={
  },
  pressure:{
   title:'Pressure versus force',
-  advice:'Pressure describes force over area. PSI, kPa, bar and standard atmosphere are pressure units, not mass or force units. When working with tires or instruments, distinguish gauge pressure from absolute pressure.',
+  advice:'Pressure describes force over area. PSI, kPa, hPa, conventional mmHg, bar and standard atmosphere are pressure units, not mass or force units. One bar is exactly 1,000 hPa. The mmHg-to-Pa factor used here is an approximate published conventional reference; it must not be confused with a torr definition. Distinguish gauge pressure from absolute pressure.',
   check:'A standard atmosphere is 101,325 pascals and one bar is 100,000 pascals by definition. A unit conversion does not determine whether the measurement is gauge or absolute.'
  },
  torque:{
@@ -61,7 +61,7 @@ const context={
  storage:{
   title:'Decimal prefixes versus binary prefixes',
   advice:'One GB (gigabyte) is 1,000,000,000 bytes, while one GiB (gibibyte) is 1,073,741,824 bytes. Many operating systems report binary quantities with different labels.',
-  check:'Do not assume GB and GiB are the same unit. A conversion of storage size does not estimate file compression or filesystem overhead.'
+  check:'Case matters: 1 GB is exactly 8 Gb, because a byte contains 8 bits. GB and Gb are different from GiB and Gi(b), and the same label should not be silently interpreted as the other. Converting size does not predict download time or compression.'
  },
  density:{
   title:'Density connects mass and volume',

@@ -15,6 +15,8 @@ import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
 import {geoVerificationHtml} from '../src/geo-verification.mjs';
+import {keywordExampleHtml} from '../src/keyword-gap-coverage.mjs';
+import {extendedUnitHtml} from '../src/category-extended-units.mjs';
 import {categoryDecisionHtml} from '../src/category-seo.mjs';
 import {llmsDirectory} from '../src/llms-directory.mjs';
 import {numericInsight} from '../src/numeric-insight.mjs';
@@ -149,6 +151,8 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ const intentExample=keywordExampleHtml(pair);
+ if(intentExample&&!html.includes(intentExample))errors.push(pair.url+': approved unbuilt keyword example missing');
  const geoProof=geoVerificationHtml(pair);
  if(!html.includes(geoProof))errors.push(pair.url+': independently computed standards trace and source missing');
  const examples=sourceBackedExamples(pair,seeds);
@@ -299,6 +303,8 @@ for(const dim of ['mass','length','volume','temperature','pressure','torque','ti
  const html=checkMarkup(route,false);
  if(decode(meta(html,'description'))!==categoryMetaDescription(dim))
   errors.push(route+': generic or inaccurate category meta description');
+ const extended=extendedUnitHtml(dim);
+ if(extended&&!html.includes(extended))errors.push(route+': extra unit definitions or density limitation missing');
  if(!html.includes(categoryDecisionHtml(dim,pairList)))
   errors.push(route+': specific category choice guidance missing');
  if(html.includes('Accurate calculations, no guesswork'))
