@@ -379,3 +379,6 @@
 @media(max-width:360px){.inner-page .tool-head .small{font-size:.72rem}}
 @media(hover:none){.swap:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.swap:active{transform:none!important}}
+
+/* V38: readable status label even in the 320px homepage demo. */
+@media(max-width:620px){.home-page .tool-head .small{font-size:.73rem;line-height:1.25;padding:4px 6px}}
