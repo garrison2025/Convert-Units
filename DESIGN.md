@@ -1,13 +1,13 @@
-# ExactUnit visual design standard — V3.0
+# ExactUnit visual design standard — V39
 
-Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Calculator, Linear 2026 UI refresh, Raycast.
+Updated: 2026-11-03 · Scope: 157 prerendered pages · Research references: Omni Calculator, Linear 2026 UI refresh, Raycast.
 
 ## Product, outcome and boundaries
 - Product: fast, accurate, browser-local unit converter. Audience: primarily US English organic search visitors.
 - User's primary task: enter a value, choose units, and read the exact result with no account or friction.
 - Page modes: **Operate** (homepage, tool, result and batch pages), **Read** (methodology, privacy and terms), **Navigate** (categories and directories).
 - Visual design must not bury the converter below a promotional hero. The actual working converter remains visible on the desktop homepage and appears directly after the concise opening on mobile.
-- Do not copy third-party brand assets or layouts verbatim. Preserve 37 directional calculators, one universal, 92 validated numeric URLs, full metadata and local computation.
+- Do not copy third-party brand assets or layouts verbatim. Preserve 38 directional calculators, one universal, 92 validated numeric URLs, full metadata and local computation.
 - No paid APIs, external font requests, image libraries or runtime animations that impair performance.
 
 ## References and applied lessons
@@ -15,17 +15,25 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - [Linear — March 2026 interface refresh](https://linear.app/now/behind-the-latest-design-refresh): consistent headers and restrained navigation surfaces, strong foreground content.
 - [Raycast](https://www.raycast.com/): clear promise, task-first interface hierarchy, and expressive but bounded interactions.
 
-## Site-specific design tokens (src/assets/refresh.css)
-| Token | Value | Purpose |
+## Site-specific design tokens (src/assets/site.css, V39)
+The definitive color tokens live in `site.css`; `refresh.css` and `polish.css` may override spacing, but must not override the brand palette. V39 replaces the former scattered bright-blue declarations with the approved ocean-teal system.
+
+| Role | Hex | Use |
 |---|---|---|
-| canvas | `#f8f9fc` | light, quiet background |
-| surface | `#ffffff` | content and calculator panels |
-| ink | `#171d2c` | primary text |
-| muted | `#67728a` | secondary UI labels |
-| primary | `#3459e8` | primary actions, result emphasis, selected focus |
-| primary-hover | `#2446c9` | interactive hover |
-| border | `#e5e9f2` | card and section edges |
-| focus | `#ffb649` | keyboard focus state |
+| canvas | `#F6F9FA` | quiet warm-white page background |
+| surface | `#FFFFFF` | calculator, content and search surfaces |
+| ink | `#152B38` | primary heading and body text |
+| muted | `#506473` | secondary readable labels |
+| primary | `#176B8A` | wordmark, links, action buttons and small accents |
+| primary-hover | `#125874` | visible hover and active states |
+| result-bg | `#E8F5F6` | answer region |
+| result-ink | `#145D73` | high-contrast numeric answers |
+| line | `#DBE6EA` | quiet borders and separators |
+| focus | `#176B8A` | high-contrast keyboard focus |
+| success | `#156044` | copy-success feedback (separate from primary brand color) |
+| error | `#CC4B64` | invalid input and error messaging |
+
+Accessible color ratios against the intended surfaces: white-on-primary ≈5.99:1 and result-ink-on-result-bg ≈6.62:1 (both above 4.5:1). All styles are native CSS; no runtime palette generator, theme JS or remote dependency.
 
 ## Components and hierarchy
 1. Header: identifiable wordmark; concise navigation; distinct tool access action.
@@ -107,3 +115,11 @@ Date: 2026-11-02 · Scope: 154 prerendered pages · Research references: Omni Ca
 - **Batch first action:** the batch page's mobile heading, form spacing and values textarea were compacted without hiding CSV settings or changing CSV import/export; a 375px first-screen Convert-button assertion was added.
 - **Performance, SEO, cost and scope:** preserve the preexisting 32KB combined gzip static asset budget, 157 routes, strictly sourced SEO, source-defined conversion engine, sitewide preview `noindex`, no production-domain switch, no advertisements and no new dependencies or external API requests.
 - **Evidence:** GitHub Actions real Chromium screenshots and focused `scripts/browser-smoke.mjs` tests; CI is the authority for 320px/375px regressions and no horizontal overflow. Manual screen review is distinct from a production-field user study.
+
+## V39: approved ocean-teal + warm-white rollout (2026-11-03)
+
+- **Scope:** recolored five existing stylesheet layers and inline favicon/meta/theme accents; all homepage, calculator, 38 directional, 16 category, 92 numeric and batch templates inherit the same palette. No restructuring, API, library, animation or copy changes.
+- **Hierarchy:** white input card; ocean teal reserved for calls to action, semantic links and small branding; pale aqua converter result with dark teal digits; neutral white card directory with subtle teal icon backgrounds. The dark informational banner retains dark-ocean depth rather than the former saturated royal blue gradient.
+- **Technical debt:** moved primary, canvas, border, focus and results design tokens into `src/assets/site.css` as the single source. Removed duplicate root palette declarations in `refresh.css` and `polish.css`. Legacy non-semantic blue literals were remapped to corresponding ocean/neutral shades. Successful-copy green and error red remain semantically distinct.
+- **Verification:** `v39-color-system` browser-smoke assertions check actual computed primary/button/result colors and their WCAG AA normal-text contrast on homepage and a directional converter; earlier V38 mobile fold, reduced-motion, SEO and static resource budgets remain enforced.
+- **Release gate:** preserve `pages.dev` preview `noindex,follow`, no production domain, no advertising, no Google Search Console and no index approval without owner decision.
