@@ -10,7 +10,7 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const origin='https://convertunits.cc';
 const mirror='https://convert-units-bwa.pages.dev';
-const routes=['/','/convert/lbs-to-kg/','/convert/kg-to-lbs/240/','/category/mass/','/contact/','/privacy/','/robots.txt','/sitemap.xml','/build-info.json'];
+const routes=['/','/convert/lbs-to-kg/','/convert/lbs-to-kg/149/','/convert/kg-to-lbs/240/','/category/mass/','/contact/','/privacy/','/robots.txt','/sitemap.xml','/llms.txt','/build-info.json'];
 const out=path.join(root,'qa-google-seo');
 fs.mkdirSync(out,{recursive:true});
 
@@ -54,9 +54,16 @@ if(info){
       if(x?.status===200&&(isNoindex(x)||canonicalOf(x)!==origin+route))issues.push('Production canonical or robots mismatch: '+route);
       if(!locs.includes(origin+route))issues.push('Production sitemap misses '+route);
     }
-    const held=byRoute.get('/convert/kg-to-lbs/240/');
-    if(held?.status===200&&!info.numericPublishedUrls?.includes('/convert/kg-to-lbs/240/')&&!isNoindex(held))
-      issues.push('Unapproved numeric URL exposed to index: /convert/kg-to-lbs/240/');
+    // The owner has approved every valid numeric result URL for publication.
+    if(info.indexablePages!==156||info.numericIndexablePages!==92)
+      issues.push('Official domain must expose all 156 URLs including all 92 numeric values');
+    if(locs.length!==156||new Set(locs).size!==156)
+      issues.push('Public sitemap is not the complete 156-URL canonical inventory');
+    for(const route of ['/convert/lbs-to-kg/149/','/convert/kg-to-lbs/240/']){
+      const page=byRoute.get(route);
+      if(page?.status===200&&(isNoindex(page)||canonicalOf(page)!==origin+route||!locs.includes(origin+route)))
+        issues.push('Numeric URL not publicly indexable or missing sitemap canonical: '+route);
+    }
     if(locs.some(u=>!u.startsWith(origin+'/')||u.includes('.pages.dev')))issues.push('Off-host sitemap loc');
     observations.push('Production release detected; inspect real Google Search Console separately');
   }else issues.push('Unexpected build mode: '+info.mode);
@@ -68,7 +75,7 @@ for(const route of ['/','/contact/','/privacy/']){
 if(byRoute.get('/contact/')?.status===200&&!byRoute.get('/contact/').body.includes('mailto:contact@convertunits.cc'))
  issues.push('Official contact link absent from live contact page');
 if(preview.status===200&&!isNoindex(preview))
- issues.push('Cloudflare pages.dev mirror missing noindex protection');
+ issues.push('Cloudflare pages.dev mirror missing noindex response-header protection (duplicate site)');
 const result={date:new Date().toISOString(),origin,mirror:preview.url,mode:info?.mode||'unknown',
   buildCommit:info?.buildCommit||null,site:info?.site||null,sitemapUrls:locs.length,
   sampledRoutes:main.map(({url,status,robotsHeader,error})=>({url,status,robotsHeader,error})),
