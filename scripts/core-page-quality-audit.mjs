@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
-import {engineeringReference} from '../src/seo-guides.mjs';
+import {engineeringReference,conventionComparison} from '../src/seo-guides.mjs';
 import {directionMetaDescription} from '../src/seo-meta.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -51,6 +51,11 @@ for(const pair of pairs){
    if(!html.includes('href="'+seed.url+'"'))
     issue.push('Missing eligible numeric link '+seed.url);
  }
+ const desiredConvention=conventionComparison(pair);
+ const hasConvention=html.includes('data-standards-comparison');
+ if(desiredConvention){
+  if(!html.includes(desiredConvention))issue.push('Missing or incorrect source-specific standard comparison');
+ }else if(hasConvention)issue.push('Irrelevant measurement standard comparison leaked onto this direction');
  const powerCompare=html.includes('data-horsepower-conventions');
  if(pair.slug==='kw-to-hp'){
   if(!powerCompare||!html.includes('mechanical horsepower (hp(I)) only')||
@@ -78,7 +83,7 @@ for(const pair of pairs){
   issue.push('torque reverse page uses wrong reference source');
  if(pair.slug==='kmh-to-mph'&&html.includes('60 mph across four speed units'))
   issue.push('road speed reference uses opposite direction');
- const row={url:pair.url,title,dimension,visibleNumericLinks:linkedNumeric.length,powerConventionReference:powerCompare,referenceHeading:heading||null,primaryAnswerValid:!issue.includes('source-derived one-unit answer missing'),reverseUrl:reverse?.url??null,issues:issue};
+ const row={url:pair.url,title,dimension,visibleNumericLinks:linkedNumeric.length,hasConventionComparison:hasConvention,powerConventionReference:powerCompare,referenceHeading:heading||null,primaryAnswerValid:!issue.includes('source-derived one-unit answer missing'),reverseUrl:reverse?.url??null,issues:issue};
  results.push(row);
  for(const finding of issue)errors.push(pair.url+': '+finding);
 }
@@ -89,7 +94,7 @@ const report={
  status:errors.length?'failed':'passed',
  scope:'38 genuine directional pages; preview source HTML; not real Google rankings or GSC',
  checked:results.length,uniqueTitles:titles.size,uniqueDescriptions:descriptions.size,
- engineeringPages:engineeringCount,distinctEngineeringHeadings:referenceHeadings.size,horsepowerStandardPages:results.filter(r=>r.powerConventionReference).length,visibleNumericResultSections:results.filter(r=>r.visibleNumericLinks>0).length,
+ engineeringPages:engineeringCount,distinctEngineeringHeadings:referenceHeadings.size,horsepowerStandardPages:results.filter(r=>r.powerConventionReference).length,standardConventionPages:results.filter(r=>r.hasConventionComparison).length,visibleNumericResultSections:results.filter(r=>r.visibleNumericLinks>0).length,
  unchangedNumericInventory:{all:seeds.length,conditionalIndex:policy.pilotIndexUrls.length,noindex:seeds.length-policy.pilotIndexUrls.length},
  failures:errors,results
 };
