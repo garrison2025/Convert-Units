@@ -343,3 +343,39 @@
 
 /* V37 desktop visual QA: align headline with tool, avoid a large empty top-left hero. */
 @media(min-width:901px){.home-page .hero>.hero-copy{align-self:start;margin-top:68px}}
+
+/* V38 phone-first tools: prioritize action, preserve SSR answer and native controls. */
+@media(max-width:620px){
+ .inner-page .crumb{margin:10px 0 6px;line-height:1.35;font-size:.74rem}
+ .inner-page .page-top{padding:0 0 4px}
+ .inner-page .page-title{margin:0 0 5px}
+ .inner-page .page-top .eyebrow{margin-bottom:4px;font-size:.69rem}
+ .inner-page .page-title h1{font-size:clamp(1.88rem,8.2vw,2.3rem);line-height:1.08;margin:0 0 5px}
+ .inner-page .page-title p{font-size:.86rem;line-height:1.43;margin:0 0 7px}
+ .inner-page .pair-key-fact{margin:6px 0 8px;padding:8px 11px;gap:3px 9px}
+ .inner-page .pair-key-fact .pair-key-kicker{font-size:.7rem}
+ .inner-page .pair-key-fact strong{font-size:1.01rem}
+ .inner-page .tool-layout{gap:10px}
+ .inner-page .tool-layout>div>.tool-card{padding:15px 14px}
+ .inner-page .tool-head{padding-bottom:10px;margin-bottom:10px!important}
+ .inner-page .tool-head strong{font-size:.94rem;max-width:67%}
+ .inner-page .tool-head .small{font-size:.73rem;line-height:1.3;padding:4px 6px}
+ .inner-page .tool-card .input-head{font-size:.74rem;margin-bottom:5px}
+ .inner-page .field-row input,.inner-page .field-row select{min-height:49px}
+ .inner-page .field-row input{font-size:1.28rem}
+ .inner-page .value-presets{margin-top:5px}
+ .inner-page .swapline{height:37px}
+ .inner-page .swap{height:40px;min-width:44px}
+ .inner-page .resultbox{min-height:84px;padding:11px 12px}
+ .inner-page .resultbox .sub{font-size:.75rem}
+ .inner-page .resultbox .big{margin-top:6px;line-height:1.15}
+ .inner-page .tool-card .error:empty{display:none}
+ .inner-page .tool-card .error:not(:empty){min-height:0;margin:7px 0}
+ .inner-page .tool-actions{margin-top:8px}
+ .inner-page .tool-actions .btn{min-height:44px}
+ .inner-page .tool-card label.small[for="precision"]{font-size:.81rem;margin:8px 0 4px!important}
+ .inner-page .tool-card .hint{font-size:.8rem}
+}
+@media(max-width:360px){.inner-page .tool-head .small{font-size:.72rem}}
+@media(hover:none){.swap:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.swap:active{transform:none!important}}
