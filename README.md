@@ -14,6 +14,18 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 
 
+## V43 GEO / AI-grounding improvement (2026-11-03)
+
+This release improves factual retrieval and ordinary human usability for generative search systems. It **does not** pretend that a special file, schema markup or an invented score guarantees AI citations.
+
+- **Primary-source-backed conversions:** `src/standards-reference.mjs` renders a 16-category standards table into the EXISTING `/methodology/#verified-conversion-facts` page. Each reference is calculated from `src/assets/engine.mjs`; it includes a real converter link, a unit-convention note, and a link to the NIST / BIPM / IEC definition resource. NIST publishes abbreviated printed factors for some units; the website distinguishes displayed rounded results from the defining factor.
+- **Useful distinctions:** U.S. vs U.K. fluid-ounce sizes, mass lb vs force lbf, decimal GB vs binary GiB, absolute temperature offsets, SI rounding and measurement tolerance. The method page explicitly states that standards sources **have not independently audited or certified the website**.
+- **Crawlable HTML:** all 38 directional tools and 16 measurement category pages link directly to the same standards reference fragment. No JavaScript is needed to read facts or follow the links. The existing SEO release gate still governs canonical URLs and indexation.
+- **Quality gates:** `tests/standards-reference.test.mjs` checks 16 distinct real directions, calculation values, primary sources and disambiguation. `scripts/seo-content-audit.mjs` tests server-rendered link/source consistency. Headless Chromium checks visible source rows, safe external references and responsive widths of 320–1024 px; visual QA captures deep-linked desktop and mobile standard tables.
+- **What this does not do:** no unproven `llms.txt` visibility claims, `FAQPage` rich-result spam, fictitious authors, fake reviews, AI-only thin pages, paid AI/API integrations, extra SEO routes or expanded numeric indexing approval.
+- **Crucial release boundary:** Live `https://convertunits.cc` remains `noindex` until separately approved in the existing Cloudflare Pages production environment. Google says a supporting AI Overviews / AI Mode link must first be indexable and eligible for a normal Google Search snippet; a passing technical audit does **not** guarantee citations.
+- References: [Google AI features and your website](https://developers.google.com/search/docs/appearance/ai-features), [Google's guide to optimizing for generative AI](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide), and [Bing Webmaster Guidelines](https://www.bing.com/webmasters/help/bing-webmaster-guidelines-30fba23a).
+
 ## V42: evidence-based homepage and pounds/kg SEO (2026-11-03)
 
 - **Seven helpful homepage references** are rendered into the initial static HTML from `src/home-reference.mjs` using the same tested conversion engine as the live calculator. Each row identifies the starting quantity, answer, exact (`=`) or displayed approximate (`≈`) relationship, and a working internal link to its matching tool. The table covers pounds/kilograms, inches/centimeters, US volume, Celsius and time. No new URLs, made-up keywords, traffic claims or third-party API.
