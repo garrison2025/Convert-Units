@@ -52,20 +52,18 @@ jobs:
           SEO_PUBLIC_HOST: convertunits.cc
           SEO_INDEX_APPROVED: I_APPROVE_PUBLIC_INDEXING
         run: npm run build
-      - name: Verify official-domain approval alone never publishes unreviewed numeric pages
+      - name: Confirm full 156-URL owner-approved launch and real-domain canonical
         run: |
-          node --input-type=module -e 'import fs from "node:fs";const x=JSON.parse(fs.readFileSync("dist/build-info.json"));if(x.mode!=="production"||x.numericPilotIndexPages!==15||x.numericIndexablePages!==0||(x.numericPublishedUrls||[]).length)throw Error("Official domain unexpectedly published numeric pages");const h=fs.readFileSync("dist/convert/ft-lbf-to-nm/400/index.html","utf8");if(!h.includes("noindex,follow")||h.includes("rel=\"canonical\""))throw Error("Unreviewed 400 torque page became indexable");console.log("NUMERIC GATE PASS: public core tools eligible, all 92 numeric pages held");'
-      - name: Validate independent per-URL numeric approval using two synthetic candidates
+          node --input-type=module -e 'import fs from "node:fs";const b=JSON.parse(fs.readFileSync("dist/build-info.json"));if(b.mode!=="production"||b.site!=="https://convertunits.cc"||b.indexablePages!==156||b.numericIndexablePages!==92||b.numericPublishedUrls.length!==92||b.numericIndexMode!=="all")throw Error("Owner-approved full release must include 156 real pages and all 92 numeric pages");const xml=fs.readFileSync("dist/sitemap.xml","utf8");const urls=[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1]);if(urls.length!==156||new Set(urls).size!==156||urls.some(x=>!x.startsWith("https://convertunits.cc/")))throw Error("Official sitemap incomplete or wrong origin");for(const route of ["/","/convert/lbs-to-kg/","/convert/lbs-to-kg/149/","/convert/kg-to-lbs/240/","/methodology/"]){const h=fs.readFileSync("dist"+route+"index.html","utf8");if(!h.includes("index,follow")||h.includes("noindex,follow")||!h.includes("rel=\"canonical\" href=\"https://convertunits.cc"+route+"\""))throw Error("Missing production index and canonical: "+route)}const notFound=fs.readFileSync("dist/404/index.html","utf8");if(!notFound.includes("noindex,follow"))throw Error("404 must not enter Google results");console.log("PUBLIC LAUNCH: 156 canonical eligible pages, including all 92 owner-approved numeric conversions, 404 excluded");'
+      - name: Confirm local and branch previews never index as duplicate hosts
         env:
           SITE_URL: https://convertunits.cc
           SEO_PUBLIC_HOST: convertunits.cc
           SEO_INDEX_APPROVED: I_APPROVE_PUBLIC_INDEXING
-          SEO_NUMERIC_PUBLIC_HOST: convertunits.cc
-          SEO_NUMERIC_INDEX_APPROVED: I_APPROVE_SELECTED_NUMERIC_URLS
-          SEO_NUMERIC_APPROVED_URLS: /convert/ft-lbf-to-nm/400/,/convert/kpa-to-psi/108/
+          CF_PAGES_BRANCH: feature-preview
         run: |
-          npm run build
-          node --input-type=module -e 'import fs from "node:fs";const b=JSON.parse(fs.readFileSync("dist/build-info.json"));const approved=new Set(["/convert/ft-lbf-to-nm/400/","/convert/kpa-to-psi/108/"]);if(b.mode!=="production"||b.numericIndexablePages!==2||b.numericPublishedUrls.length!==2||b.numericPublishedUrls.some(x=>!approved.has(x)))throw Error("Numeric allowlist leaked");for(const u of ["/convert/ft-lbf-to-nm/400/","/convert/kpa-to-psi/108/","/convert/m-to-ft/8849/","/convert/kg-to-lbs/240/"]){const h=fs.readFileSync("dist"+u+"index.html","utf8");if(approved.has(u)?!h.includes("index,follow")||h.includes("noindex,follow")||!h.includes("rel=\"canonical\""):!h.includes("noindex,follow")||h.includes("rel=\"canonical\""))throw Error("Unexpected numeric index status: "+u)}console.log("NUMERIC GATE PASS: exact two allowlisted pages and unapproved candidates noindex");'
+          node scripts/build.mjs
+          node --input-type=module -e 'import fs from "node:fs";const info=JSON.parse(fs.readFileSync("dist/build-info.json"));const html=fs.readFileSync("dist/index.html","utf8");if(info.mode!=="preview"||info.indexablePages!==0||!html.includes("noindex,follow")||html.includes("rel=\"canonical\""))throw Error("Branch preview was accidentally opened to indexing");const hdr=fs.readFileSync("dist/_headers","utf8");if(!hdr.includes("https://:project.pages.dev/*\n  X-Robots-Tag: noindex"))throw Error("Cloudflare mirror host guard missing");console.log("Branch preview remains noindex without restricting official domain");'
       - name: Upload small QA reports for manual SEO review
         uses: actions/upload-artifact@v4
         with:
