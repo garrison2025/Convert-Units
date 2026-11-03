@@ -649,6 +649,54 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-feet-fraction]').textContent.includes('1 ft 0 in'),'swapping to meters still correct');
      break;
    }
+   case 'seo-v33-source-kg':{
+     const worked=q('[data-source-backed-examples="kg-to-lbs"]');
+     const rows=[...document.querySelectorAll('[data-source-backed-examples="kg-to-lbs"] tbody tr')];
+     ok(Boolean(worked),'kg to lb existing tool must include its source-verified worked answers');
+     ok(rows.length===5,'verified examples must cap the section at five unique source values');
+     ok(rows[0].textContent.includes('240 kg')&&rows[0].textContent.includes('529.109429244 lb'),
+       'priority Semrush long-tail query 240 kg to lbs must show the exact-engine result');
+     ok(new Set(rows.map(r=>r.querySelector('th')?.textContent)).size===5,
+       'worked examples must not repeat the same numeric source value');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),
+       'Cloudflare preview must keep the entire core converter noindex');
+     ok(!worked.querySelector('a[href*="/240/"]'),'source-backed answer table must not force numeric-page links');
+     break;
+   }
+   case 'seo-v33-source-lbs':{
+     const worked=q('[data-source-backed-examples="lbs-to-kg"]');
+     const rows=[...worked?.querySelectorAll('tbody tr')||[]];
+     ok(Boolean(worked)&&rows.length===5,'pounds to kg must show five vetted numeric answers');
+     ok(rows.some(row=>row.textContent.includes('126 lb')&&row.textContent.includes('kg')),
+       '126-pound historical query should be covered by a calculated core-page answer');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview tool page is noindex');
+     break;
+   }
+   case 'seo-v33-unsourced':{
+     ok(!q('[data-source-backed-examples]'),
+       'unsupported direction must not show invented numeric long-tail results');
+     ok(Boolean(q('[data-converter]')&&q('.pair-key-fact')),
+       'existing converter and exact-engine quick answer must still work');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview remains noindex');
+     break;
+   }
+   case 'seo-v33-generic-intent':{
+     const qa=q('.intent-answers');
+     const slug=location.pathname.includes('kn-to-lbf')?'kn-to-lbf':'kw-to-hp';
+     ok(qa?.getAttribute('data-intent-answers')===slug,
+       'core page must show its targeted query-specific questions');
+     if(slug==='kn-to-lbf'){
+      ok(qa.textContent.includes('224.8089431 lbf')&&qa.textContent.includes('pounds of mass'),
+        'force converter must answer kN to lbf without treating mass pounds as force');
+     }else{
+      ok(qa.textContent.includes('1.3410221 hp')&&qa.textContent.includes('mechanical horsepower'),
+        'power converter must state mechanical horsepower and calculated kW result');
+     }
+     ok(Boolean(qa.querySelector('a[href="/methodology/"]')),
+       'explanatory answers must link to measurement definitions');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview remains noindex');
+     break;
+   }
    case 'feet-inches-8849':{
      const panel=q('[data-feet-inches]');
      ok(Boolean(panel&&!panel.hidden),'approved existing 8849-meter page SSR reading required');
@@ -661,6 +709,11 @@ async function smokeScenario(SCENARIO){
   }
 }
 const suites=[
+ {name:'seo-v33-source-kg',url:'/convert/kg-to-lbs/'},
+ {name:'seo-v33-source-lbs',url:'/convert/lbs-to-kg/'},
+ {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
+ {name:'seo-v33-generic-intent',url:'/convert/kn-to-lbf/'},
+ {name:'seo-v33-generic-intent',url:'/convert/kw-to-hp/'},
  {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'direction',url:'/'},{name:'progressive',url:'/'},{name:'batch-visual',url:'/batch-converter/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'batch-multiline',url:'/batch-converter/'},
  {name:'batch-alias',url:'/batch-converter/'},
