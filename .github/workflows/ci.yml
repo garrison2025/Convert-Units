@@ -78,6 +78,15 @@ jobs:
         env:
           EXPECTED_MAIN_SHA: ${{ github.event_name == 'push' && github.sha || '' }}
         run: node scripts/live-preview-audit.mjs
+      - name: Observe official-domain Google SEO signals without changing publication
+        run: node scripts/official-domain-seo-audit.mjs
+      - name: Upload actual apex-domain SEO diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: convertunits-official-google-seo-audit
+          path: qa-google-seo/official-domain-audit.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Upload observed Cloudflare preview status (never substitute for local QA)
         uses: actions/upload-artifact@v4
         with:
