@@ -197,6 +197,60 @@ export function horsepowerConventionsReference(pair){
   '</section>';
 }
 
+/**
+ * Unit labels can be context-sensitive even when all math in the converter is correct.
+ * These *static* conventions do NOT change live unit definitions. Public regulatory
+ * references and definitions are cited; do not claim medical or dietary advice.
+ */
+export function conventionComparison(pair){
+ const slug=pair.slug;
+ if(!['us-cup-to-ml','us-tbsp-to-us-tsp','gb-to-mb'].includes(slug))return '';
+ const row=cells=>'<tr><th scope="row">'+esc(cells[0])+'</th>'+cells.slice(1).map(t=>'<td>'+esc(t)+'</td>').join('')+'</tr>';
+ const table=(heading,lead,headers,rows,note,links)=>
+  '<section class="card standards-comparison" data-standards-comparison="'+esc(slug)+'">'+
+  '<h2>'+esc(heading)+'</h2><p>'+lead+'</p>'+
+  '<div class="reference-scroll"><table class="number-table reference-table"><thead><tr>'+
+  headers.map(x=>'<th scope="col">'+esc(x)+'</th>').join('')+
+  '</tr></thead><tbody>'+rows.map(row).join('')+'</tbody></table></div>'+
+  '<p class="hint">'+note+' '+links+'</p></section>';
+ if(slug==='us-cup-to-ml'){
+  const cup=convert(1,'us-cup','ml');
+  return table('Which cup does your source mean?',
+   '<strong>This calculator uses the US customary measuring cup (8 US fl oz).</strong> A US Nutrition Facts label uses a different 240 mL labeling convention, while metric cups are commonly 250 mL.',
+   ['Convention','1 cup in mL','2 cups in mL','Where used'],
+   [
+    ['US customary measuring cup',formatNumber(cup,7),formatNumber(2*cup,7),'This live converter'],
+    ['US nutrition labeling cup','240','480','FDA serving-size labels'],
+    ['Metric cup','250','500','Metric cooking measures']
+   ],
+   'These conventions are not interchangeable when precise volume matters. A volume does not determine the mass of an ingredient.',
+   '<a href="https://www.unitconverters.net/volume/cups-to-ml.htm" rel="noopener noreferrer">US customary cup definition</a> · <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-industry-guidelines-determining-metric-equivalents-household-measures" rel="noopener noreferrer">FDA nutrition-label measures</a>.');
+ }
+ if(slug==='us-tbsp-to-us-tsp'){
+  const tbsp=convert(1,'us-tbsp','ml'),tsp=convert(1,'us-tsp','ml');
+  return table('US tablespoons, nutrition labels, and Australian tablespoons',
+   '<strong>This converter uses US customary tablespoons and teaspoons: 1 US tbsp = 3 US tsp.</strong> Kitchen recipes and US nutrition labels can use slightly different milliliter sizes.',
+   ['Convention','1 tablespoon in mL','Teaspoons per tablespoon','Important distinction'],
+   [
+    ['US customary tbsp',formatNumber(tbsp,9),'3','This live converter; 1 US tsp ≈ '+formatNumber(tsp,9)+' mL'],
+    ['US nutrition-label tbsp','15','3','FDA label: 1 teaspoon = 5 mL'],
+    ['Australian tablespoon','20','4','With 5 mL metric teaspoons']
+   ],
+   'Do not silently replace US customary tablespoons with metric or Australian spoons. A tablespoon is volume, not ingredient mass.',
+   '<a href="https://www.unitconverters.net/volume/tablespoon-us-to-teaspoon-us.htm" rel="noopener noreferrer">US spoon definitions</a> · <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/guidance-industry-guidelines-determining-metric-equivalents-household-measures" rel="noopener noreferrer">FDA food-label standards</a>.');
+ }
+ const binary=convert(1,'gib','mib');
+ return table('Decimal GB is not binary GiB',
+  '<strong>This calculator converts decimal gigabytes to decimal megabytes: 1 GB = 1,000 MB.</strong> Some software uses binary counting, which should be labeled GiB and MiB. These quantities have different byte counts.',
+  ['Standard','1 source unit','Target size','Byte count of source'],
+  [
+   ['Decimal (SI)','1 GB','1,000 MB',formatNumber(convert(1,'gb','mb')*units.mb.factor,0)+' bytes'],
+   ['Binary (IEC)','1 GiB',formatNumber(binary,0)+' MiB',formatNumber(units.gib.factor,0)+' bytes']
+  ],
+  'GB/MB use powers of 10; GiB/MiB use powers of 2. Comparing a number of GB with the same number of GiB compares different byte sizes.',
+  '<a href="https://csrc.nist.gov/glossary/term/gibi_byte" rel="noopener noreferrer">NIST gibibyte definition</a> · <a href="https://www.unitconverters.net/data-storage-converter.html" rel="noopener noreferrer">Storage unit comparison</a>.');
+}
+
 export function directionExplanation(pair,allPairs){
  const from=units[pair.from],to=units[pair.to];
  if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Unknown or incompatible conversion pair');
@@ -217,7 +271,7 @@ export function directionExplanation(pair,allPairs){
    '<p>'+esc(item.check)+'</p>'+
    (reverse?'<p>Need the other direction? <a href="'+esc(reverse.url)+'">Convert '+esc(to.symbol)+' to '+esc(from.symbol)+'</a>.</p>':'')+
    '<p class="hint">Reference: <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST conversion factors</a>. Calculation and display rounding are separate. <a href="/methodology/">See how we calculate</a>.</p>'+
-   '</section>'+engineeringReference(pair)+horsepowerConventionsReference(pair);
+   '</section>'+engineeringReference(pair)+horsepowerConventionsReference(pair)+conventionComparison(pair);
 }
 
 /**
