@@ -99,7 +99,7 @@ export function categoryExplanation(dim){
   '<h3>'+esc(item.title)+'</h3>'+
   '<p>'+esc(item.advice)+'</p>'+
   '<h3>How to verify a conversion</h3><p>'+esc(item.check)+'</p>'+
-  '<p class="hint">Source definitions: <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST Guide to the SI</a>. See <a href="/methodology/">our conversion methodology</a> for calculation and rounding details.</p></section>';
+  '<p class="hint">For category-specific factors, conventions and original sources see <a href="/methodology/#verified-conversion-facts">verified conversion examples</a>. For general SI conversion tables see <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST Guide to the SI</a>.</p></section>';
 }
 
 /**
