@@ -48,6 +48,8 @@ const entries=seeds.map(seed=>{
  const headings=[...new Set([...matches(main,'h2'),...matches(main,'h3')]
   .map(normalizeParagraph).filter(Boolean))];
  const hasCrossCheck=main.includes('data-numeric-intent-check="'+seed.url+'"');
+ const hasSourceScenario=main.includes('data-source-rounding-scenario="'+seed.url+'"');
+ if(!hasSourceScenario)throw Error('Missing source rounding scenario '+seed.url);
  const alternatives=dimensionUnits(units[pair.from].dimension)
   .filter(u=>u.id!==pair.from&&u.id!==pair.to).slice(0,4);
  const table=main.match(/<h2>Same value in other units<\/h2>[\s\S]*?<\/table>/i)?.[0]||'';
@@ -58,6 +60,7 @@ const entries=seeds.map(seed=>{
  }
  const row={url:seed.url,direction:seed.slug,sourceQuery:seed.keyword,
   indexEligibleOnThisBuild:actualPublished.has(seed.url),hasValueSpecificCrossCheck:hasCrossCheck,
+  hasSourceScenario,
   paragraphCount:paragraphs.length,headingCount:headings.length,paragraphs,headings};
  if(!byDirection.has(seed.slug))byDirection.set(seed.slug,[]);
  byDirection.get(seed.slug).push(row);
@@ -77,7 +80,7 @@ for(const group of byDirection.values()){
  }
 }
 const fields=['url','direction','sourceQuery','indexEligibleOnThisBuild',
- 'sameDirectionPages','hasValueSpecificCrossCheck','paragraphCount',
+ 'sameDirectionPages','hasValueSpecificCrossCheck','hasSourceScenario','paragraphCount',
  'reusedParagraphsWithinDirection','reusedParagraphShare','headingCount','repeatedHeadingCount'];
 const quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';
 fs.writeFileSync(path.join(dist,'numeric-similarity-audit.csv'),
@@ -88,6 +91,7 @@ const summary={
  sameDirectionClusters:[...byDirection.values()].filter(x=>x.length>1).length,
  largestSameDirectionCluster:Math.max(...[...byDirection.values()].map(x=>x.length)),
  pagesWithValueSpecificCrossCheck:entries.filter(x=>x.hasValueSpecificCrossCheck).length,
+ pagesWithSourceScenarios:entries.filter(x=>x.hasSourceScenario).length,
  pagesWithoutValueSpecificCrossCheck:entries.filter(x=>!x.hasValueSpecificCrossCheck).length,
  notes:[
  'Template paragraph overlap is a site-internal lexical diagnostic, not a Google duplicate-content score.',
@@ -102,5 +106,6 @@ const summary={
 fs.writeFileSync(path.join(dist,'numeric-similarity-audit.json'),JSON.stringify(summary,null,2)+'\n');
 console.log('NUMERIC TEMPLATE REVIEW:',JSON.stringify({pages:summary.allPages,
  published:summary.eligiblePages,crossChecks:summary.pagesWithValueSpecificCrossCheck,
+ sourceScenarios:summary.pagesWithSourceScenarios,
  repeatedDirectionClusters:summary.sameDirectionClusters,
  note:'Evidence for editorial review only; no Google penalty or noindex decision inferred.'}));
