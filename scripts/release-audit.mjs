@@ -24,7 +24,9 @@ const pages=new Map(htmlFiles.map(f=>{
   return [rel?'/'+rel+'/':'/',fs.readFileSync(f,'utf8')];
 }));
 const allRoutes=new Set(pages.keys());
-const unindexableNumeric=new Set(seeds.filter(s=>info.numericIndexMode!=='all'&&!pilot.has(s.url)).map(s=>s.url));
+const publishedNumeric=new Set(info.mode==='production'?info.numericPublishedUrls||[]:info.numericIndexMode==='all'?seeds.map(s=>s.url):[...pilot]);
+const unindexableNumeric=new Set(seeds.filter(s=>!publishedNumeric.has(s.url)).map(s=>s.url));
+if(info.mode==='production'&&[...publishedNumeric].some(u=>!pilot.has(u)))fail('Production published a non-pilot numeric URL');
 const canonicalRoutes=new Set([...allRoutes].filter(p=>p!=='/404/'&&!unindexableNumeric.has(p)));
 const eligibleValuePages=seeds.filter(s=>!unindexableNumeric.has(s.url));
 const byDirection=new Map();
@@ -33,8 +35,8 @@ for(const seed of eligibleValuePages){
  byDirection.set(seed.slug,count);
  if(info.numericIndexMode==='curated'&&count>1)fail('Curated SEO index collision: more than one numeric value for '+seed.slug);
 }
-if(info.numericIndexMode==='curated'&&numericPolicy.strategy==='one-numeric-value-per-direction-launch'&&eligibleValuePages.length!==15)
- fail('Curated SEO pilot should contain exactly 15 selected numeric pages, got '+eligibleValuePages.length);
+if(info.numericIndexMode==='curated'&&numericPolicy.strategy==='one-numeric-value-per-direction-launch'&&eligibleValuePages.length>15)
+ fail('Public numeric pages cannot exceed the 15 reviewed pilot candidates');
 
 const titleSeen=new Map(), descriptionSeen=new Map(), inbound=new Map([...allRoutes].map(r=>[r,0]));
 const seedPaths=new Set(seeds.map(s=>s.url));
