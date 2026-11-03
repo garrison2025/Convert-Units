@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
-import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,speedFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
+import {units,dimensions,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,speedFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {homeReferenceFacts} from '../src/home-reference.mjs';
 import {standardsReferenceFacts} from '../src/standards-reference.mjs';
@@ -384,6 +384,11 @@ for(const p of pairList){
  const content=read(p.url);
  if(!content.includes('href="/methodology/#verified-conversion-facts"'))
   errors.push(p.url+': direct source-definitions anchor missing');
+}
+for(const dimension of Object.keys(dimensions)){
+ const html=read('/category/'+dimension+'/');
+ if(!html.includes('href="/methodology/#verified-conversion-facts"'))
+  errors.push('/category/'+dimension+'/: source definitions should be discoverable from category page');
 }
 if(!standardsBlock.includes('US versus UK fluid ounces')||
    !standardsBlock.includes('Decimal versus binary storage')||
