@@ -11,6 +11,7 @@ import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidO
 import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from '../src/seo-guides.mjs';
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
+import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -128,6 +129,12 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ const examples=sourceBackedExamples(pair,seeds);
+ if(examples){
+  if(!html.includes(examples))errors.push(pair.url+': source-backed, calculated examples are missing or incorrect');
+ }else if(html.includes('data-source-backed-examples=')){
+  errors.push(pair.url+': unapproved numerical examples leaked onto an unsupported direction');
+ }
  const intent=intentAnswers(pair,pairList);
  if(intent){
   if(!html.includes(intent)||!html.includes('data-intent-answers="'+pair.slug+'"'))
