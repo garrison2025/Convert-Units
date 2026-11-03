@@ -563,6 +563,35 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-torque-unit="nm"]').textContent==='= 9.80665 N·m','metric source amount correct');
      break;
    }
+   case 'standard-cups':{
+     const panel=q('[data-standards-comparison="us-cup-to-ml"]');
+     ok(Boolean(panel),'customary-cup source conventions panel exists');
+     ok(panel.querySelectorAll('tbody tr').length===3,'customary, FDA and metric cup rows');
+     for(const value of ['236.5882365','240','250','473.176473'])
+      ok(panel.textContent.includes(value),'cup comparison correctly shows '+value);
+     ok(panel.textContent.includes('US Nutrition Facts'),'US nutrition cup label explicitly distinguished');
+     const input=q('[data-value]');input.value='2';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output-number]').textContent.includes('473.176'),'live US customary cup must still use 236.5882365 mL');
+     break;
+   }
+   case 'standard-spoons':{
+     const panel=q('[data-standards-comparison="us-tbsp-to-us-tsp"]');
+     ok(Boolean(panel),'customary/FDA/AU tablespoon definitions panel exists');
+     for(const value of ['14.786764781','4.928921594','15','20'])
+      ok(panel.textContent.includes(value),'spoon standard includes '+value);
+     const input=q('[data-value]');input.value='2';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output-number]').textContent.trim()==='6','live US tbsp to US tsp stays exact three-to-one');
+     break;
+   }
+   case 'standard-storage':{
+     const panel=q('[data-standards-comparison="gb-to-mb"]');
+     ok(Boolean(panel),'decimal-vs-binary storage standard panel exists');
+     for(const value of ['1,000 MB','1,024 MiB','1,000,000,000 bytes','1,073,741,824 bytes'])
+      ok(panel.textContent.includes(value),'data unit panel includes '+value);
+     const input=q('[data-value]');input.value='2';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output-number]').textContent.includes('2,000'),'live GB to MB remains decimal');
+     break;
+   }
    case 'power-standards':{
      const panel=q('[data-horsepower-conventions]');
      ok(Boolean(panel),'kilowatt page has actual horsepower standard comparison');
@@ -657,6 +686,9 @@ const suites=[
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
  {name:'speed-four-330',url:'/convert/kmh-to-mph/330/'},
  {name:'speed-four-reverse',url:'/convert/mph-to-kmh/'},
+ {name:'standard-cups',url:'/convert/us-cup-to-ml/'},
+ {name:'standard-spoons',url:'/convert/us-tbsp-to-us-tsp/'},
+ {name:'standard-storage',url:'/convert/gb-to-mb/'},
  {name:'power-standards',url:'/convert/kw-to-hp/'},
  {name:'engineering-torque',url:'/convert/ft-lbf-to-nm/'},
  {name:'torque-four-400',url:'/convert/ft-lbf-to-nm/400/'},
@@ -667,7 +699,7 @@ const suites=[
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/kw-to-hp/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/kw-to-hp/'},{name:'mobile',url:'/convert/us-cup-to-ml/'},{name:'mobile',url:'/convert/us-tbsp-to-us-tsp/'},{name:'mobile',url:'/convert/gb-to-mb/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
