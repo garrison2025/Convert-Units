@@ -15,6 +15,7 @@ import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
 import {numericInsight} from '../src/numeric-insight.mjs';
+import {sourceRoundingScenarioHtml} from '../src/numeric-value-utility.mjs';
 import {relatedNumericAnswers,relatedNumericAnswersHtml} from '../src/seo-related-values.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
@@ -309,6 +310,8 @@ for(const seed of seeds){
  if(h1!==numericHeading(seed,pair))errors.push(seed.url+': H1 does not name actual measurement and units');
  const desc=meta(html,'description');
  if(desc!==numericDescription(seed,pair))errors.push(seed.url+': descriptive snippet is inconsistent with the numeric answer');
+ const sourceRounding=sourceRoundingScenarioHtml(seed,pair);
+ if(!html.includes(sourceRounding))errors.push(seed.url+': missing numerical source rounding utility');
  const expectedInsight=numericInsight(seed,pair);
  if(expectedInsight){
   if(!html.includes(expectedInsight))errors.push(seed.url+': computed pilot cross-check panel does not match the shared engine');

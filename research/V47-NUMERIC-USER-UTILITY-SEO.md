@@ -1,0 +1,7 @@
+# V47 | Value-specific numerical utility (not SEO filler)
+
+All 92 source-backed numeric URLs preserve their direct answer, formula, original interactive calculator, nearest-value navigation, precision tables and accurate internal links.
+Added feature: a conditional source-rounding thought experiment, with independently converted lower/upper bounds and a check on whether whole-unit rounding changes. Input decimal places are used only to define the hypothetical rounding step, not to infer instrument accuracy, measurement uncertainty or actual user context. Distinct examples: 126 pounds keeps whole-kg 57, 149 pounds may be 67 or 68 kg, 133.8 pounds uses 0.1-pound source granularity, 37.9 Celsius requires temperature offset, 60,000 milliseconds must not be treated as verified 1ms accuracy.
+All cases are calculated by the shared offline engine and verified against every existing seed, with value-specific tests. No new routes, external APIs, server functions, invented queries, fake testimonials, or CSS dependencies.
+Current production publication policy stays at 92 numerical URLs and 156 sitemap URLs. All local/preview builds remain noindex; 404 is excluded.
+Google may still consolidate similar numeric pages. Template similarity, added numerical features, or self-canonicals cannot prove indexability. Check GSC discovered/crawled-but-not-indexed and Google-selected canonicals, then review individual URLs rather than adding pseudo-unique SEO prose.
