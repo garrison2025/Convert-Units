@@ -105,7 +105,7 @@ function checkMarkup(route,expectedApp=false){
   }
   const sites=jsonBlocks.filter(x=>x['@type']==='WebSite');
   if(route==='/'){
-   if(sites.length!==1||sites[0].url!==expectedUrl||sites[0].name!=='ExactUnit')
+   if(sites.length!==1||sites[0].url!==expectedUrl||sites[0].name!=='ConvertUnits.cc')
     errors.push(route+': home WebSite schema missing or inaccurate');
    else schemaStats.webSites++;
   }else if(sites.length)errors.push(route+': homepage WebSite schema leaked onto an inner page');
@@ -290,7 +290,7 @@ for(const seed of seeds){
  const h1=decode(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1].replace(/<[^>]*>/g,'')||'');
  const pair=pairList.find(p=>p.slug===seed.slug);
  if(!pair){errors.push(seed.url+': parent pair is missing');continue;}
- if(title!==numericTitle(seed,pair)+' | ExactUnit')errors.push(seed.url+': title does not match natural, calculated query intent');
+ if(title!==numericTitle(seed,pair)+' | ConvertUnits.cc')errors.push(seed.url+': title does not match natural, calculated query intent');
  if(h1!==numericHeading(seed,pair))errors.push(seed.url+': H1 does not name actual measurement and units');
  const desc=meta(html,'description');
  if(desc!==numericDescription(seed,pair))errors.push(seed.url+': descriptive snippet is inconsistent with the numeric answer');
