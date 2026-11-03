@@ -21,7 +21,7 @@ test('38 directional SEO title strings are unique and exactly nine redundant lon
   if(curated.has(p.slug)){
    assert.ok(legacy.length>60,'must only shorten demonstrably repetitive titles: '+p.slug);
    assert.ok(title.length<legacy.length,'curated title must be shorter: '+p.slug);
-   assert.ok(title.length<=60,'curated title should be concise: '+p.slug);
+   assert.ok(directionSeoTitle(p).length<=48,'curated directional phrase must remain concise regardless of the official site-brand suffix: '+p.slug);
   }else assert.equal(title,legacy,'other metadata must retain the original precise keyword and symbols');
   const desc=directionMetaDescription(p);
   assert.ok(desc.includes(p.title),'meta description still identifies the source/target units: '+p.slug);
