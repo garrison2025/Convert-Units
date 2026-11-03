@@ -144,7 +144,7 @@ if(root.id==='universal'){const dimSelect=el('[data-dimension]',root);dimSelect?
 // Unit-name/abbreviation finder: native selects remain accessible and are not mutated while typing.
 if(root.id==='universal'){
  const finder=el('[data-unit-find]',root),results=el('[data-unit-results]',root),status=el('[data-unit-status]',root),dimension=el('[data-dimension]',root);
- const aliases={lbs:'pound pounds lb lbs',kg:'kilogram kilograms kilo kilos kgs',oz:'ounce ounces',g:'gram grams',ft:'feet foot',in:'inch inches',m:'meter meters metre metres',cm:'centimeter centimeters centimetre centimetres',ml:'milliliter milliliters millilitre millilitres',l:'liter liters litre litres',celsius:'centigrade',fahrenheit:'fahrenheit',kmh:'kph kmh',ms2:'acceleration meters per second squared',nm:'newton meter'};
+ const aliases={lbs:'pound pounds lb lbs',kg:'kilogram kilograms kilo kilos kgs',oz:'ounce ounces',g:'gram grams',ft:'feet foot',in:'inch inches',m:'meter meters metre metres',cm:'centimeter centimeters centimetre centimetres',ml:'milliliter milliliters millilitre millilitres',mm3:'cubic millimeter cubic millimeters cubic millimetre mm3',l:'liter liters litre litres',hpa:'hectopascal hectopascals hpa mbar',mmhg:'millimeters of mercury mmhg conventional mercury',gb:'gigabyte gigabytes gb decimal bytes',gbit:'gigabit gigabits gbit gbits',celsius:'centigrade',fahrenheit:'fahrenheit',kmh:'kph kmh',ms2:'acceleration meters per second squared',nm:'newton meter'};
  const clear=()=>{finder.value='';results.replaceChildren();results.hidden=true;status.textContent='Search within the selected measurement category.';};
  finder?.addEventListener('input',()=>{
   const term=finder.value.trim().toLowerCase();

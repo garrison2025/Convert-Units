@@ -2,6 +2,10 @@
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
 
+## V50 unbuilt keyword coverage & missing free units (2026-11-04)
+
+Three previously absent conversion choices (hPa ↔ conventional mmHg, mm³ ↔ mL, GB ↔ Gb) are now supported by the existing universal converter and browser-local CSV. Eight research-backed, computed keyword examples are rendered on existing tool directions; pressure, volume and storage hubs show direct conversion links and primary-source references, while density explains why mL ↔ mg requires a material-specific density. Source mismatch and target ambiguity remain explicit. All existing 38 tools, 16 categories, 92 numeric answer pages and 156 indexable official URLs remain unchanged. No paid API or new low-value SEO routes. See `research/V50-LONGTAIL-UNIT-GAPS-20261104.md` and regression tests.
+
 ## V49 verifiable GEO and directory-led outreach (2026-11-03)
 
 38 existing direction converters now expose reproducible source/target factor traces and standards links. All 16 category hubs provide distinct tool-choice guidance rather than a repeated generic CTA, and the optional `llms.txt` is generated from the live converter and category registries. See `research/V49-GEO-VERIFICATION-REPORT.md`. Legitimate external citation opportunities and disqualifications are documented in `research/V49-THIRD-PARTY-CITATION-OUTREACH.md`; **no third-party placement is falsely claimed**.
