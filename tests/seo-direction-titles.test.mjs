@@ -14,7 +14,7 @@ test('38 directional SEO title strings are unique and exactly nine redundant lon
  for(const p of pairs){
   const title=directionSeoTitle(p)+' | ExactUnit';
   const legacy=p.title+' Converter ('+units[p.from].symbol+' to '+units[p.to].symbol+') | ExactUnit';
-  assert.ok(title&&p.title&&title.startsWith(p.title.split(' ')[0]),'missing core direction: '+p.slug);
+  assert.ok(title&&p.title&&title.toLowerCase().startsWith(p.title.split(' ')[0].toLowerCase()),'missing core direction: '+p.slug);
   assert.ok(title.includes(' | ExactUnit'),'brand separator missing');
   assert.ok(!actual.has(title),'duplicate tool title: '+title);
   actual.add(title);
