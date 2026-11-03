@@ -18,6 +18,7 @@ const expectedSha=/^[a-f0-9]{40}$/i.test(process.env.EXPECTED_MAIN_SHA||'')?
 fs.mkdirSync(out,{recursive:true});
 
 const checks=[];
+const pilotRoutes=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-policy.json'),'utf8')).pilotIndexUrls;
 const privateReports=['/keyword-evidence-review.csv','/seo-editorial-review.csv','/quality-report.json'];
 const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/convert/kg-to-lbs/','/convert/kg-to-lbs/240/','/convert/seconds-to-hours/14400/','/category/mass/','/category/temperature/','/convert/minutes-to-hours/','/convert/seconds-to-hours/','/convert/ml-to-us-fl-oz/','/convert/ml-to-us-fl-oz/355/','/convert/kpa-to-atm/','/convert/kpa-to-atm/50/','/convert/kpa-to-psi/108/','/convert/celsius-to-fahrenheit/','/convert/celsius-to-fahrenheit/37.9/','/convert/celsius-to-fahrenheit/36.6/','/convert/m-to-ft/','/convert/ft-to-m/','/convert/m-to-ft/8849/','/convert/ft-lbf-to-nm/','/convert/nm-to-ft-lbf/','/convert/ft-lbf-to-nm/400/','/convert/kmh-to-mph/','/convert/mph-to-kmh/','/convert/kmh-to-mph/330/','/convert/in-to-cm/','/convert/cm-to-in/','/convert/in-to-mm/','/assets/styles.css','/assets/app.mjs','/build-info.json',...privateReports];
 async function probe(route){
@@ -40,7 +41,7 @@ async function probe(route){
   return record;
  }
 }
-for(const route of paths)await probe(route);
+for(const route of new Set([...paths,...pilotRoutes]))await probe(route);
 const get=route=>checks.find(c=>c.route===route);
 const home=get('/'),batch=get('/batch-converter/'),tool=get('/convert/lbs-to-kg/');
 const reverseTool=get('/convert/kg-to-lbs/'),numeric=get('/convert/kg-to-lbs/240/'),exactTime=get('/convert/seconds-to-hours/14400/');
@@ -163,6 +164,14 @@ const hasV23DirectionReferences=allReachable&&
  torqueTool.body.includes('data-engineering-source="ft-lbf"')&&
  torqueReverse.body.includes('data-engineering-source="nm"')&&
  torqueReverse.body.includes('73.756215 ft·lbf');
+const hasV24CandidatePreview=pilotRoutes.length===15&&pilotRoutes.every(route=>{
+ const page=get(route);
+ return page&&page.ok&&!page.error&&protectsPreview(page)&&
+  page.body.includes('class="direct-answer"')&&
+  page.body.includes('<h2>Calculation steps</h2>')&&
+  page.body.includes('data-converter')&&
+  page.body.includes('data-precision-table');
+});
 let buildInfo=null;
 if(deployment.ok){try{buildInfo=JSON.parse(deployment.body);}catch{}}
 const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.buildCommit.toLowerCase():null;
@@ -189,7 +198,7 @@ else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
 else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
-else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds||!hasV17Temperature||!hasV19MixedFeet||!hasV20FourUnitTorque||!hasV21FourUnitSpeed||!hasV22IntentLinks||!hasV23DirectionReferences)status='VERIFIED_PREVIOUS_VERSION';
+else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds||!hasV17Temperature||!hasV19MixedFeet||!hasV20FourUnitTorque||!hasV21FourUnitSpeed||!hasV22IntentLinks||!hasV23DirectionReferences||!hasV24CandidatePreview)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
@@ -197,7 +206,7 @@ else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,hasV17TemperatureFeatures:hasV17Temperature,hasV19MixedFeetFeatures:hasV19MixedFeet,hasV20FourUnitTorqueFeatures:hasV20FourUnitTorque,hasV21FourUnitSpeedFeatures:hasV21FourUnitSpeed,hasV22IntentLinksFeatures:hasV22IntentLinks,hasV23DirectionReferencesFeatures:hasV23DirectionReferences,assetStatuses,qaReportExposure,qaReportsNotPublic},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,hasV17TemperatureFeatures:hasV17Temperature,hasV19MixedFeetFeatures:hasV19MixedFeet,hasV20FourUnitTorqueFeatures:hasV20FourUnitTorque,hasV21FourUnitSpeedFeatures:hasV21FourUnitSpeed,hasV22IntentLinksFeatures:hasV22IntentLinks,hasV23DirectionReferencesFeatures:hasV23DirectionReferences,hasV24Pilot15PreviewSafe:hasV24CandidatePreview,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };
