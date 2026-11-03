@@ -2,7 +2,7 @@
   "officialOrigin": "https://convertunits.cc",
   "ownerApprovedPublicIndex": true,
   "approvalDate": "2026-11-03",
-  "request": "Fix SEO audit issues including blocked indexability, missing canonical URLs and sitemap on registered official domain",
-  "scope": "Cloudflare Pages main branch only, 64 core tools and informational pages; 92 numeric results independently noindex",
-  "numericIndexApproval": false
+  "request": "Owner explicitly requested to launch the whole website and lift all noindex restrictions for valid pages on convertunits.cc",
+  "scope": "Cloudflare Pages main branch on convertunits.cc: all 156 valid site pages, including all 92 numeric conversions. 404 excluded; pages.dev mirror must remain noindex.",
+  "numericIndexApproval": true
 }
