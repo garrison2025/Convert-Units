@@ -37,8 +37,8 @@ test('three added unit pairs use correct factors, round trip and preserve dimens
 test('new unit pairs work in local mixed-unit CSV; Gb stays separate from GB',()=>{
  const table=parseBatchTable('amount,from,to\n1,GB,Gb\n8,Gb,GB\n390,mm³,mL\n1000,hPa,bar',{delimiter:'comma',column:1,maxRows:10});
  const out=convertBatchToCsv(table,'gb','gbit',{fromColumn:2,toColumn:3});
- assert.equal(out.results.length,4);
- assert.equal(out.results.filter(x=>x.status==='OK').length,4);
+ assert.equal(out.rows.length,4);
+ assert.equal(out.rows.filter(x=>x.status==='OK').length,4);
  assert.ok(out.csv.includes('GB'));
 });
 test('source-documented keyword examples map to real original competitor rows and existing converter tools',()=>{
