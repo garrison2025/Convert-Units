@@ -22,11 +22,25 @@ test('38 directional SEO title strings are unique and exactly nine redundant lon
    assert.ok(legacy.length>60,'must only shorten demonstrably repetitive titles: '+p.slug);
    assert.ok(title.length<legacy.length,'curated title must be shorter: '+p.slug);
    assert.ok(directionSeoTitle(p).length<=48,'curated directional phrase must remain concise regardless of the official site-brand suffix: '+p.slug);
+  }else if(p.slug==='lbs-to-kg'||p.slug==='kg-to-lbs'){
+   const alias=p.slug==='lbs-to-kg'?'lbs to kg':'kg to lbs';
+   assert.ok(title.includes('('+alias+')'),'mass page title should include authentic everyday notation: '+p.slug);
+   assert.ok(title.length<=65,'mass title must remain compact: '+p.slug);
   }else assert.equal(title,legacy,'other metadata must retain the original precise keyword and symbols');
   const desc=directionMetaDescription(p);
   assert.ok(desc.includes(p.title),'meta description still identifies the source/target units: '+p.slug);
  }
  assert.equal(actual.size,38);
+});
+test('high-demand mass directions use clear human unit aliases without inventing search volume',()=>{
+ const mass=pairs.filter(p=>['lbs-to-kg','kg-to-lbs'].includes(p.slug));
+ assert.equal(mass.length,2);
+ for(const p of mass){
+  const alias=p.slug==='lbs-to-kg'?'lbs to kg':'kg to lbs';
+  assert.ok(directionSeoTitle(p).includes(alias));
+  assert.ok(directionMetaDescription(p).includes('('+alias+')'));
+  assert.match(directionMetaDescription(p),/Enter any value/);
+ }
 });
 test('short titles retain the important pair and standard distinctions',()=>{
  const bySlug=slug=>directionSeoTitle(pairs.find(x=>x.slug===slug));
