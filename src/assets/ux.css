@@ -153,3 +153,8 @@
   .multi-unit-panel summary span{display:none}
   .multi-unit-panel .reference-scroll{display:block!important;overflow:visible!important}
 }
+
+/* V37: clear user-selected quick value and honest invalid-field treatment. */
+.value-presets .preset[aria-pressed="true"]{background:#dfe9ff;border-color:#88a5ef;color:#1747b5;box-shadow:inset 0 0 0 1px #bed0ff}
+.field-row input[aria-invalid="true"]{border-color:#cc4b64;background:#fff8f9}
+.field-row input[aria-invalid="true"]:focus{box-shadow:0 0 0 3px #ffe5e9}
