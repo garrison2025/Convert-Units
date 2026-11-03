@@ -1,4 +1,4 @@
-# ExactUnit visual design standard — V39
+# ConvertUnits.cc visual design standard — V40 (V39 palette)
 
 Updated: 2026-11-03 · Scope: 157 prerendered pages · Research references: Omni Calculator, Linear 2026 UI refresh, Raycast.
 
@@ -123,3 +123,11 @@ Accessible color ratios against the intended surfaces: white-on-primary ≈5.99:
 - **Technical debt:** moved primary, canvas, border, focus and results design tokens into `src/assets/site.css` as the single source. Removed duplicate root palette declarations in `refresh.css` and `polish.css`. Legacy non-semantic blue literals were remapped to corresponding ocean/neutral shades. Successful-copy green and error red remain semantically distinct.
 - **Verification:** `v39-color-system` browser-smoke assertions check actual computed primary/button/result colors and their WCAG AA normal-text contrast on homepage and a directional converter; earlier V38 mobile fold, reduced-motion, SEO and static resource budgets remain enforced.
 - **Release gate:** preserve `pages.dev` preview `noindex,follow`, no production domain, no advertising, no Google Search Console and no index approval without owner decision.
+
+## V40: official domain and branding (2026-11-03)
+
+- Owner has purchased `convertunits.cc` and provided the official contact email `contact@convertunits.cc`. Current apex domain is serving the same Pages project as the preview, though the original indexing gate still remains closed.
+- Visual brand formerly displayed `ExactUnit`; update new site-facing wordmarks, SEO title suffix, Open Graph site name, copyright, policy and contact content to `ConvertUnits.cc`. Preserve the established V39 ocean-teal palette and V38 motion/first-screen action requirements.
+- Contact email is visible in the footer and relevant legal pages, not merely in a README. Do not claim email delivery or sending has been tested: only Cloudflare MX/SPF DNS was observed.
+- Keep `https://convertunits.cc` as the intended canonical domain **when explicitly authorized to index**, and plan `www` to apex redirects through Cloudflare. Until then, every page remains noindex, and the future production canonical/sitemap/structured data must not appear prematurely.
+- The already-active public site is not by itself authorization to change `SEO_INDEX_APPROVED`, enable ads, or submit the sitemap to GSC.
