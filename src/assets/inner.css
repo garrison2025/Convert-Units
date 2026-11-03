@@ -329,3 +329,14 @@
 .numeric-insight-parent a{font-weight:760;text-decoration:underline}
 @media(max-width:850px){.numeric-insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.numeric-intent-check{padding:15px 12px}.numeric-insight-grid{grid-template-columns:1fr;gap:7px}.numeric-insight-value{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.numeric-insight-value dd{margin:0;text-align:right}}
+
+/* V37: task-first polish; only composited pointer feedback, no loops. */
+.tool-card:focus-within{border-color:#b9caf8;box-shadow:0 14px 36px #234d9718}
+.tool-card:focus-within .resultbox{border-color:#b9cdfb}
+.resultbox{position:relative}
+.resultbox:before{content:"";position:absolute;inset:12px auto 12px 0;width:3px;background:#4169ed;border-radius:0 4px 4px 0}
+.field-row input:hover,.field-row select:hover{border-color:#a9badd}
+.tile .pict,.hero-utility a{transition:transform .22s ease}
+@media(hover:hover) and (pointer:fine){.tile:hover .pict{transform:translateY(-2px) rotate(-4deg)}.hero-utility a:hover{transform:translateY(-2px)}}
+.btn:active,.hero-search-row button:active{transform:scale(.985)}
+@media(prefers-reduced-motion:reduce){.hero .demo,.hero .hero-intro{animation:none!important}.tile:hover .pict,.hero-utility a:hover,.btn:active{transform:none!important}}
