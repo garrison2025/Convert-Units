@@ -158,3 +158,9 @@
 .value-presets .preset[aria-pressed="true"]{background:#dfe9ff;border-color:#88a5ef;color:#1747b5;box-shadow:inset 0 0 0 1px #bed0ff}
 .field-row input[aria-invalid="true"]{border-color:#cc4b64;background:#fff8f9}
 .field-row input[aria-invalid="true"]:focus{box-shadow:0 0 0 3px #ffe5e9}
+
+/* V38: task-triggered feedback, high-contrast copied state; no looping motion. */
+.swap:hover{transform:none}
+.tool-actions [data-copied="true"],.tool-actions .btn.primary[data-copied="true"]{background:#e8f7ef;color:#156044;border-color:#9bd5b8}
+.tool-actions [data-copied="true"]:focus-visible{outline-color:#176e50}
+@media(hover:hover) and (pointer:fine){.swap:hover{background:#e8efff}}
