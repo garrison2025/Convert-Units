@@ -20,7 +20,7 @@ fs.mkdirSync(out,{recursive:true});
 const checks=[];
 const pilotRoutes=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-policy.json'),'utf8')).pilotIndexUrls;
 const privateReports=['/keyword-evidence-review.csv','/seo-editorial-review.csv','/quality-report.json'];
-const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/convert/kg-to-lbs/','/convert/kg-to-lbs/240/','/convert/seconds-to-hours/14400/','/category/mass/','/category/temperature/','/convert/minutes-to-hours/','/convert/seconds-to-hours/','/convert/ml-to-us-fl-oz/','/convert/ml-to-us-fl-oz/355/','/convert/kpa-to-atm/','/convert/kpa-to-atm/50/','/convert/kpa-to-psi/108/','/convert/celsius-to-fahrenheit/','/convert/celsius-to-fahrenheit/37.9/','/convert/celsius-to-fahrenheit/36.6/','/convert/m-to-ft/','/convert/ft-to-m/','/convert/m-to-ft/8849/','/convert/ft-lbf-to-nm/','/convert/nm-to-ft-lbf/','/convert/ft-lbf-to-nm/400/','/convert/kmh-to-mph/','/convert/mph-to-kmh/','/convert/kmh-to-mph/330/','/convert/in-to-cm/','/convert/cm-to-in/','/convert/in-to-mm/','/convert/kw-to-hp/','/assets/styles.css','/assets/app.mjs','/build-info.json',...privateReports];
+const paths=['/','/batch-converter/','/convert/lbs-to-kg/','/convert/kg-to-lbs/','/convert/kg-to-lbs/240/','/convert/seconds-to-hours/14400/','/category/mass/','/category/temperature/','/convert/minutes-to-hours/','/convert/seconds-to-hours/','/convert/ml-to-us-fl-oz/','/convert/ml-to-us-fl-oz/355/','/convert/kpa-to-atm/','/convert/kpa-to-atm/50/','/convert/kpa-to-psi/108/','/convert/celsius-to-fahrenheit/','/convert/celsius-to-fahrenheit/37.9/','/convert/celsius-to-fahrenheit/36.6/','/convert/m-to-ft/','/convert/ft-to-m/','/convert/m-to-ft/8849/','/convert/ft-lbf-to-nm/','/convert/nm-to-ft-lbf/','/convert/ft-lbf-to-nm/400/','/convert/kmh-to-mph/','/convert/mph-to-kmh/','/convert/kmh-to-mph/330/','/convert/in-to-cm/','/convert/cm-to-in/','/convert/in-to-mm/','/convert/kw-to-hp/','/convert/us-cup-to-ml/','/convert/us-tbsp-to-us-tsp/','/convert/gb-to-mb/','/assets/styles.css','/assets/app.mjs','/build-info.json',...privateReports];
 async function probe(route){
  const url=site+route;
  try{
@@ -55,13 +55,14 @@ const torqueTool=get('/convert/ft-lbf-to-nm/'),torqueReverse=get('/convert/nm-to
 const speedTool=get('/convert/kmh-to-mph/'),speedReverse=get('/convert/mph-to-kmh/'),speed330=get('/convert/kmh-to-mph/330/');
 const inchCm=get('/convert/in-to-cm/'),cmIn=get('/convert/cm-to-in/'),inchMm=get('/convert/in-to-mm/');
 const powerTool=get('/convert/kw-to-hp/');
+const cups=get('/convert/us-cup-to-ml/'),spoons=get('/convert/us-tbsp-to-us-tsp/'),storage=get('/convert/gb-to-mb/');
 const deployment=get('/build-info.json');
-const allReachable=[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool,fluidTool,fluid355,pressureTool,pressure50,pressure108,celsiusTool,celsius37,celsius36,metricFeet,reverseFeet,metric8849,torqueTool,torqueReverse,torque400,speedTool,speedReverse,speed330,inchCm,cmIn,inchMm,powerTool].every(c=>c.ok&&!c.error);
+const allReachable=[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool,fluidTool,fluid355,pressureTool,pressure50,pressure108,celsiusTool,celsius37,celsius36,metricFeet,reverseFeet,metric8849,torqueTool,torqueReverse,torque400,speedTool,speedReverse,speed330,inchCm,cmIn,inchMm,powerTool,cups,spoons,storage].every(c=>c.ok&&!c.error);
 function protectsPreview(c){
  return /<meta\s+name="robots"\s+content="[^"]*noindex/i.test(c.body)||
   /(?:^|,)\s*noindex\b/i.test(c.xRobotsTag||'');
 }
-const noindexSafe=allReachable&&[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool,fluidTool,fluid355,pressureTool,pressure50,pressure108,celsiusTool,celsius37,celsius36,metricFeet,reverseFeet,metric8849,torqueTool,torqueReverse,torque400,speedTool,speedReverse,speed330,inchCm,cmIn,inchMm,powerTool].every(protectsPreview);
+const noindexSafe=allReachable&&[home,batch,tool,reverseTool,numeric,exactTime,massCategory,temperatureCategory,minuteTool,secondTool,fluidTool,fluid355,pressureTool,pressure50,pressure108,celsiusTool,celsius37,celsius36,metricFeet,reverseFeet,metric8849,torqueTool,torqueReverse,torque400,speedTool,speedReverse,speed330,inchCm,cmIn,inchMm,powerTool,cups,spoons,storage].every(protectsPreview);
 const hasV5=allReachable&&home.body.includes('data-output-number')&&
  home.body.includes('data-copy-number')&&batch.body.includes('data-batch-advanced')&&
  batch.body.includes('data-batch-input');
@@ -182,6 +183,15 @@ const hasV28CoreIntent=allReachable&&
  powerTool.body.includes('0.101942 hp')&&
  !powerTool.body.includes('<h2>Specific hp values</h2>')&&
  !tool.body.includes('data-horsepower-conventions');
+const hasV29Standards=allReachable&&
+ cups.body.includes('data-standards-comparison="us-cup-to-ml"')&&
+ cups.body.includes('236.5882365')&&cups.body.includes('FDA serving-size labels')&&
+ cups.body.includes('240')&&cups.body.includes('250')&&
+ spoons.body.includes('data-standards-comparison="us-tbsp-to-us-tsp"')&&
+ spoons.body.includes('14.786764781')&&spoons.body.includes('Australian tablespoon')&&
+ storage.body.includes('data-standards-comparison="gb-to-mb"')&&
+ storage.body.includes('1,000 MB')&&storage.body.includes('1,024 MiB')&&
+ !powerTool.body.includes('data-standards-comparison=');
 let buildInfo=null;
 if(deployment.ok){try{buildInfo=JSON.parse(deployment.body);}catch{}}
 const deployedSha=/^[a-f0-9]{40}$/i.test(buildInfo?.buildCommit||'')?buildInfo.buildCommit.toLowerCase():null;
@@ -208,7 +218,7 @@ else if(!noindexSafe)status='WARNING_PREVIEW_INDEXABILITY';
 else if(!hasV5)status='WARNING_STALE_OR_DIFFERENT_BUILD';
 else if(expectedSha&&deployedSha&&deployedSha!==expectedSha)status='PENDING_CLOUDFLARE_DEPLOYMENT';
 else if(expectedSha&&!deployedSha)status='VERIFIED_PREVIEW_VERSION_UNKNOWN';
-else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds||!hasV17Temperature||!hasV19MixedFeet||!hasV20FourUnitTorque||!hasV21FourUnitSpeed||!hasV22IntentLinks||!hasV23DirectionReferences||!hasV24CandidatePreview||!hasV28CoreIntent)status='VERIFIED_PREVIOUS_VERSION';
+else if(!hasV6||!hasV8SEO||!hasV9SEO||!hasV10SEO||!hasV12SEO||!hasV13TimeSEO||!hasV14Ounces||!hasV15Pressure||!hasV16MixedPounds||!hasV17Temperature||!hasV19MixedFeet||!hasV20FourUnitTorque||!hasV21FourUnitSpeed||!hasV22IntentLinks||!hasV23DirectionReferences||!hasV24CandidatePreview||!hasV28CoreIntent||!hasV29Standards)status='VERIFIED_PREVIOUS_VERSION';
 else if(qaReportExposure.length)status='WARNING_PUBLIC_QA_REPORT_EXPOSURE';
 else if(!qaReportsNotPublic)status='WARNING_PRIVATE_QA_PATH_NOT_BLOCKED';
 else if(!assetStatuses.every(c=>c.ok))status='WARNING_MISSING_ASSET';
@@ -216,7 +226,7 @@ else status=expectedSha?'VERIFIED_MAIN_COMMIT':'VERIFIED_CONTENT';
 const report={
  source:'Public Cloudflare Pages preview checked over HTTPS from GitHub Actions; NOT official production domain',
  checkedAt:new Date().toISOString(),site,status,expectedSha,deployedSha,revision,
- codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,hasV17TemperatureFeatures:hasV17Temperature,hasV19MixedFeetFeatures:hasV19MixedFeet,hasV20FourUnitTorqueFeatures:hasV20FourUnitTorque,hasV21FourUnitSpeedFeatures:hasV21FourUnitSpeed,hasV22IntentLinksFeatures:hasV22IntentLinks,hasV23DirectionReferencesFeatures:hasV23DirectionReferences,hasV24Pilot15PreviewSafe:hasV24CandidatePreview,hasV28CoreIntentAndPowerConventions:hasV28CoreIntent,assetStatuses,qaReportExposure,qaReportsNotPublic},
+ codeChecks:{htmlReachable:allReachable,previewNoindexSafe:noindexSafe,hasV5Features:hasV5,hasV6Features:hasV6,hasV8SEOFeatures:hasV8SEO,hasV9SEOFeatures:hasV9SEO,hasV10SEOFeatures:hasV10SEO,hasV12SEOFeatures:hasV12SEO,hasV13TimeSEOFeatures:hasV13TimeSEO,hasV14OuncesFeatures:hasV14Ounces,hasV15PressureFeatures:hasV15Pressure,hasV16MixedPoundsFeatures:hasV16MixedPounds,hasV17TemperatureFeatures:hasV17Temperature,hasV19MixedFeetFeatures:hasV19MixedFeet,hasV20FourUnitTorqueFeatures:hasV20FourUnitTorque,hasV21FourUnitSpeedFeatures:hasV21FourUnitSpeed,hasV22IntentLinksFeatures:hasV22IntentLinks,hasV23DirectionReferencesFeatures:hasV23DirectionReferences,hasV24Pilot15PreviewSafe:hasV24CandidatePreview,hasV28CoreIntentAndPowerConventions:hasV28CoreIntent,hasV29StandardDistinctions:hasV29Standards,assetStatuses,qaReportExposure,qaReportsNotPublic},
  buildInfo:buildInfo?{mode:buildInfo.mode,publicationApproved:buildInfo.publicationApproved,tools:buildInfo.tools,numericalPages:buildInfo.numericalPages,indexablePages:buildInfo.indexablePages,buildCommit:buildInfo.buildCommit??null,builtAt:buildInfo.builtAt}:null,
  responses:checks.map(({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation})=>({route,url,status,ok,bytes,contentType,contentEncoding,cacheControl,elapsedMs,xRobotsTag,error,redirectLocation}))
 };
