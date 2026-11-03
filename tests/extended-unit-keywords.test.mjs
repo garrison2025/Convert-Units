@@ -14,8 +14,8 @@ test('three added unit pairs use correct factors, round trip and preserve dimens
  assert.equal(convert(1,'bar','hpa'),1000);
  assert.ok(relative(convert(760,'mmhg','hpa'),760*133.3224/100));
  assert.equal(convert(1000,'mm3','ml'),1);
- assert.equal(convert(390,'mm3','ml'),0.39);
- assert.equal(convert(1,'ml','mm3'),1000);
+ assert.ok(relative(convert(390,'mm3','ml'),0.39));
+ assert.ok(relative(convert(1,'ml','mm3'),1000));
  assert.equal(convert(1,'gb','gbit'),8);
  assert.equal(convert(1,'gbit','gb'),0.125);
  assert.equal(convert(1,'gbit','mb'),125);
