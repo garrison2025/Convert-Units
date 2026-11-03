@@ -7,7 +7,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {units,convert,formatNumber,displayRelation} from '../src/assets/engine.mjs';
 import {engineeringReference,conventionComparison} from '../src/seo-guides.mjs';
-import {directionMetaDescription} from '../src/seo-meta.mjs';
+import {directionMetaDescription,directionSeoTitle} from '../src/seo-meta.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dist=path.join(root,'dist');
@@ -28,7 +28,7 @@ for(const pair of pairs){
  const title=unescape(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]||'');
  const h1=unescape((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]||'').replace(/<[^>]*>/g,''));
  const description=unescape(html.match(/<meta name="description" content="([^"]*)"/i)?.[1]||'');
- if(!title.startsWith(pair.title+' Converter'))issue.push('title lacks exact direction');
+ if(title!==directionSeoTitle(pair)+' | ExactUnit')issue.push('title differs from the source-curated direction and unit symbols');
  if(h1!==pair.title)issue.push('H1 is not the exact descriptive direction title');
  if(description!==directionMetaDescription(pair))issue.push('meta description is stale or not source-calculated');
  if(titles.has(title))issue.push('duplicate title');titles.add(title);
@@ -87,6 +87,16 @@ for(const pair of pairs){
  results.push(row);
  for(const finding of issue)errors.push(pair.url+': '+finding);
 }
+// Keep homepage direct navigation aligned with the verified V32 keyword
+// evidence without pretending numeric long-tail volume is generic demand.
+const home=page('/');
+const featuredBlock=home.split('<div class="grid popular-grid">')[1]?.split('</section><section class="section">')[0]||'';
+const featuredUrls=[...featuredBlock.matchAll(/<a\\b[^>]*href="([^"]+)"/g)].map(x=>x[1]);
+const expectedFeatured=['kg-to-lbs','lbs-to-kg','ft-lbf-to-nm','celsius-to-fahrenheit','minutes-to-hours','ml-to-us-fl-oz']
+ .map(slug=>pairs.find(p=>p.slug===slug)?.url);
+if(expectedFeatured.some(x=>!x)||JSON.stringify(featuredUrls)!==JSON.stringify(expectedFeatured))
+ errors.push('Homepage featured tool cards must align with the six selected existing routes, once each, without new URLs');
+
 const engineeringCount=results.filter(x=>x.referenceHeading).length;
 if(engineeringCount!==9)errors.push('Expected precisely nine length/speed/torque reference tables; got '+engineeringCount);
 if(referenceHeadings.size!==8)errors.push('Expected eight distinct relevant reference headings, with only the two inch-source directions intentionally sharing one: '+referenceHeadings.size);
