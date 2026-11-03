@@ -105,7 +105,7 @@ function checkMarkup(route,expectedApp=false){
   }
   const sites=jsonBlocks.filter(x=>x['@type']==='WebSite');
   if(route==='/'){
-   if(sites.length!==1||sites[0].url!==expectedUrl||sites[0].name!=='ConvertUnits.cc')
+   if(sites.length!==1||sites[0].url!==expectedUrl||sites[0].name!=='ConvertUnits.cc'||sites[0].alternateName!=='ConvertUnits')
     errors.push(route+': home WebSite schema missing or inaccurate');
    else schemaStats.webSites++;
   }else if(sites.length)errors.push(route+': homepage WebSite schema leaked onto an inner page');
