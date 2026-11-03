@@ -2,6 +2,10 @@
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
 
+## V49 verifiable GEO and directory-led outreach (2026-11-03)
+
+38 existing direction converters now expose reproducible source/target factor traces and standards links. All 16 category hubs provide distinct tool-choice guidance rather than a repeated generic CTA, and the optional `llms.txt` is generated from the live converter and category registries. See `research/V49-GEO-VERIFICATION-REPORT.md`. Legitimate external citation opportunities and disqualifications are documented in `research/V49-THIRD-PARTY-CITATION-OUTREACH.md`; **no third-party placement is falsely claimed**.
+
 ## V45 code-level SEO integrity (2026-11-03)
 
 Owner-approved search indexation remains fully enabled for **156 genuine site pages**, including **92 numeric answer pages**. Nothing in this release reintroduces `noindex` on these official apex routes.
