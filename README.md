@@ -14,6 +14,14 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 
 
 
+## V42: evidence-based homepage and pounds/kg SEO (2026-11-03)
+
+- **Seven helpful homepage references** are rendered into the initial static HTML from `src/home-reference.mjs` using the same tested conversion engine as the live calculator. Each row identifies the starting quantity, answer, exact (`=`) or displayed approximate (`≈`) relationship, and a working internal link to its matching tool. The table covers pounds/kilograms, inches/centimeters, US volume, Celsius and time. No new URLs, made-up keywords, traffic claims or third-party API.
+- **Clear factual differentiation:** the table explains that US fluid ounces are a volume measure, unlike mass ounces, and that Celsius conversion has an offset; links users to authoritative unit-definition references through the existing methodology page.
+- **Two already-supported weight directions** have natural search-language aliases in their SEO titles and meta descriptions: `Pounds to Kilograms Converter (lbs to kg)` and `Kilograms to Pounds Converter (kg to lbs)`. Both explain why `lb` and informal plural `lbs` occur. This reflects the user-provided Semrush **numbered** query examples and their search phrasing; it does **not** assign those numeric volumes or KD values to generic unnumbered phrases.
+- **Automated verification:** `tests/home-reference.test.mjs` checks every computed answer, exactness/rounding indicator and target route; SEO title tests protect other directions, while `scripts/seo-content-audit.mjs` enforces crawlable links, server-rendered fact rows, methodology references and proper weight notation.
+- **Release control:** official apex is `https://convertunits.cc`, but production search indexing is still gated by the owner's explicit approval variables; 92 numeric pages are still individually withheld. Google indexing, rankings, CTR and traffic cannot be inferred from CI success.
+
 ## V41 Google SEO: actual-domain rehearsal and publication checklist (2026-11-03)
 
 The live apex `https://convertunits.cc` is connected to the existing Cloudflare Pages project and currently resolves in **preview / noindex** mode. Its ownership and hosting are not in doubt; Google's permission to index is a **separate decision**.
