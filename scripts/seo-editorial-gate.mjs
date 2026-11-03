@@ -17,6 +17,12 @@ const pairs=readJson('src/data/pairs.json');
 const seeds=readJson('src/data/seeds.json');
 const policy=readJson('src/data/numeric-seo-policy.json');
 const selected=new Set(policy.pilotIndexUrls);
+// The 15-value pilot is historical. Report the ACTUAL current build publication policy
+// rather than incorrectly classifying the 77 other values as permanently noindex.
+const publication=readJson('dist/build-info.json');
+const published=new Set(publication.mode==='production'?(publication.numericPublishedUrls||[]):[]);
+if(publication.mode==='production' && published.size!==publication.numericIndexablePages)
+ throw new Error('Published numeric URLs disagree with build-info.json.');
 const currentSerpReview=readJson('research/SEO-15-SERP-EVIDENCE-20261102.json');
 const serpReviews=currentSerpReview.items||[];
 const out=path.join(root,'dist');
@@ -77,10 +83,13 @@ const valueRows=seeds.map(s=>{
   competitorTrafficEstimate:s.trafficEstimate,competitorLandingPath:s.competitorURL,
   direction:s.slug,sourceUnit:units[p.from].symbol,targetUnit:units[p.to].symbol,
   siblingNumericPages:(bySlug.get(s.slug)||[]).length,
-  launchIndexPolicy:inPilot?'requires separate exact-URL approval AND official-domain approval; otherwise noindex':'always noindex; excluded from production sitemap',
-  editorialDisposition:inPilot?'PILOT_REVIEW_REQUIRED':'KEEP_FUNCTIONAL_NOINDEX',
-  editorialReason:inPilot?'One numeric value per directional cluster; parent-intent and SERP distinctness not independently verified':
-   'Sibling numeric-intent duplication risk; no separate validated reason to index at launch',
+  launchIndexPolicy:published.has(s.url)?'PUBLIC_INDEX_ELIGIBLE__OWNER_APPROVED':
+    publication.mode!=='production'?'PREVIEW_NOINDEX':'NOT_PUBLISHED_IN_THIS_BUILD',
+  editorialDisposition:published.has(s.url)?'PUBLIC_INDEX_ELIGIBLE__INTENT_UNVERIFIED':
+    inPilot?'HISTORICAL_PILOT__NOT_PUBLISHED':'NOT_PUBLISHED',
+  editorialReason:published.has(s.url)?
+    'Owner-approved numeric release; independent search intent and Google canonical selection are not proven':
+    'This build does not publish the numeric URL; historical pilot selection is not a live indexing directive',
   sourceReconciliation:sourceMatch?'exact competitor keyword+volume+KD+traffic':'NOT_RECONCILED',
   searchIntentVerified:false
  };
@@ -140,12 +149,16 @@ writeCsv('seo-source-landing-review.csv',sourcePathDisagreements,
  ['sourceRow','keyword','queryLeadingNumber','competitorLandingValue','competitorLandingURL','note']);
 const totalNumericSupportedDirections=pairRows.filter(p=>p.siblingNumericPages>0).length;
 const report={
- date:'2026-11-02',source:'600-row competitor Semrush TSV and 92 previously approved numeric seeds',
+ date:new Date().toISOString().slice(0,10),
+ publicationMode:publication.mode,actualPublicNumericUrls:published.size,
+ actualUnpublishedNumericUrls:seeds.length-published.size,
+ historicalPilotCandidates:selected.size,
+ source:'600-row competitor Semrush TSV and 92 previously approved numeric seeds',
  sourceRows:keywordRows.length,
  ownerTrafficClaim:'NONE; all competitor metric fields are third-party observations, not ExactUnit visits or forecasts',
  mainConverterPages:pairRows.length,numericPages:valueRows.length,
- numericPilotCandidates:valueRows.filter(x=>x.editorialDisposition==='PILOT_REVIEW_REQUIRED').length,
- numericNoindex:valueRows.filter(x=>x.editorialDisposition==='KEEP_FUNCTIONAL_NOINDEX').length,
+ numericPilotCandidates:selected.size,
+ numericNoindex:seeds.length-published.size,
  converterDirectionsWithApprovedNumericEvidence:totalNumericSupportedDirections,
  converterDirectionsWithoutApprovedNumericEvidence:pairRows.length-totalNumericSupportedDirections,
  pilotSameDirectionPairs:0,
@@ -156,7 +169,7 @@ const report={
  serpUSGoogleRankVerified:false,
  rawCompetitorLandingNumberMismatches:sourcePathDisagreements.length,
  approvedSeedsOverlappingRawLandingMismatches:taintedNumericSeeds.length,
- note:'This is a zero-invention content planning and release safety inventory. Generic converter keyword demand and Google SERP user-intent divergence remain unverified. No index policy or URL has been changed.',
+ note:'Reports CURRENT build index eligibility from build-info.json. The 15-value policy is historical fallback only. Generic query demand, Google canonical choice and search performance remain unverified. The report does not alter URLs or index directives.',
  failures
 };
 fs.writeFileSync(path.join(out,'seo-editorial-review.json'),JSON.stringify(report,null,2)+'\n');

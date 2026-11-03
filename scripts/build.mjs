@@ -134,7 +134,7 @@ function alternateUnitTable(p,value){
  const dim=units[p.from].dimension;
  const alternatives=dimensionUnits(dim).filter(u=>u.id!==p.from && u.id!==p.to).slice(0,4);
  if(!alternatives.length)return '';
- const rows=alternatives.map(u=>`<tr><td>${E(u.name)}</td><td>${E(number(convert(value,p.from,u.id),9))} ${E(u.symbol)}</td></tr>`).join('');
+ const rows=alternatives.map(u=>`<tr><td>${E(u.name)}</td><td>${E(number(convert(value,p.from,u.id),6))} ${E(u.symbol)}</td></tr>`).join('');
  return `<h2>Same value in other units</h2><p class="reference-caption">Equivalent measurements in the same physical dimension, calculated from the original input without intermediate rounding.</p><div class="reference-scroll"><table class="number-table reference-table"><thead><tr><th>Unit</th><th>Equivalent value</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function generateSeed(s){const p=pairs.find(p=>p.slug===s.slug);if(!p)throw Error('Unmapped seed '+s.slug);const dim=units[p.from].dimension;const v=s.value,r=convert(v,p.from,p.to);const result=number(r,9),symbol=units[p.to].symbol;

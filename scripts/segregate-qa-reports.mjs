@@ -17,7 +17,8 @@ const reportNames=[
  'performance-budget-report.json','keyword-evidence-review.json',
  'keyword-evidence-review.csv','seo-editorial-review.json',
  'seo-editorial-review.csv','seo-source-landing-review.csv',
- 'seo-content-audit.json','seo-crawl-audit.json','seo-url-inventory.csv'
+ 'seo-content-audit.json','seo-crawl-audit.json','seo-url-inventory.csv',
+ 'numeric-similarity-audit.json','numeric-similarity-audit.csv'
 ];
 if(!fs.existsSync(path.join(dist,'index.html')))throw Error('No complete public build in dist.');
 // Validate the full audit first so a partial build cannot masquerade as a
