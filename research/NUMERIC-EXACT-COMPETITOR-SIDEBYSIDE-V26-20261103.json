@@ -1,0 +1,285 @@
+{
+  "reviewedOn": "2026-11-03",
+  "scope": "13 preselected numeric candidates whose recorded rivals are exact-value pages; excludes two generic rivals reviewed separately in V25",
+  "sourceQualityNote": "Directly retrievable public source text for 8 competitors, indexed page excerpts for 4 original competitors, and one verified replacement exact-value rival because the originally logged link could not be fetched. No live Google US positions, search volume or site GSC are inferred.",
+  "entries": [
+    {
+      "url": "/convert/kg-to-lbs/240/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "Exact 240 kg → 529.109429244 lbs answer and multiplication",
+        "Working kilogram-to-pound converter inputs",
+        "Multi-unit mass chart including grams, ounces and stones",
+        "Neighbor value links"
+      ],
+      "siteFeatureMarkers": [
+        "data-lb-oz-readout",
+        "data-precision-table"
+      ],
+      "remainingGap": "Mass equivalents and nearby numeric values overlap; pounds-plus-ounces is useful but an indexing advantage is not shown.",
+      "assessment": "HOLD: competitor's exact-value page already satisfies answer and mass comparison.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/lbs-to-kg/126/",
+      "inspectionMethod": "search_indexed_page_excerpt",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "126 lb → 57.152639 kg with exact international pound factor",
+        "Kilograms + grams and stones + pounds representations",
+        "Worked steps and a large mass unit comparison chart",
+        "Context examples and FAQs"
+      ],
+      "siteFeatureMarkers": [
+        "data-mixed-kg",
+        "data-precision-table"
+      ],
+      "remainingGap": "The competitor already includes kilograms plus grams and a broader mass table; no defensible unique page value established.",
+      "assessment": "HOLD: original URL has indexed excerpt but direct fetch unavailable.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/celsius-to-fahrenheit/37.9/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "37.9 °C → 100.22 °F with formula",
+        "Stepwise temperature calculation",
+        "Nearby Celsius/Fahrenheit values table"
+      ],
+      "siteFeatureMarkers": [
+        "data-temperature-triple",
+        "data-precision-table"
+      ],
+      "remainingGap": "ExactUnit additionally shows Kelvin, but the competitor already answers the temperature conversion; no independent value search advantage proven.",
+      "assessment": "HOLD: functional three-scale panel is useful, not proof that a separate result should be indexed.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/minutes-to-hours/10000/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "10,000 minutes → 166.66667 hours, rounded",
+        "Calculator and selectable rounding digits",
+        "Mixed fraction 166 2/3 hours and plain-English description",
+        "Scientific notation and a numerical reference table"
+      ],
+      "siteFeatureMarkers": [
+        "data-elapsed-duration",
+        "data-precision-table"
+      ],
+      "remainingGap": "Competitor provides fraction/scientific answer; ExactUnit offers elapsed clock and precision, but no independent SEO win evidence.",
+      "assessment": "HOLD: results are substantially answered by existing rival exact-value page.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/milliseconds-to-minutes/3600000/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "3,600,000 milliseconds = exactly 60 minutes",
+        "Hours/minutes/seconds controls",
+        "Plain-English and scientific notation answers"
+      ],
+      "siteFeatureMarkers": [
+        "data-elapsed-duration",
+        "data-precision-table"
+      ],
+      "remainingGap": "Both already give exact result; the elapsed-time output may be convenient but does not establish search-value superiority.",
+      "assessment": "HOLD: exact answer already appears on a dedicated competitor result.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/kpa-to-atm/50/",
+      "inspectionMethod": "search_indexed_page_excerpt",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "Exact-value 50 kPa → 0.493462 atm",
+        "Bidirectional kPa↔atm tool",
+        "Nearby reference values and formula",
+        "50 kPa also appears on general-tool reference table"
+      ],
+      "siteFeatureMarkers": [
+        "data-pressure-summary",
+        "data-precision-table"
+      ],
+      "remainingGap": "Four pressure units offer more context, but the generic page ALSO has the exact 50 kPa row, weakening numeric page separation.",
+      "assessment": "HOLD, parent-tool comparison prioritized; original link verified in indexed page excerpt.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/in-to-cm/17.7/",
+      "inspectionMethod": "search_indexed_page_excerpt",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "17.7 inches → exactly 44.958 cm",
+        "Calculation 17.7 × 2.54",
+        "Large neighboring inch-to-cm chart"
+      ],
+      "siteFeatureMarkers": [
+        "data-precision-table"
+      ],
+      "remainingGap": "ExactUnit's precision and interactive conversion do not yet demonstrate value beyond existing direct answer/formula/table.",
+      "assessment": "HOLD: competitor exact-value page visible in indexed content; no organic rank verification.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/seconds-to-minutes/6000/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "6,000 seconds = exactly 100 minutes",
+        "Hours/minutes/seconds calculator",
+        "Plain-language exact answer and scientific notation",
+        "Nearby seconds-to-minutes table"
+      ],
+      "siteFeatureMarkers": [
+        "data-elapsed-duration",
+        "data-precision-table"
+      ],
+      "remainingGap": "The same answer and neighboring values are fully supplied by the competitor; HH:MM:SS is helpful but not proved distinctive in SERP.",
+      "assessment": "HOLD: independently indexed numeric page intent not verified.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/milliseconds-to-seconds/60000/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "60,000 milliseconds = exactly 60 seconds",
+        "Universal converter with many units",
+        "Direct answer prominently rendered"
+      ],
+      "siteFeatureMarkers": [
+        "data-elapsed-duration",
+        "data-precision-table"
+      ],
+      "remainingGap": "Generic universal tools can satisfy this very simple exact value; separate page usefulness and value remain unverified.",
+      "assessment": "HOLD: another exact-value rival is present; local elapsed display alone does not prove superiority.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/ml-to-us-fl-oz/355/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "355 mL ≈ 12.003978 US fluid ounces",
+        "US fluid-ounce definition explicitly distinct from Imperial and mass ounces",
+        "Plain-English, scientific notation and conversion table"
+      ],
+      "siteFeatureMarkers": [
+        "data-fluid-oz-compare",
+        "data-precision-table"
+      ],
+      "remainingGap": "ExactUnit displays actual US AND UK fl oz side by side, while rival explains distinction; confirm search users want both readings before public numeric indexing.",
+      "assessment": "HOLD with relatively strong utility-comparison hypothesis, but no ranking or unique demand verification.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/kmh-to-mph/330/",
+      "inspectionMethod": "replacement_competitor_search_excerpt",
+      "checkedOn": "2026-11-03",
+      "observedUrl": "https://www.kmhtomphconverter.com/330-kmh-to-mph/",
+      "competitorFeatures": [
+        "Replacement exact-value rival explicitly provides 330 km/h → around 205.05243 mph",
+        "Stepwise multiply-factor example",
+        "Kmh-to-mph conversion chart and calculator"
+      ],
+      "siteFeatureMarkers": [
+        "data-speed-summary",
+        "data-precision-table"
+      ],
+      "remainingGap": "Original recorded competitor URL could not be directly retrieved in this review. An independent exact-number competitor confirms answer coverage but not its US SERP position; multi-unit readout needs SERP validation.",
+      "assessment": "HOLD: replacement is NOT proof original landing URL has the recorded current content.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/seconds-to-hours/14400/",
+      "inspectionMethod": "direct_retrieved_page_text",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "14,400 seconds = exactly 4 hours",
+        "Hours/minutes/seconds converter",
+        "Plain-English and scientific notation answer"
+      ],
+      "siteFeatureMarkers": [
+        "data-elapsed-duration",
+        "data-precision-table"
+      ],
+      "remainingGap": "Exact 4-hour answer is trivial and rival already has it; elapsed clock may help but not prove separate index value.",
+      "assessment": "HOLD: parent seconds-to-hours calculator remains sufficient until SERP distinctness verified.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    },
+    {
+      "url": "/convert/m-to-ft/8849/",
+      "inspectionMethod": "search_indexed_page_excerpt",
+      "checkedOn": "2026-11-03",
+      "observedUrl": null,
+      "competitorFeatures": [
+        "8,849 m ≈ 29,032 feet",
+        "Converter with significant-figures selection and copy",
+        "Alternative metric/imperial unit values and reverse conversion",
+        "Source-specific measurement context"
+      ],
+      "siteFeatureMarkers": [
+        "data-feet-inches",
+        "data-precision-table"
+      ],
+      "remainingGap": "Competitor already has precision settings, nearby and alternate units; mixed feet/inches may help but is not a proven ranking advantage.",
+      "assessment": "HOLD: indexed excerpt from original rival exists; exact value and intent already served.",
+      "rankingVerified": false,
+      "independentDemandVerified": false,
+      "uniqueValueVerified": false,
+      "recommendation": "HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED"
+    }
+  ]
+}

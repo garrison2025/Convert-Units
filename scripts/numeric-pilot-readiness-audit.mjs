@@ -16,6 +16,7 @@ const seeds=fromJson('src/data/seeds.json');
 const policy=fromJson('src/data/numeric-seo-policy.json');
 const evidence=fromJson('research/SEO-15-SERP-EVIDENCE-20261102.json');
 const directReviews=fromJson('research/NUMERIC-GENERIC-COMPETITOR-SIDEBYSIDE-V25-20261103.json');
+const exactReviews=fromJson('research/NUMERIC-EXACT-COMPETITOR-SIDEBYSIDE-V26-20261103.json');
 const build=fromJson('dist/build-info.json');
 const selected=new Set(policy.pilotIndexUrls),published=new Set(build.numericPublishedUrls||[]);
 const errors=[];
@@ -43,6 +44,10 @@ function similarity(a,b){
 }
 const reviewByUrl=new Map((evidence.items||[]).map(x=>[x.url,x]));
 const genericByUrl=new Map(directReviews.entries.map(x=>[x.url,x]));
+const exactByUrl=new Map(exactReviews.entries.map(x=>[x.url,x]));
+if(exactByUrl.size!==13||exactReviews.entries.length!==13)
+ errors.push('Expected 13 individually reviewed exact-value competitor comparisons.');
+const supportedMethods=new Set(['direct_retrieved_page_text','search_indexed_page_excerpt','replacement_competitor_search_excerpt']);
 if(genericByUrl.size!==2||directReviews.entries.length!==2)errors.push('Expected two verified generic competitor examples.');
 const byPair=new Map(pairs.map(p=>[p.slug,p]));
 if(pairs.length!==38||seeds.length!==92||selected.size!==15||
@@ -88,6 +93,29 @@ for(const url of policy.pilotIndexUrls){
      (!numericHtml.includes('data-pressure-summary')||!numericHtml.includes('data-copy-pressure')))
    errors.push(url+': side-by-side pressure features are absent in actual rendered HTML');
  }
+ const exactComparison=exactByUrl.get(url)||null;
+ if(ev.observedPageType==='exact-value-page'){
+  if(!exactComparison||!supportedMethods.has(exactComparison.inspectionMethod)||
+    !exactComparison.observedUrl && exactComparison.inspectionMethod==='replacement_competitor_search_excerpt'||
+    exactComparison.rankingVerified!==false||exactComparison.independentDemandVerified!==false||
+    exactComparison.uniqueValueVerified!==false||
+    exactComparison.recommendation!=='HOLD_UNTIL_VALUE_AND_US_SERP_VERIFIED'||
+    !Array.isArray(exactComparison.competitorFeatures)||exactComparison.competitorFeatures.length<2||
+    !Array.isArray(exactComparison.siteFeatureMarkers)||exactComparison.siteFeatureMarkers.length<1)
+    errors.push(url+': incomplete, ungrounded or prematurely approved exact-value competitor comparison');
+  if(exactComparison){
+   if(exactComparison.inspectionMethod!=='replacement_competitor_search_excerpt'&&
+      exactComparison.observedUrl!==null)errors.push(url+': unexpected replacement competitor URL');
+   if(exactComparison.inspectionMethod==='replacement_competitor_search_excerpt'&&
+      (!exactComparison.observedUrl.startsWith('https://')||url!=='/convert/kmh-to-mph/330/'))
+    errors.push(url+': replacement competitor evidence not correctly identified');
+   for(const marker of exactComparison.siteFeatureMarkers)
+    if(!numericHtml.includes(marker))
+     errors.push(url+': site feature claim unsupported by rendered markup: '+marker);
+  }
+ }else if(exactComparison){
+  errors.push(url+': an exact-value competitor review overlaps a generic competitor review');
+ }
  const risks=[];
  if(ev.observedPageType!=='exact-value-page')risks.push('competitor observation is a general tool/example, not an exact-value page');
  if(!ev.independentSearchDemandProven)risks.push('independent US Google organic demand unverified');
@@ -97,7 +125,15 @@ for(const url of policy.pilotIndexUrls){
   url,query:seed.keyword,parent:pair.url,dimension:units[pair.from].dimension,
   historicalCompetitor:{source:'user-supplied Semrush export (not ExactUnit GSC)',volumeUS:seed.volumeUS,kd:seed.kd,rank:seed.rank,estimatedTraffic:seed.trafficEstimate,landingPath:seed.competitorURL},
   observedCompetitor:{url:ev.competitorUrl,pageType:ev.observedPageType,visibleFunction:ev.observedFunction,reviewedOn:evidence.reviewedOn},
-  verifiedHeadToHead:comparison?{rivalCapabilities:comparison.observedCompetitorCapabilities,siteCapabilities:comparison.siteCurrentCapabilities,conclusion:comparison.comparison,indexRecommendation:comparison.launchIndexDisposition}:null,
+  verifiedHeadToHead:comparison?{rivalCapabilities:comparison.observedCompetitorCapabilities,siteCapabilities:comparison.siteCurrentCapabilities,conclusion:comparison.comparison,indexRecommendation:comparison.launchIndexDisposition}:exactComparison?{
+   rivalCapabilities:exactComparison.competitorFeatures,
+   siteVerifiedMarkup:exactComparison.siteFeatureMarkers,
+   contentSource:exactComparison.inspectionMethod,
+   replacementEvidenceUrl:exactComparison.observedUrl,
+   remainingGap:exactComparison.remainingGap,
+   conclusion:exactComparison.assessment,
+   indexRecommendation:exactComparison.recommendation
+  }:null,
   checks,sourceContentSimilarityToParent:similarity(numericHtml,parentHtml),
   keyEvidenceGaps:risks,
   editorialRecommendation:ev.observedPageType==='exact-value-page'?
@@ -105,6 +141,11 @@ for(const url of policy.pilotIndexUrls){
   currentReleasePolicy:'candidate after explicit official-domain approval only; preview always noindex'
  });
 }
+if(rows.length!==15||new Set(rows.map(r=>r.parent)).size!==15||
+   rows.filter(x=>x.verifiedHeadToHead).length!==15)
+ errors.push('Each candidate must have one real competitor feature comparison.');
+if(new Set([...genericByUrl.keys(),...exactByUrl.keys()]).size!==15)
+ errors.push('Generic and exact-value comparison sets must be disjoint and cover exactly 15 candidates.');
 if(rows.length!==15||new Set(rows.map(r=>r.parent)).size!==15)
  errors.push('Expected one and only one evidence-backed pilot per direction.');
 const cohort=[];
@@ -124,6 +165,8 @@ const audit={
  previewIndexability:build.mode==='preview'?'all 157 URLs remain noindex':'synthetic production: only independently approved candidates may be indexed',
  pagesChecked:rows.length,observedExactValueCompetitorPages:rows.filter(r=>r.observedCompetitor.pageType==='exact-value-page').length,
  observedGenericOnlyCompetitorPages:rows.filter(r=>r.observedCompetitor.pageType!=='exact-value-page').length,
+ headToHeadCompared:rows.filter(x=>x.verifiedHeadToHead).length,
+ exactCompetitorEvidenceMethodCounts:Object.fromEntries([...supportedMethods].map(k=>[k,exactReviews.entries.filter(x=>x.inspectionMethod===k).length])),
  conditionalCandidates:selected.size,excludedNumericPages:seeds.length-selected.size,
  comparisonRequiredBeforePublicNumericIndex:rows.filter(r=>r.keyEvidenceGaps.length).length,
  similarSameDimensionPilotPairsAt065:cohort,
@@ -144,6 +187,8 @@ console.log('NUMERIC PILOT READINESS AUDIT:',JSON.stringify({
  status:audit.status,pagesChecked:audit.pagesChecked,
  exactValueCompetitors:audit.observedExactValueCompetitorPages,
  genericOnlyCompetitors:audit.observedGenericOnlyCompetitorPages,
+ headToHeadCompared:audit.headToHeadCompared,
+ evidenceMethods:audit.exactCompetitorEvidenceMethodCounts,
  candidatesStillNeedingDifferentiationEvidence:audit.comparisonRequiredBeforePublicNumericIndex,
  strongSameDimensionTextOverlapPairs:cohort.length,
  overlappingPairs:cohort.map(x=>[x.a,x.b,x.trigramJaccard]),
