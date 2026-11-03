@@ -58,6 +58,17 @@ async function smokeScenario(SCENARIO){
        ok(number.getAnimations().length===0,'reduced-motion path must perform conversion without animation');
      }finally{window.matchMedia=match;}
      ok(number.textContent!=='—','reduced-motion input still converts');
+     const preset=tool.querySelector('[data-preset="10"]');
+     ok(Boolean(preset),'quick-value preset stays available');
+     preset.click();
+     ok(preset.getAttribute('aria-pressed')==='true'&&input.getAttribute('aria-invalid')==='false',
+       'chosen preset is visibly selected and calculation remains valid');
+     input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(input.getAttribute('aria-invalid')==='true'&&
+       [...tool.querySelectorAll('[data-preset]')].every(b=>b.getAttribute('aria-pressed')==='false'),
+       'empty value exposes accessible invalid state and clears active preset');
+     input.value='11';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(input.getAttribute('aria-invalid')==='false','input correction clears invalid styling');
      input.focus();
      ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
      break;
