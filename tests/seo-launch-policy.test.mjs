@@ -49,6 +49,6 @@ test('invalid URL and accidental tokens fail closed without publishing incorrect
   assert.throws(()=>resolveSitePublication({siteUrl}),/SITE_URL/);
  }
  assert.throws(()=>resolveSitePublication({
-  siteUrl:'https://qa.example.test',approval:'I_APPROVE_PUBLIC_INDEXING'
+  siteUrl:'https://convertunits.cc',approval:'I_APPROVE_PUBLIC_INDEXING'
  }),/exactly match/);
 });
