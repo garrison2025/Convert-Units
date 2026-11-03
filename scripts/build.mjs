@@ -29,7 +29,7 @@ const cloudflareMainBuild=process.env.CF_PAGES_BRANCH==='main' &&
  /^[a-f0-9]{40}$/i.test(process.env.CF_PAGES_COMMIT_SHA||'');
 const ownerApprovedMain=ownerLaunch.ownerApprovedPublicIndex===true &&
  ownerLaunch.officialOrigin==='https://convertunits.cc' &&
- ownerLaunch.numericIndexApproval===false &&cloudflareMainBuild;
+ typeof ownerLaunch.numericIndexApproval==='boolean' &&cloudflareMainBuild;
 const publication=resolveSitePublication({
  siteUrl:process.env.SITE_URL || (ownerApprovedMain?ownerLaunch.officialOrigin:''),
  approvedHost:process.env.SEO_PUBLIC_HOST || (ownerApprovedMain?'convertunits.cc':''),
@@ -37,11 +37,17 @@ const publication=resolveSitePublication({
  pagesBranch:process.env.CF_PAGES_BRANCH
 });
 const {isProduction:IS_PRODUCTION,site:SITE}=publication;
-const numericRelease=resolveNumericPilotPublication({
- isProduction:IS_PRODUCTION,site:SITE,mode:numericIndexMode,pilotUrls:numericPolicy.pilotIndexUrls,
- approval:process.env.SEO_NUMERIC_INDEX_APPROVED,approvedHost:process.env.SEO_NUMERIC_PUBLIC_HOST,
- approvedUrls:process.env.SEO_NUMERIC_APPROVED_URLS
-});
+// The owner has separately approved ALL actual numeric result URLs for the
+// real domain. Keep the full production release distinct from preview builds.
+const ownerApprovedNumeric=IS_PRODUCTION&&ownerLaunch.numericIndexApproval===true;
+const numericRelease=ownerApprovedNumeric
+ ?{publishedUrls:seeds.map(seed=>seed.url),reason:'owner-approved-full-numeric-publication'}
+ :resolveNumericPilotPublication({
+    isProduction:IS_PRODUCTION,site:SITE,mode:numericIndexMode,pilotUrls:numericPolicy.pilotIndexUrls,
+    approval:process.env.SEO_NUMERIC_INDEX_APPROVED,approvedHost:process.env.SEO_NUMERIC_PUBLIC_HOST,
+    approvedUrls:process.env.SEO_NUMERIC_APPROVED_URLS
+  });
+const effectiveNumericIndexMode=ownerApprovedNumeric?'all':numericIndexMode;
 const publishedNumeric=new Set(numericRelease.publishedUrls);
 const numericIndexable=url=>IS_PRODUCTION?publishedNumeric.has(url):numericIndexMode==='all'||launchPilot.has(url);
 if(!IS_PRODUCTION)console.warn('PREVIEW / SAFE MODE:',publication.reason,'— every page is noindex.');
@@ -177,5 +183,5 @@ if(/^pub-\d{16}$/.test(adsPublisher))fs.writeFileSync(path.join(dist,'ads.txt'),
 // public, non-secret deployment marker enables read-only preview freshness checks.
 const candidateCommit=(process.env.CF_PAGES_COMMIT_SHA||process.env.GITHUB_SHA||'').trim();
 const buildCommit=/^[a-f0-9]{40}$/i.test(candidateCommit)?candidateCommit.toLowerCase():null;
-fs.writeFileSync(path.join(dist,'build-info.json'),JSON.stringify({buildCommit,site:SITE,mode:IS_PRODUCTION?'production':'preview',tools:pairs.length,numericalPages:seeds.length,categories:byDim.length,indexablePages:allUrls.length,numericPilotIndexPages:launchPilot.size,numericIndexMode,numericIndexablePages:IS_PRODUCTION?publishedNumeric.size:0,numericPublishedUrls:IS_PRODUCTION?numericRelease.publishedUrls:[],numericReleaseReason:numericRelease.reason,publicationReason:publication.reason,publicationApproved:publication.launchApproved,cfPagesBranch:process.env.CF_PAGES_BRANCH||null,builtAt:new Date().toISOString()},null,2));
+fs.writeFileSync(path.join(dist,'build-info.json'),JSON.stringify({buildCommit,site:SITE,mode:IS_PRODUCTION?'production':'preview',tools:pairs.length,numericalPages:seeds.length,categories:byDim.length,indexablePages:allUrls.length,numericPilotIndexPages:launchPilot.size,numericIndexMode:effectiveNumericIndexMode,numericIndexablePages:IS_PRODUCTION?publishedNumeric.size:0,numericPublishedUrls:IS_PRODUCTION?numericRelease.publishedUrls:[],numericReleaseReason:numericRelease.reason,publicationReason:publication.reason,publicationApproved:publication.launchApproved,cfPagesBranch:process.env.CF_PAGES_BRANCH||null,builtAt:new Date().toISOString()},null,2));
 console.log('Built',allUrls.length,IS_PRODUCTION?'indexable pages:':'preview indexable pages:',pairs.length,'tools,',seeds.length,'specific pages,',byDim.length,'categories.');
