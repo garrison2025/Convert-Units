@@ -32,12 +32,12 @@ export function relatedNumericAnswers(seed, pair, seeds, limit=4) {
 export function relatedNumericAnswersHtml(seed,pair,seeds) {
   const nearby=relatedNumericAnswers(seed,pair,seeds);
   if(!nearby.length)return '';
-  const text=nearby.map(x=>'<li><a href="'+escapeHtml(x.url)+'">'+
+  const text=nearby.map(x=>'<a class="chip" href="'+escapeHtml(x.url)+'">'+
     escapeHtml(x.valueText)+' '+escapeHtml(x.from)+' '+
     escapeHtml(x.relation)+' '+escapeHtml(x.output)+' '+
-    escapeHtml(x.to)+'</a></li>').join('');
+    escapeHtml(x.to)+'</a>').join('');
   return '<section class="numeric-neighbors" aria-labelledby="numeric-neighbors-heading">'+
     '<h2 id="numeric-neighbors-heading">Other values in this conversion</h2>'+
     '<p>Explore nearby published measurements using the same units and independently calculated results.</p>'+
-    '<ul class="numeric-neighbor-list">'+text+'</ul></section>';
+    '<div class="chiplist">'+text+'</div></section>';
 }
