@@ -342,4 +342,4 @@
 @media(prefers-reduced-motion:reduce){.hero .demo,.hero .hero-intro{animation:none!important}.tile:hover .pict,.hero-utility a:hover,.btn:active{transform:none!important}}
 
 /* V37 desktop visual QA: align headline with tool, avoid a large empty top-left hero. */
-@media(min-width:901px){.home-page .hero-copy{align-self:start;margin-top:68px}}
+@media(min-width:901px){.home-page .hero>.hero-copy{align-self:start;margin-top:68px}}
