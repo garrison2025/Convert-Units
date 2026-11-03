@@ -2,6 +2,22 @@
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
 
+## V44 official Google search launch — complete (2026-11-03)
+
+**Current and authoritative.** Supersedes the older V41–V43 preparation and tentative numeric-review instructions below, which are retained only as development history.
+
+- **Owner's latest explicit instruction:** open ALL valid pages of the purchased `convertunits.cc` website to search indexing. Source approval: `src/data/official-domain-launch.json` (`ownerApprovedPublicIndex: true`, `numericIndexApproval: true`).
+- **Actually deployed:** `https://convertunits.cc/build-info.json` shows `mode=production`, `site=https://convertunits.cc`, `indexablePages=156`, `numericIndexablePages=92`. The 38 converter tools, 16 category pages, 92 numerical result pages and 10 other valid pages share the same official origin.
+- **All 156 real pages:** `<meta name="robots" content="index,follow">`, correct per-page self-canonical, matching `og:url`, and URL placement in `https://convertunits.cc/sitemap.xml`. `robots.txt` includes `Allow: /` and a pointer to the official sitemap. The site is HTML-rendered at build time, not dependent on client-side execution for the content/metadata.
+- **404 excluded by design:** A missing page must keep HTTP 404, and its fallback page has `noindex`. This is not holding back any genuine content URL.
+- **Only duplicate hosts remain protected:** `convert-units-bwa.pages.dev` and preview branch URLs are not separate websites to index. Their `X-Robots-Tag: noindex` host-specific Cloudflare Pages response-header rule avoids sending duplicate URL signals to Google. The primary apex domain is freely indexable. An optional stronger solution is a 301 Bulk Redirect from Pages.dev to apex per [Cloudflare documentation](https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/).
+- **Live Schema:** HTML contains truthful WebPage, WebSite, Organization (name/site/contact), BreadcrumbList and eligible WebApplication JSON-LD from the actual site identity. No invented individual author, review score, fake AI citations or claim of Google rich result entitlement.
+- **Optional LLM directory:** `https://convertunits.cc/llms.txt` is available, but **Google does not require or officially use this file for AI Overviews/AI Mode rankings**.
+- **Validation:** GitHub Actions repeats a production-origin rehearsal (all 156 URLs, 92 numeric pages), 404 exclusion, preview protection, 157 static HTML checks, real Chromium tests and Lighthouse lab performance checks. Live `scripts/official-domain-seo-audit.mjs` separately checks the deployed apex.
+- **Google indexing still not guaranteed:** 156 URLs are technically eligible for discovery/indexing, not 156 Google-indexed pages. Add the verified `convertunits.cc` Domain property in [Google Search Console](https://search.google.com/search-console), submit `https://convertunits.cc/sitemap.xml`, and inspect Coverage/Pages and individual example URLs after Google crawls.
+- **No secret or paid integrations:** no external AI API, no automated ads, no requirement to revisit old numeric approval controls, and no user email delivery test.
+
+
 ## Official domain and contact — confirmed 2026-11-03
 
 - **Official apex:** [https://convertunits.cc](https://convertunits.cc). Owner confirmed purchase and Cloudflare zone connection; verified the hostname already serves the existing Cloudflare Pages project and shares its `build-info.json` commit with `convert-units-bwa.pages.dev`.
