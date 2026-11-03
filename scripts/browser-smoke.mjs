@@ -877,6 +877,32 @@ async function smokeScenario(SCENARIO){
      ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview remains noindex');
      break;
    }
+   case 'numeric-source-adjust':{
+     const panel=q('[data-source-rounding-scenario]');
+     const select=panel?.querySelector('[data-source-step]');
+     const controls=panel?.querySelector('[data-round-controls]');
+     ok(Boolean(panel&&select&&controls&&!controls.hidden),'source precision explorer must activate only on numeric pages');
+     ok(!panel.querySelector('a[href]'),'explorer must never create SEO URL links');
+     const rows=panel.querySelectorAll('tbody tr');
+     ok(rows.length===3,'pre-rendered scenario must retain three comparison rows');
+     if(location.pathname.includes('/149/')){
+       select.value='0.1';select.dispatchEvent(new Event('change',{bubbles:true}));
+       ok(rows[0].cells[1].textContent.includes('148.95 lb'),'source sensitivity uses selected tenth-pound increment');
+       ok(panel.querySelector('[data-source-comparison]').textContent.includes('Both bounds round to 68 kg'),
+          'changed interval now has stable 68 kg whole-unit result');
+       select.value='1';select.dispatchEvent(new Event('change',{bubbles:true}));
+       ok(rows[0].cells[1].textContent.includes('148.5 lb')&&
+         panel.querySelector('[data-source-comparison]').textContent.includes('67 or 68 kg'),
+          'restoring integer source step restores original numerical distinction');
+     }
+     if(location.pathname.includes('/37.9/')){
+       select.value='1';select.dispatchEvent(new Event('change',{bubbles:true}));
+       ok(rows[0].cells[2].textContent.includes('99.32 °F')&&
+          rows[2].cells[2].textContent.includes('101.12 °F'),
+          'affine temperature conversion is used at both adjusted source boundaries');
+     }
+     break;
+   }
    case 'numeric-insight-pilot':{
      const panel=q('[data-numeric-intent-check]');
      ok(Boolean(panel),'curated numeric page must provide an actual calculated cross-check');
@@ -919,6 +945,8 @@ const suites=[
  {name:'numeric-insight-pilot',url:'/convert/ml-to-us-fl-oz/355/'},
  {name:'numeric-insight-pilot',url:'/convert/minutes-to-hours/10000/'},
  {name:'numeric-insight-held',url:'/convert/lbs-to-kg/149/'},
+ {name:'numeric-source-adjust',url:'/convert/lbs-to-kg/149/'},
+ {name:'numeric-source-adjust',url:'/convert/celsius-to-fahrenheit/37.9/'},
  {name:'seo-v33-source-kg',url:'/convert/kg-to-lbs/'},
  {name:'seo-v33-source-lbs',url:'/convert/lbs-to-kg/'},
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},

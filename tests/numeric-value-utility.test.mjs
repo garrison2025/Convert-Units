@@ -58,3 +58,18 @@ test('malformed or mismatched sources cannot publish an inaccurate interval',()=
  assert.throws(()=>sourceRoundingScenario({...seed,valueText:'149lb'},pair));
  assert.throws(()=>sourceRoundingScenario({...seed,valueText:'150'},pair));
 });
+
+test('92 numeric pages expose distinct, accessible no-JS-safe precision controls',()=>{
+ for(const seed of seeds){
+  const pair=bySlug.get(seed.slug),html=sourceRoundingScenarioHtml(seed,pair);
+  assert.ok(html.includes('data-round-controls hidden'),seed.url);
+  assert.ok(html.includes('data-source-comparison aria-live="polite"'),seed.url);
+  assert.ok(html.includes('data-source-value="'+seed.valueText+'"'),seed.url);
+  assert.ok(html.includes('data-source-from="'+pair.from+'"'),seed.url);
+  assert.ok(html.includes('data-source-to="'+pair.to+'"'),seed.url);
+  const options=[...html.matchAll(/<option value="([^"]+)"(?: selected)?>/g)].map(m=>Number(m[1]));
+  assert.ok(options.length>=1&&options.includes(sourceRoundingScenario(seed,pair).step),seed.url);
+  assert.ok(options.every(v=>seed.value-v/2>=0),seed.url);
+  assert.equal((html.match(/<option /g)||[]).length,options.length,seed.url);
+ }
+});

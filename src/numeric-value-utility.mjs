@@ -30,13 +30,23 @@ export function sourceRoundingScenarioHtml(seed,pair){
  const step=esc(formatNumber(s.step,s.decimals));
  const row=(label,n,result)=>'<tr><th scope="row">'+label+'</th><td>'+esc(fmtSource(n))+' '+
   esc(from.symbol)+'</td><td>'+rel(result)+' '+esc(fmtOut(result))+' '+esc(to.symbol)+'</td></tr>';
+
+ const stepChoices=[0.01,0.1,1,10,100,1000].filter(x=>x/2<=s.value);
+ const selectOptions=stepChoices.map(x=>'<option value="'+x+'"'+(x===s.step?' selected':'')+'>Nearest '+
+  esc(formatNumber(x,2))+' '+esc(from.symbol)+'</option>').join('');
+ const controls='<div data-round-controls hidden><label class="input-head" for="source-step-'+
+  seed.id+'">Change the hypothetical source rounding increment</label>'+
+  '<select class="select" id="source-step-'+seed.id+'" data-source-step>'+
+  selectOptions+'</select><p class="hint">Use this to compare rounding scenarios. No accuracy is inferred.</p></div>';
  const comparison=s.stable
   ?'Both boundaries round to '+esc(formatNumber(s.roundedLower,0))+' '+esc(to.symbol)+
     ' when reported to the nearest whole target unit.'
   :'The two boundaries round to different whole-unit target answers ('+
     esc(formatNumber(s.roundedLower,0))+' or '+esc(formatNumber(s.roundedUpper,0))+
     ' '+esc(to.symbol)+'). Retain decimals if that difference matters.';
- return '<section class="source-rounding-scenario" data-source-rounding-scenario="'+esc(seed.url)+
+ return '<section class="source-rounding-scenario" data-source-from="'+esc(pair.from)+
+  '" data-source-to="'+esc(pair.to)+'" data-source-value="'+esc(seed.valueText)+
+  '" data-source-rounding-scenario="'+esc(seed.url)+
   '" data-whole-result-stable="'+(s.stable?'yes':'no')+'">'+
   '<h2>If '+esc(seed.valueText)+' '+esc(from.symbol)+' was rounded at the source</h2>'+
   '<p class="reference-caption">The stated input converts to '+rel(s.central)+' <strong>'+
@@ -48,7 +58,7 @@ export function sourceRoundingScenarioHtml(seed,pair){
    '<tr><th>Scenario</th><th>Source reading</th><th>Converted result</th></tr></thead><tbody>'+
    row('Lower boundary',s.below,s.lower)+row('Stated value',s.value,s.central)+
    row('Upper boundary',s.above,s.upper)+'</tbody></table></div>'+
-  '<p class="reference-caption">'+comparison+'</p>'+
+  '<p class="reference-caption" data-source-comparison aria-live="polite">'+comparison+'</p>'+controls+
   '<p class="hint">This is a conditional rounding example, not an estimate of measurement '+
    'uncertainty. Displayed digits, especially trailing zeros, do not establish instrument '+
    'accuracy. If the original input is exact, the stated result is the applicable conversion.</p>'+
