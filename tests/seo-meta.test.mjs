@@ -40,7 +40,8 @@ test('all 38 direction meta descriptions accurately distinguish rounded versus e
  const descriptions=new Set();
  for(const p of pairs){
   const result=directionMetaDescription(p);
-  assert.ok(result.startsWith(p.title+': 1 '),p.slug);
+  const alias=p.slug==='lbs-to-kg'?' (lbs to kg)':p.slug==='kg-to-lbs'?' (kg to lbs)':'';
+  assert.ok(result.startsWith(p.title+alias+': 1 '),p.slug);
   assert.match(result,/ (?:=|≈) /,p.slug);
   assert.ok(result.includes('local batch converter'),p.slug);
   assert.ok(result.length<190,p.slug+' description too long: '+result.length);
