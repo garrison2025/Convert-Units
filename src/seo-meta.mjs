@@ -36,3 +36,27 @@ export function directionMetaDescription(pair){
  return pair.title+': 1 '+from.symbol+' '+relation+' '+rendered+' '+to.symbol+
   '. Enter any value, check the formula and use the reference table or local batch converter.';
 }
+
+/**
+ * Curated, concise titles for the nine directions with redundant long
+ * title text. Search engines have no fixed character limit: shorten only
+ * where a symbol and its full unit name otherwise repeat unnecessarily.
+ * This does not rewrite H1 text, create routes or infer keyword volume.
+ */
+const conciseTitles=Object.freeze({
+ 'ml-to-us-fl-oz':'Milliliters to US Fluid Ounces (mL to fl oz)',
+ 'us-fl-oz-to-ml':'US Fluid Ounces to Milliliters (fl oz to mL)',
+ 'us-tbsp-to-us-tsp':'US Tablespoons to Teaspoons (tbsp to tsp)',
+ 'ft-lbf-to-nm':'Foot-Pounds to Newton-Meters (ft·lbf to N·m)',
+ 'nm-to-ft-lbf':'Newton-Meters to Foot-Pounds (N·m to ft·lbf)',
+ 'kmh-to-mph':'Kilometers per Hour to MPH (km/h to mph)',
+ 'mph-to-kmh':'MPH to Kilometers per Hour (mph to km/h)',
+ 'm2-to-ft2':'Square Meters to Square Feet (m² to ft²)',
+ 'mpg-us-to-l-100km':'US MPG to L/100 km Converter'
+});
+export const conciseDirectionTitleSlugs=Object.freeze(Object.keys(conciseTitles));
+export function directionSeoTitle(pair){
+ const from=units[pair.from],to=units[pair.to];
+ if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Incompatible SEO units');
+ return conciseTitles[pair.slug]||pair.title+' Converter ('+from.symbol+' to '+to.symbol+')';
+}
