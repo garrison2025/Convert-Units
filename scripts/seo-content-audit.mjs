@@ -87,6 +87,12 @@ function checkMarkup(route,expectedApp=false){
    const found=html.match(new RegExp('<meta property="'+property+'" content="([^"]*)"', 'i'))?.[1];
    if(decode(found||'')!==expected)errors.push(route+': '+property+' disagrees with page metadata');
   }
+  const locale=html.match(/<meta property="og:locale" content="([^"]+)"/i)?.[1];
+  if(locale!=='en_US')errors.push(route+': Open Graph language/locale missing or inconsistent');
+  if(meta(html,'twitter:card')!=='summary')errors.push(route+': X share card should use factual summary metadata');
+  for(const [name,value] of [['twitter:title',getTitle(html)],['twitter:description',decode(meta(html,'description'))]]){
+   if(decode(meta(html,name))!==value)errors.push(route+': '+name+' disagrees with actual page metadata');
+  }
   const routeChain=expectedBreadcrumbRoutes(route);
   const breadcrumbs=jsonBlocks.filter(x=>x['@type']==='BreadcrumbList');
   if(route==='/'){
