@@ -35,6 +35,41 @@ async function smokeScenario(SCENARIO){
      ok([...document.querySelectorAll('[data-quick-item]')].some(el=>!el.hidden),'suggestions should include matching tools');
      break;
    }
+   case 'motion-interaction':{
+     const tool=q('[data-converter]'),input=tool?.querySelector('[data-value]'),number=tool?.querySelector('[data-output-number]');
+     ok(Boolean(input&&number),'motion must use the original, accessible calculator result');
+     input.value='151';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(number.textContent!=='—','input must update immediately before any visual effect');
+     if(window.matchMedia('(prefers-reduced-motion: no-preference)').matches){
+       const motions=number.getAnimations();
+       ok(motions.length===1&&motions[0].effect.getTiming().duration===190,
+         'first user edit must provide a short task-related Web Animations result cue');
+       input.value='152';input.dispatchEvent(new Event('input',{bubbles:true}));
+       ok(number.getAnimations().length===1,'rapid input must cancel and replace previous animation');
+       await new Promise(resolve=>setTimeout(resolve,230));
+       ok(number.getAnimations().length===0,'result must settle without continuous looping');
+     }
+     const match=window.matchMedia;
+     try{
+       window.matchMedia=()=>({matches:false});
+       input.value='153';input.dispatchEvent(new Event('input',{bubbles:true}));
+       ok(number.getAnimations().length===0,'reduced-motion path must perform conversion without animation');
+     }finally{window.matchMedia=match;}
+     ok(number.textContent!=='—','reduced-motion input still converts');
+     input.focus();
+     ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
+     break;
+   }
+   case 'motion-entrance':{
+     const hero=q('.home-page .hero'),demo=q('.home-page .hero .demo'),intro=q('.home-page .hero-intro');
+     ok(Boolean(hero&&demo&&intro),'home layout and calculator must stay in the DOM');
+     if(window.matchMedia('(prefers-reduced-motion: no-preference)').matches){
+       ok(getComputedStyle(demo).animationName.includes('fade-pop'),'homepage calculator entrance no longer suppressed');
+       ok(getComputedStyle(intro).animationName.includes('fade-up'),'homepage intro entrance no longer suppressed');
+     }
+     ok(getComputedStyle(hero).minHeight!=='0px','hero retains its stable space');
+     break;
+   }
    case 'copy-number':{
      const numberButton=q('[data-copy-number]');
      const feedback=q('[data-action-status]');
@@ -755,6 +790,9 @@ const suites=[
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
  {name:'seo-v33-generic-intent',url:'/convert/kn-to-lbf/'},
  {name:'seo-v33-generic-intent',url:'/convert/kw-to-hp/'},
+ {name:'motion-entrance',url:'/'},
+ {name:'motion-interaction',url:'/'},
+ {name:'motion-interaction',url:'/convert/kg-to-lbs/'},
  {name:'homepage',url:'/'},{name:'copy-number',url:'/'},{name:'direction',url:'/'},{name:'progressive',url:'/'},{name:'batch-visual',url:'/batch-converter/'},{name:'batch',url:'/batch-converter/'},{name:'batch-mixed',url:'/batch-converter/'},
  {name:'batch-multiline',url:'/batch-converter/'},
  {name:'batch-alias',url:'/batch-converter/'},
