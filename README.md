@@ -12,6 +12,14 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
 
+### V36 closed-loop pre-domain quality pass (2026-11-03)
+
+- **Actual code, not expansion:** exactly 15 existing source-backed numeric candidates now display category-appropriate, engine-calculated multi-unit checks. Examples: `240 kg` in pounds/ounces/grams; `400 ft·lbf` in N·m/in·lbf/kgf·m; `37.9 °C` as absolute F/K plus separately derived temperature *interval*; `10,000 minutes` as days/hours/minutes; `355 mL` distinguishes US and UK fluid ounces. The other **77** numeric pages remain useful but do not receive invented keyword-focused content. `src/numeric-insight.mjs` uses no API and creates no routes.
+- **Editorial decisions are explicit, not a release approval:** `research/NUMERIC-PRELAUNCH-DECISIONS-V36-20261103.json` records 15 source queries, 6 cases where independent competitor feature parity favors the existing parent direction tool, and 9 more that still lack independently proven unique value. All are held until a later explicit release; the preview remains sitewide `noindex`.
+- **38 keyword directions fully source reconciled:** `scripts/prelaunch-editorial-audit.mjs` checks V32's original 38-row matrix against real 92 seeds and 15 strict evidenced directions. It *never* calls historical numeric keyword Volume/KD the generic tool's Volume/KD. Detailed editorial decisions and caveats: [V36 review](research/SEO-PRELAUNCH-V36-FINAL-REVIEW-20261103.md).
+- **UI and QA:** desktop/phone insight cards, high-contrast unit values and 320/375px responsive checks; `tests/numeric-insight.test.mjs`, the static SEO audit, new prelaunch audit, and Chrome smoke scenarios prevent missing/incorrect content, unsuitable numeric links, route proliferation, and unsafe indexing. Each `npm run build` produces private reports only in `qa-reports/`.
+- **Deliberately not done at user request:** ads/AdSense, real domain purchase/connection, GSC/real ranking checks, or any opening of indexing. No GitHub/CDN configuration changes.
+
 ### V35 source-backed title and homepage navigation pass (2026-11-03)
 
 - Preserves **38** source-accurate directional tools and their H1 headings. On **nine** verbose titles only, eliminates repeated unit wording while retaining direction, unit symbols and the `ExactUnit` suffix. This is editorial concision, **not** a claim that Google imposes a 60-character title limit. Source: `src/seo-meta.mjs`; guard: `tests/seo-direction-titles.test.mjs`.
