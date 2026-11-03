@@ -3,7 +3,8 @@ const root=new URL('../dist/',import.meta.url);const build=JSON.parse(fs.readFil
 const indexPolicy=JSON.parse(fs.readFileSync(new URL('../src/data/numeric-seo-policy.json',import.meta.url)));
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 function content(url){const f=new URL(url.slice(1)+'index.html',root);assert.ok(fs.existsSync(f),'Missing '+f);return fs.readFileSync(f,'utf8');}
-const excluded=new Set(build.numericIndexMode==='all'?[]:seeds.filter(x=>!indexPolicy.pilotIndexUrls.includes(x.url)).map(x=>x.url));
+const published=build.mode==='production'?new Set(build.numericPublishedUrls||[]):new Set(build.numericIndexMode==='all'?seeds.map(s=>s.url):indexPolicy.pilotIndexUrls);
+const excluded=new Set(seeds.filter(x=>!published.has(x.url)).map(x=>x.url));
 let count=0;const routes=['/',...pairs.map(p=>p.url),...seeds.map(s=>s.url),'/all-converters/','/universal-converter/','/batch-converter/', '/methodology/','/privacy/','/about/','/contact/','/terms/'];
 assert.ok(['preview','production'].includes(build.mode),'Build mode must be explicit');
 if(build.mode==='production') {

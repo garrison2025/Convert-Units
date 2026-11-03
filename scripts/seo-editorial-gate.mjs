@@ -77,7 +77,7 @@ const valueRows=seeds.map(s=>{
   competitorTrafficEstimate:s.trafficEstimate,competitorLandingPath:s.competitorURL,
   direction:s.slug,sourceUnit:units[p.from].symbol,targetUnit:units[p.to].symbol,
   siblingNumericPages:(bySlug.get(s.slug)||[]).length,
-  launchIndexPolicy:inPilot?'eligible-only-after-explicit-domain-approval':'noindex; excluded from production sitemap',
+  launchIndexPolicy:inPilot?'requires separate exact-URL approval AND official-domain approval; otherwise noindex':'always noindex; excluded from production sitemap',
   editorialDisposition:inPilot?'PILOT_REVIEW_REQUIRED':'KEEP_FUNCTIONAL_NOINDEX',
   editorialReason:inPilot?'One numeric value per directional cluster; parent-intent and SERP distinctness not independently verified':
    'Sibling numeric-intent duplication risk; no separate validated reason to index at launch',

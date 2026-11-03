@@ -26,7 +26,8 @@ const read=(route)=>fs.readFileSync(path.join(dist,route.replace(/^\/+/,''),'ind
 const meta=(html,name)=>html.match(new RegExp('<meta\\s+name="'+name+'"\\s+content="([^"]*)"','i'))?.[1]||'';
 const decode=s=>s.replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'");
 const getTitle=html=>decode(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]||'');
-const indexedSeed=s=>info.numericIndexMode==='all'||pilot.has(s.url);
+const publishedNumeric=new Set(info.numericPublishedUrls||[]);
+const indexedSeed=s=>info.mode==='production'?publishedNumeric.has(s.url):info.numericIndexMode==='all'||pilot.has(s.url);
 
 const pairByUrl=new Map(pairList.map(p=>[p.url,p]));
 const seedByUrl=new Map(seeds.map(s=>[s.url,s]));
