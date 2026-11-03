@@ -347,7 +347,7 @@ if(!homepage.includes('data-mixed-kg')||!homepage.includes('67 kg 585 g'))
  errors.push('/: calculated kilograms-plus-grams initial homepage result missing');
 if(!/<h1>Unit converter\.<br>/.test(homepage))
  errors.push('/: principal H1 omits Unit converter task and no longer aligns with search title');
-const referenceSection=homepage.match(/<section class="section" aria-labelledby="home-quick-reference">([\\s\\S]*?)<\\/section>/)?.[1]||'';
+const referenceSection=homepage.split('<section class="section" aria-labelledby="home-quick-reference">')[1]?.split('</section>')[0]||'';
 if(!referenceSection)errors.push('/: accurate, crawlable homepage reference section missing');
 const homeFacts=homeReferenceFacts(pairList);
 if((referenceSection.match(/<tr>/g)||[]).length!==homeFacts.length+1)
