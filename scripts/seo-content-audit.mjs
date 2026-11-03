@@ -360,6 +360,11 @@ for(const fact of homeFacts){
 if(!referenceSection.includes('href="/methodology/"')||
    !referenceSection.includes('US fluid ounces measure volume'))
  errors.push('/: home reference content must explain units and cite methodology');
+for(const [route,alias] of [['/convert/lbs-to-kg/','lbs to kg'],['/convert/kg-to-lbs/','kg to lbs']]){
+ const html=read(route);
+ if(!html.includes('Unit notation:')||!html.includes('“'+alias+'”'))
+  errors.push(route+': natural, factual common-notation explanation missing');
+}
 const batchHtml=checkMarkup('/batch-converter/',true);
 for(const feature of [
  'Batch unit converter for CSV and spreadsheets',
