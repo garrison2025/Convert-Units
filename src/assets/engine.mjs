@@ -50,8 +50,8 @@ export const units = {
  psi:{name:'Pounds per square inch',symbol:'psi',dimension:'pressure',factor:6894.757293168},
  kpa:{name:'Kilopascals',symbol:'kPa',dimension:'pressure',factor:1000},
  hpa:{name:'Hectopascals',symbol:'hPa',dimension:'pressure',factor:100},
- // Conventional mmHg: NIST SP 811 lists a rounded factor of 1.333224e2 Pa.
- // It is not the different exact 101325/760 Pa definition of the torr.
+ /** Conventional mmHg: NIST SP 811 B.8 uses rounded 133.3224 Pa;
+  * unlike the torr, which is exactly 101325/760 Pa. */
  mmhg:{name:'Conventional millimeters of mercury',symbol:'mmHg',dimension:'pressure',factor:133.3224},
  atm:{name:'Standard atmospheres',symbol:'atm',dimension:'pressure',factor:101325},
  pa:{name:'Pascals',symbol:'Pa',dimension:'pressure',factor:1},
