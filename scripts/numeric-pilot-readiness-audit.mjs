@@ -69,7 +69,7 @@ for(const url of policy.pilotIndexUrls){
  const rounded=formatNumber(value,9);
  const expression=seed.valueText+' '+units[pair.from].symbol+' '+displayRelation(value,rounded)+' '+rounded+' '+units[pair.to].symbol;
  const checks={
-  titleMatchesAnswer:getTitle(numericHtml)===numericTitle(seed,pair)+' | ExactUnit',
+  titleMatchesAnswer:getTitle(numericHtml)===numericTitle(seed,pair)+' | ConvertUnits.cc',
   headingMatchesQuery:getH1(numericHtml)===numericHeading(seed,pair),
   snippetMatchesCalculation:getMeta(numericHtml)===numericDescription(seed,pair),
   originalValueAndAnswerVisible:numericHtml.includes('class="direct-answer"')&&numericHtml.includes(expression),
