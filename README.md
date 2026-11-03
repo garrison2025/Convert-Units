@@ -12,6 +12,13 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
 
+### V33 on-page SEO (2026-11-03)
+
+- **Implemented in existing tool pages:** `src/source-backed-examples.mjs` renders up to five exact-engine worked answers on 15 of the 38 main converter routes, using the 92 already reviewed US Semrush numeric seed inputs. The other 23 tools retain their own purpose-built explanations without unsourced examples.
+- Two source-specific unit-standard Q&A blocks now explain **mechanical hp versus metric/electrical horsepower** on `/convert/kw-to-hp/`, and **pound-force versus mass pounds** on `/convert/kn-to-lbf/`.
+- New Node tests: `tests/source-backed-examples.test.mjs`; `scripts/seo-content-audit.mjs` checks generated page examples in static HTML. Full report: `research/SEO-ONPAGE-IMPLEMENTATION-V33-20261103.md`.
+- Existing 157 routes, zero-dependency architecture, 92 numeric pages, 15 conditional numeric pilots, deferred official domain and fail-closed Cloudflare preview `noindex` are unchanged. Live preview deployment must still be checked separately.
+
 ### Current US SEO research — V32 (2026-11-03)
 
 - **Use the supplied Semrush data; no new export or subscription required:** `research/SEO-38-DIRECTION-PRIORITY-V32-20261103.md` is the latest SEO research entrypoint.
