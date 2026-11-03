@@ -43,3 +43,25 @@ test('relevant numeric candidates and SEO release inventory remain unchanged',()
  assert.equal(seeds.length-policy.pilotIndexUrls.length,77);
  assert.equal(seeds.filter(s=>s.slug==='kw-to-hp').length,0,'Do not invent keywords or numeric SEO pages for horsepower');
 });
+
+test('eight competitor-first core intents are evidenced without pretending to know current US keyword metrics',()=>{
+ const registry=JSON.parse(fs.readFileSync(new URL('../research/CORE-8-COMPETITOR-INTENT-V28-20261103.json',import.meta.url),'utf8'));
+ assert.equal(registry.items.length,8);
+ assert.equal(registry.remainingCoreDirectionsWithoutExternalPageComparison,30);
+ assert.equal(registry.competitorUSVolumeVerified,false);
+ assert.equal(registry.competitorCurrentGoogleRankingVerified,false);
+ assert.equal(registry.exactunitGSCVerified,false);
+ assert.equal(new Set(registry.items.map(x=>x.slug)).size,8);
+ for(const item of registry.items){
+  assert.equal(item.siteURL,pair(item.slug).url);
+  assert.ok(item.source.startsWith('https://'));
+  assert.ok(item.evidence.length>65);
+  assert.ok(item.gap.length>65);
+  assert.equal(item.verifiedVolumeUS,null);
+  assert.equal(item.verifiedKD,null);
+  assert.equal(item.verifiedGooglePositionUS,null);
+  assert.equal(item.estimatedExactunitClicks,null);
+ }
+ assert.equal(registry.items.filter(x=>x.decision==='FIX_CONFUSING_CONVENTION_WITH_STATIC_REFERENCE').length,1);
+ assert.equal(registry.items.find(x=>x.slug==='kw-to-hp').decision,'FIX_CONFUSING_CONVENTION_WITH_STATIC_REFERENCE');
+});
