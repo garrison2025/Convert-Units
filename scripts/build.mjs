@@ -137,7 +137,7 @@ const srcAssets=path.join(root,'src/assets');fs.mkdirSync(path.join(dist,'assets
 }
 // One production CSS resource, while keeping ordered, maintainable source layers.
 const cssLayers=['site.css','refresh.css','polish.css','ux.css','inner.css'];
-fs.writeFileSync(path.join(dist,'assets','styles.css'),cssLayers.map(name=>fs.readFileSync(path.join(srcAssets,name),'utf8')).join('\n'));
+fs.writeFileSync(path.join(dist,'assets','styles.css'),cssLayers.map(name=>fs.readFileSync(path.join(srcAssets,name),'utf8')).join('\n').replace(/\/\*[\s\S]*?\*\//g,''));
 
 fs.writeFileSync(path.join(dist,'favicon.svg'),`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="0" y="0" width="64" height="64" rx="16" fill="#2055d6"/><path d="M14 24h36m0 0-10-9m10 9-10 9M50 42H14m0 0 10-9m-10 9 10 9" fill="none" stroke="#fff" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`);
 fs.writeFileSync(path.join(dist,'robots.txt'),IS_PRODUCTION?`User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`:`User-agent: *\nAllow: /\n# Preview noindex provided by meta and HTTP header.\n`);
