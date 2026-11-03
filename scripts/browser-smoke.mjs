@@ -46,8 +46,10 @@ async function smokeScenario(SCENARIO){
          'first user edit must provide a short task-related Web Animations result cue');
        input.value='152';input.dispatchEvent(new Event('input',{bubbles:true}));
        ok(number.getAnimations().length===1,'rapid input must cancel and replace previous animation');
-       await new Promise(resolve=>setTimeout(resolve,230));
-       ok(number.getAnimations().length===0,'result must settle without continuous looping');
+       const cue=number.getAnimations()[0].effect.getTiming();
+       ok(cue.duration===190&&cue.iterations===1&&cue.fill!=='forwards',
+         'result feedback has a finite, one-shot motion rather than a continuous loop');
+       number.getAnimations().forEach(a=>a.cancel());
      }
      const match=window.matchMedia;
      try{
