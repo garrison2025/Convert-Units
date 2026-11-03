@@ -14,6 +14,9 @@ import {standardsReferenceFacts} from '../src/standards-reference.mjs';
 import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from '../src/seo-guides.mjs';
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
+import {geoVerificationHtml} from '../src/geo-verification.mjs';
+import {categoryDecisionHtml} from '../src/category-seo.mjs';
+import {llmsDirectory} from '../src/llms-directory.mjs';
 import {numericInsight} from '../src/numeric-insight.mjs';
 import {sourceRoundingScenarioHtml} from '../src/numeric-value-utility.mjs';
 import {relatedNumericAnswers,relatedNumericAnswersHtml} from '../src/seo-related-values.mjs';
@@ -146,6 +149,8 @@ for(const pair of pairList){
   errors.push(pair.url+': first-screen source-calculated 1-unit direct answer missing or inaccurate');
  if(decode(meta(html,'description'))!==directionMetaDescription(pair))
   errors.push(pair.url+': converter meta description has wrong rounded/equality relation');
+ const geoProof=geoVerificationHtml(pair);
+ if(!html.includes(geoProof))errors.push(pair.url+': independently computed standards trace and source missing');
  const examples=sourceBackedExamples(pair,seeds);
  if(examples){
   if(!html.includes(examples))errors.push(pair.url+': source-backed, calculated examples are missing or incorrect');
@@ -294,12 +299,23 @@ for(const dim of ['mass','length','volume','temperature','pressure','torque','ti
  const html=checkMarkup(route,false);
  if(decode(meta(html,'description'))!==categoryMetaDescription(dim))
   errors.push(route+': generic or inaccurate category meta description');
+ if(!html.includes(categoryDecisionHtml(dim,pairList)))
+  errors.push(route+': specific category choice guidance missing');
+ if(html.includes('Accurate calculations, no guesswork'))
+  errors.push(route+': repeated generic category CTA was not removed');
  if(!html.includes(categoryConversionExamples(dim,pairList)))
   errors.push(route+': computed category examples or eligible tool links do not match shared engine');
  if(!html.includes('class="card measurement-guide"'))errors.push(route+': category-specific measurement explanation missing');
  if(!html.includes('How to verify a conversion'))errors.push(route+': category-specific verification missing');
  if(!html.includes('nist.gov'))errors.push(route+': NIST source link missing');
 }
+
+// The optional LLM index must never drift from actual tool/category paths.
+const llms=fs.readFileSync(path.join(root,'dist/llms.txt'),'utf8');
+if(llms!==llmsDirectory(pairList,Object.keys(dimensions).map(id=>({id}))))
+ errors.push('/llms.txt: outdated or invalid registry-driven directory');
+if(llms.includes('.pages.dev')||llms.includes('guaranteed AI ranking'))
+ errors.push('/llms.txt: preview hostname or unfounded AI claim');
 for(const seed of seeds){
  const html=checkMarkup(seed.url,false);
  const title=getTitle(html);
