@@ -314,22 +314,18 @@
 @media(max-width:520px){.temperature-scale-values{grid-template-columns:1fr}}
 
 
-/* V36: helpful, SSR value-specific cross-checks on exactly 15 candidate pages.
-   Compact static HTML, responsive and keyboard-friendly; no runtime/API. */
-.inner-page .numeric-intent-check{margin:23px 0;padding:22px;border:1px solid #cddbf4;border-radius:15px;background:linear-gradient(135deg,#f6f9ff,#fff);box-shadow:0 8px 22px #1837620a;min-width:0}
-.numeric-insight-head>span{font-size:.67rem;font-weight:800;letter-spacing:.1em;color:#345d99}
-.inner-page .body-content .card .numeric-intent-check h2{margin:5px 0 8px;font-size:clamp(1.12rem,2vw,1.36rem);color:#192f50;letter-spacing:-.02em}
-.numeric-insight-head p{margin:0 0 17px;font-size:.83rem;line-height:1.6;color:#526b8c}
+/* V36: data-backed numeric cross-checks. Browser-native, no extra scripts. */
+.numeric-intent-check{margin:22px 0;padding:19px;border:1px solid #cfdef2;border-radius:14px;background:#f7faff;min-width:0}
+.numeric-insight-head>span{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:#365b96}
+.inner-page .body-content .card .numeric-intent-check h2{margin:5px 0 8px;font-size:clamp(1.1rem,2vw,1.32rem);color:#193456}
+.numeric-insight-head p{margin:0 0 14px;font-size:.83rem;line-height:1.55}
 .numeric-insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 12px}
-.numeric-insight-value{min-width:0;padding:12px 11px;background:white;border:1px solid #dfe7f5;border-radius:11px}
-.numeric-insight-value dt{font-size:.73rem;line-height:1.45;color:#536a8d;font-weight:650}
-.numeric-insight-value dd{margin:7px 0 0;color:#14396e;font-size:clamp(.9rem,1.6vw,1.02rem);font-weight:810;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;line-height:1.4}
-.numeric-insight-value dd small{font-weight:680;font-size:.78em;color:#416294}
-.inner-page .numeric-intent-check .numeric-insight-extra{padding:10px 12px;background:#e9f1ff;border-radius:9px;color:#1e477f;font-size:.82rem;line-height:1.6;margin:8px 0}
-.inner-page .numeric-intent-check .numeric-insight-note,.inner-page .numeric-intent-check .numeric-insight-parent{margin:10px 0 0;color:#526785;font-size:.78rem;line-height:1.65}
-.numeric-insight-parent a{font-weight:760;text-decoration:underline;text-underline-offset:3px;color:#225ca8}
-.numeric-insight-parent a:focus-visible{outline:3px solid #196fbd;outline-offset:3px;border-radius:2px}
+.numeric-insight-value{min-width:0;padding:11px;background:#fff;border:1px solid #dfe7f5;border-radius:10px}
+.numeric-insight-value dt{font-size:.72rem;line-height:1.4;color:#536a8d}
+.numeric-insight-value dd{margin:7px 0 0;color:#183c6f;font-weight:800;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.numeric-insight-value dd small{font-size:.78em;color:#416294}
+.inner-page .numeric-intent-check p{font-size:.81rem;line-height:1.6}
+.numeric-insight-extra{padding:10px 12px;border-radius:9px;background:#e9f1ff}
+.numeric-insight-parent a{font-weight:760;text-decoration:underline}
 @media(max-width:850px){.numeric-insight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.inner-page .numeric-intent-check{padding:16px 13px;margin:20px 0}.numeric-insight-grid{grid-template-columns:1fr;gap:7px}.numeric-insight-value{padding:10px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}.numeric-insight-value dd{margin:0;text-align:right;font-size:.94rem}}
-@media(prefers-reduced-motion:reduce){.numeric-intent-check *{animation:none!important;transition:none!important}}
-@media print{.inner-page .numeric-intent-check{background:#fff!important;box-shadow:none!important;break-inside:avoid;page-break-inside:avoid}}
+@media(max-width:520px){.numeric-intent-check{padding:15px 12px}.numeric-insight-grid{grid-template-columns:1fr;gap:7px}.numeric-insight-value{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.numeric-insight-value dd{margin:0;text-align:right}}
