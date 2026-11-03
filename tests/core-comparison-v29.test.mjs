@@ -49,7 +49,8 @@ test('US customary spoon, nutrition-label spoon and Australian spoon never chang
  for(const value of ['14.786764781','4.928921594','15','20','3','4'])
   assert.ok(html.includes(value),value);
  assert.match(html,/Australian tablespoon/);
- assert.match(html,/FDA nutrition-label tbsp/);
+ assert.match(html,/US nutrition-label tbsp/);
+ assert.match(html,/FDA food-label standards/);
  assert.equal(convert(1,'us-tbsp','us-tsp'),3);
  assert.equal(formatNumber(convert(1,'us-tbsp','ml'),9),'14.786764781');
 });
