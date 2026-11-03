@@ -81,7 +81,7 @@ async function smokeScenario(SCENARIO){
      ok(css.getPropertyValue('--canvas').trim().toLowerCase()==='#f6f9fa'&&
         css.getPropertyValue('--result-bg').trim().toLowerCase()==='#e8f5f6',
        'background and answer surface must share the V39 palette');
-     const RGB=v=>(v.match(/[\\d.]+/g)||[]).slice(0,3).map(Number);
+     const RGB=v=>(v.match(/[0-9.]+/g)||[]).slice(0,3).map(Number);
      const luminance=v=>{const rgb=RGB(v).map(c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
      const contrast=(a,b)=>{const x=luminance(a),y=luminance(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05);};
      const primaryStyle=getComputedStyle(primary),panelStyle=getComputedStyle(panel),numStyle=getComputedStyle(number);
