@@ -1,0 +1,144 @@
+{
+  "reviewedOn": "2026-11-03",
+  "market": "US-English search-intent hypothesis; public-page inspection not geolocated Google SERP snapshot",
+  "title": "Four numeric query comparator-feature parity reassessment after V26",
+  "purpose": "Prevent unsubstantiated claims that multi-unit panels or metric/imperial examples uniquely differentiate these numerical SEO pages.",
+  "currentDecision": "PREFER_PARENT_CONVERTER__NUMERIC_HOLD",
+  "independentUSGoogleRankVerified": false,
+  "googleSearchConsoleClicksVerified": false,
+  "discoveredNewNumericalUrls": 0,
+  "items": [
+    {
+      "url": "/convert/ml-to-us-fl-oz/355/",
+      "query": "355 ml to fluid ounces",
+      "value": 355,
+      "from": "ml",
+      "to": "us-fl-oz",
+      "sources": [
+        {
+          "url": "https://www.calculateme.com/volume/milliliters/to-fluid-ounces/355",
+          "type": "original-value-specific-competitor",
+          "verifiedObservation": "Exact-value 355 mL to US fluid ounces answer and conversion chart from prior stored research."
+        },
+        {
+          "url": "https://calcfluent.com/conversions/ml-to-ounces/",
+          "type": "additional-generic-competitor",
+          "verifiedObservation": "Generic calculator explicitly displays 355 mL as about 12.004 US fl oz AND 12.4943 UK fl oz, plus US/Imperial/cups/table."
+        },
+        {
+          "url": "https://moneydeck.io/tools/ml-to-oz",
+          "type": "additional-generic-competitor",
+          "verifiedObservation": "US and UK fluid ounces on the same converter, with 355 mL included in the dual-unit table."
+        }
+      ],
+      "siteMarkers": [
+        "data-fluid-oz-compare",
+        "data-precision-table"
+      ],
+      "siteExistingUtility": "Both US and imperial fluid-ounce conversions and precision comparison are already displayed on 355-mL page.",
+      "actualFeatureGap": "Two additional competitors provide US/UK side-by-side values and 355-mL examples; dual-system display is not exclusive to ExactUnit.",
+      "recommendedHandling": "PREFER_PARENT_CONVERTER__NUMERIC_HOLD",
+      "serpIntent": "exact-conversion; general tool also answers the number",
+      "confidence": "public-page-content-only"
+    },
+    {
+      "url": "/convert/kmh-to-mph/330/",
+      "query": "330kmh to mph",
+      "value": 330,
+      "from": "kmh",
+      "to": "mph",
+      "sources": [
+        {
+          "url": "https://convert-top.com/velocity-speed/kilometers-per-hour/km-h-to-mph/330/",
+          "type": "original-value-specific-competitor",
+          "verifiedObservation": "Indexed page extract provides 330 km/h ≈205.0524934 mph and formula 330/1.609344; direct webpage request did not complete."
+        },
+        {
+          "url": "https://convertoctopus.com/330-kilometers-per-hour-to-miles-per-hour",
+          "type": "additional-value-specific-competitor",
+          "verifiedObservation": "Exact-number page 330 km/h to mph with formula, chart, and links to m/s and knots."
+        },
+        {
+          "url": "https://unitly.tooleek.com/en/kmh-to-mph",
+          "type": "additional-generic-competitor",
+          "verifiedObservation": "Live generic km/h converter offers mph, m/s, knots and other speed outputs."
+        }
+      ],
+      "siteMarkers": [
+        "data-speed-summary",
+        "data-precision-table"
+      ],
+      "siteExistingUtility": "Four simultaneously visible speed units (km/h, mph, m/s, kn) and round-precision table.",
+      "actualFeatureGap": "The rival offers the same speed-unit families and numeric page value; the source-only advantage is not demonstrated.",
+      "recommendedHandling": "PREFER_PARENT_CONVERTER__NUMERIC_HOLD",
+      "serpIntent": "exact-conversion; number and multiunit outputs already available elsewhere",
+      "confidence": "indexed-excerpt-and-public-pages"
+    },
+    {
+      "url": "/convert/celsius-to-fahrenheit/37.9/",
+      "query": "37.9 celsius to fahrenheit",
+      "value": 37.9,
+      "from": "celsius",
+      "to": "fahrenheit",
+      "sources": [
+        {
+          "url": "https://www.celsiusfahrenheit.co/37.9",
+          "type": "original-value-specific-competitor",
+          "verifiedObservation": "37.9 °C=100.22 °F with formula, step-by-step solution, nearby temperatures and an interpretation question."
+        },
+        {
+          "url": "https://convert-units.info/temperature/celsius/37.9",
+          "type": "additional-value-specific-competitor",
+          "verifiedObservation": "37.9 °C displayed in Fahrenheit, Kelvin, Réaumur and Rankine simultaneously."
+        },
+        {
+          "url": "https://www.chkd.org/patient-family-resources/health-library/safety-and-injury-prevention/temperature-conversion-chart/",
+          "type": "independent-reference-not-serp-rank",
+          "verifiedObservation": "Pediatric hospital chart rounds 37.9 °C to 100.2 °F; it is not a diagnostic tool."
+        }
+      ],
+      "siteMarkers": [
+        "data-temperature-triple",
+        "data-precision-table"
+      ],
+      "siteExistingUtility": "Live Celsius, Fahrenheit and Kelvin results with rounding options; no diagnostic classification.",
+      "actualFeatureGap": "Competitor displays more temperature scales and medical interpretation; adding unsupported fever classification to a conversion result is inappropriate because context and measurement method matter.",
+      "recommendedHandling": "PREFER_PARENT_CONVERTER__NUMERIC_HOLD",
+      "serpIntent": "exact-temperature-reading; medical context requires dedicated verified guidance, not numeric SEO filler",
+      "confidence": "public-page-content-only"
+    },
+    {
+      "url": "/convert/m-to-ft/8849/",
+      "query": "8849 meters to feet",
+      "value": 8849,
+      "from": "m",
+      "to": "ft",
+      "sources": [
+        {
+          "url": "https://coolconversion.com/length/8849-meter-to-feet",
+          "type": "original-value-specific-competitor",
+          "verifiedObservation": "8849 meters converted to about 29032 feet; precision selector, converter, alternate units and conversion context."
+        },
+        {
+          "url": "https://convert-units.info/length/meter/8849",
+          "type": "additional-value-specific-competitor",
+          "verifiedObservation": "Exact-number page lists 8849 m=29032.152230971 feet and many unit equivalents."
+        },
+        {
+          "url": "https://quinvert.com/m-to-feet",
+          "type": "additional-generic-competitor",
+          "verifiedObservation": "Generic meter-to-feet converter includes 8849 m example and fractional foot-and-inch explanation."
+        }
+      ],
+      "siteMarkers": [
+        "data-feet-inches",
+        "data-precision-table"
+      ],
+      "siteExistingUtility": "Decimal feet and mixed feet/inches from exact 0.3048 m international-foot definition, plus rounding.",
+      "actualFeatureGap": "Precise result, alternate units, 8849-m example and similar practical explanation already appear on other competitors; mixed feet/inches is not a documented ranking differentiator.",
+      "recommendedHandling": "PREFER_PARENT_CONVERTER__NUMERIC_HOLD",
+      "serpIntent": "exact value with potential altitude context but no verified unique search demand",
+      "confidence": "public-page-content-only"
+    }
+  ]
+}
