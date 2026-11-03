@@ -74,6 +74,10 @@ function checkMarkup(route,expectedApp=false){
    schemaStats.webPages++;
    if(page['@context']!=='https://schema.org'||page.name!==getTitle(html)||page.description!==decode(meta(html,'description')))
     errors.push(route+': WebPage schema title/description does not match visible meta data');
+   if(page['@id']!==new URL(route,info.site).href+'#webpage'||page.isPartOf?.['@id']!==info.site+'/#website'||page.inLanguage!=='en')
+    errors.push(route+': WebPage stable identity, site membership or English-language reference missing');
+   if(expectedApp&&page.mainEntity?.['@id']!==new URL(route,info.site).href+'#application')
+    errors.push(route+': calculator page does not connect to its application entity');
   }
   const headCanonical=html.match(/<link rel="canonical" href="([^"]+)"/g)||[];
   if(headCanonical.length!==1)errors.push(route+': expected exactly one self-referencing canonical link');
@@ -119,6 +123,8 @@ function checkMarkup(route,expectedApp=false){
     schemaStats.webApplications++;
     if(app.url!==expectedUrl||app.name!==getTitle(html)||app['@context']!=='https://schema.org')
      errors.push(route+': WebApplication schema URL/name inconsistent with actual page');
+    if(app['@id']!==expectedUrl+'#application'||app.mainEntityOfPage?.['@id']!==expectedUrl+'#webpage'||app.isPartOf?.['@id']!==info.site+'/#website')
+     errors.push(route+': application does not have a stable link back to its actual WebPage and site');
    }
   }
   if(jsonBlocks.some(x=>x.aggregateRating||x.review))errors.push(route+': fabricated review/ratings schema prohibited');
