@@ -17,6 +17,7 @@ const policy=fromJson('src/data/numeric-seo-policy.json');
 const evidence=fromJson('research/SEO-15-SERP-EVIDENCE-20261102.json');
 const directReviews=fromJson('research/NUMERIC-GENERIC-COMPETITOR-SIDEBYSIDE-V25-20261103.json');
 const exactReviews=fromJson('research/NUMERIC-EXACT-COMPETITOR-SIDEBYSIDE-V26-20261103.json');
+const focusReviews=fromJson('research/NUMERIC-FOUR-INTENT-COMPETITOR-PARITY-V27-20261103.json');
 const build=fromJson('dist/build-info.json');
 const selected=new Set(policy.pilotIndexUrls),published=new Set(build.numericPublishedUrls||[]);
 const errors=[];
@@ -45,6 +46,11 @@ function similarity(a,b){
 const reviewByUrl=new Map((evidence.items||[]).map(x=>[x.url,x]));
 const genericByUrl=new Map(directReviews.entries.map(x=>[x.url,x]));
 const exactByUrl=new Map(exactReviews.entries.map(x=>[x.url,x]));
+const focusByUrl=new Map(focusReviews.items.map(x=>[x.url,x]));
+if(focusReviews.items.length!==4||focusByUrl.size!==4)
+ errors.push('Four user-prioritized value queries must each have a distinct current feature-parity review.');
+if(focusReviews.independentUSGoogleRankVerified!==false||focusReviews.googleSearchConsoleClicksVerified!==false)
+ errors.push('External page inspection cannot claim independent Google US ranking or ExactUnit GSC results.');
 if(exactByUrl.size!==13||exactReviews.entries.length!==13)
  errors.push('Expected 13 individually reviewed exact-value competitor comparisons.');
 const supportedMethods=new Set(['direct_retrieved_page_text','search_indexed_page_excerpt','replacement_competitor_search_excerpt']);
@@ -116,6 +122,21 @@ for(const url of policy.pilotIndexUrls){
  }else if(exactComparison){
   errors.push(url+': an exact-value competitor review overlaps a generic competitor review');
  }
+ const focusedComparison=focusByUrl.get(url)||null;
+ if(focusedComparison){
+  if(focusedComparison.query!==seed.keyword||focusedComparison.value!==seed.value||
+    focusedComparison.from!==pair.from||focusedComparison.to!==pair.to||
+    focusedComparison.recommendedHandling!=='PREFER_PARENT_CONVERTER__NUMERIC_HOLD'||
+    !Array.isArray(focusedComparison.sources)||focusedComparison.sources.length<2||
+    !focusedComparison.sources.every(source=>source.url.startsWith('https://')&&source.verifiedObservation.length>35)||
+    !focusedComparison.sources.some(source=>source.type==='original-value-specific-competitor')||
+    !Array.isArray(focusedComparison.siteMarkers)||focusedComparison.siteMarkers.length<2||
+    focusedComparison.actualFeatureGap.length<50)
+   errors.push(url+': missing or overstated V27 four-query feature parity evidence');
+  for(const marker of focusedComparison.siteMarkers)
+   if(!numericHtml.includes(marker))
+    errors.push(url+': V27 parity report claims unsupported live converter markup '+marker);
+ }
  const risks=[];
  if(ev.observedPageType!=='exact-value-page')risks.push('competitor observation is a general tool/example, not an exact-value page');
  if(!ev.independentSearchDemandProven)risks.push('independent US Google organic demand unverified');
@@ -125,6 +146,7 @@ for(const url of policy.pilotIndexUrls){
   url,query:seed.keyword,parent:pair.url,dimension:units[pair.from].dimension,
   historicalCompetitor:{source:'user-supplied Semrush export (not ExactUnit GSC)',volumeUS:seed.volumeUS,kd:seed.kd,rank:seed.rank,estimatedTraffic:seed.trafficEstimate,landingPath:seed.competitorURL},
   observedCompetitor:{url:ev.competitorUrl,pageType:ev.observedPageType,visibleFunction:ev.observedFunction,reviewedOn:evidence.reviewedOn},
+  latestFeatureParity:focusedComparison?{competitorSources:focusedComparison.sources,existingSiteUtility:focusedComparison.siteExistingUtility,comparisonGap:focusedComparison.actualFeatureGap,handling:focusedComparison.recommendedHandling}:null,
   verifiedHeadToHead:comparison?{rivalCapabilities:comparison.observedCompetitorCapabilities,siteCapabilities:comparison.siteCurrentCapabilities,conclusion:comparison.comparison,indexRecommendation:comparison.launchIndexDisposition}:exactComparison?{
    rivalCapabilities:exactComparison.competitorFeatures,
    siteVerifiedMarkup:exactComparison.siteFeatureMarkers,
@@ -136,7 +158,7 @@ for(const url of policy.pilotIndexUrls){
   }:null,
   checks,sourceContentSimilarityToParent:similarity(numericHtml,parentHtml),
   keyEvidenceGaps:risks,
-  editorialRecommendation:ev.observedPageType==='exact-value-page'?
+  editorialRecommendation:focusedComparison?'PREFER_PARENT_CONVERTER__NUMERIC_HOLD':ev.observedPageType==='exact-value-page'?
    'HOLD_FOR_COMPARATIVE_DIFFERENTIATION_EVIDENCE':'PREFER_EXISTING_DIRECTION_TOOL_UNTIL_NUMERIC_INTENT_VERIFIED',
   currentReleasePolicy:'candidate after explicit official-domain approval only; preview always noindex'
  });
@@ -166,6 +188,7 @@ const audit={
  pagesChecked:rows.length,observedExactValueCompetitorPages:rows.filter(r=>r.observedCompetitor.pageType==='exact-value-page').length,
  observedGenericOnlyCompetitorPages:rows.filter(r=>r.observedCompetitor.pageType!=='exact-value-page').length,
  headToHeadCompared:rows.filter(x=>x.verifiedHeadToHead).length,
+ updatedFourQueryParities:rows.filter(x=>x.latestFeatureParity).length,
  exactCompetitorEvidenceMethodCounts:Object.fromEntries([...supportedMethods].map(k=>[k,exactReviews.entries.filter(x=>x.inspectionMethod===k).length])),
  conditionalCandidates:selected.size,excludedNumericPages:seeds.length-selected.size,
  comparisonRequiredBeforePublicNumericIndex:rows.filter(r=>r.keyEvidenceGaps.length).length,
@@ -188,6 +211,7 @@ console.log('NUMERIC PILOT READINESS AUDIT:',JSON.stringify({
  exactValueCompetitors:audit.observedExactValueCompetitorPages,
  genericOnlyCompetitors:audit.observedGenericOnlyCompetitorPages,
  headToHeadCompared:audit.headToHeadCompared,
+ refreshedFeatureParityCases:audit.updatedFourQueryParities,
  evidenceMethods:audit.exactCompetitorEvidenceMethodCounts,
  candidatesStillNeedingDifferentiationEvidence:audit.comparisonRequiredBeforePublicNumericIndex,
  strongSameDimensionTextOverlapPairs:cohort.length,
