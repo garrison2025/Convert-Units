@@ -192,7 +192,7 @@ export function horsepowerConventionsReference(pair){
   '<p><strong>This converter uses mechanical horsepower (hp(I)) only.</strong> Other horsepower definitions produce different numerical answers for the same kilowatts. Confirm the convention on the source label before comparing ratings.</p>'+
   '<div class="reference-scroll"><table class="number-table reference-table"><thead><tr>'+
   '<th scope="col">Horsepower convention</th><th scope="col">1 kW in hp</th><th scope="col">5 kW in hp</th><th scope="col">Converter support</th></tr></thead>'+
-  '<tbody>'+values.join('')+'</tbody></table></div>'+
+  '<tbody>'+values+'</tbody></table></div>'+
   '<p class="hint">Mechanical hp uses approximately 745.699871582 W per hp; electric hp uses 746 W, metric hp uses 735.49875 W and boiler hp uses 9,809.5 W per hp by the conventions shown. Display results are rounded. <a href="https://www.inchcalculator.com/convert/kilowatt-to-horsepower/" rel="noopener noreferrer">Compare horsepower definitions</a>.</p>'+
   '</section>';
 }
