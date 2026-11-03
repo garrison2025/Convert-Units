@@ -8,6 +8,7 @@ import {categoryMetaDescription,categoryConversionExamples} from '../src/categor
 import {directionalQuickAnswer} from '../src/seo-answer.mjs';
 import {resolveNumericIndexMode} from '../src/seo-index-policy.mjs';
 import {resolveSitePublication} from '../src/seo-launch-policy.mjs';
+import {resolveNumericPilotPublication} from '../src/seo-numeric-publication.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
@@ -15,7 +16,6 @@ const numericPolicy=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-
 const launchPilot=new Set(numericPolicy.pilotIndexUrls);
 if(launchPilot.size!==numericPolicy.pilotIndexUrls.length||![...launchPilot].every(url=>seeds.some(s=>s.url===url)))throw Error('Numeric pilot index policy must contain only unique approved numeric URLs.');
 const numericIndexMode=resolveNumericIndexMode(process.env.NUMERIC_INDEX_MODE,process.env.NUMERIC_INDEX_CONFIRMATION);
-const numericIndexable=(url)=>numericIndexMode==='all'||launchPilot.has(url);
 const dist=path.join(root,'dist');fs.rmSync(dist,{recursive:true,force:true});fs.mkdirSync(dist,{recursive:true});
 // Fail closed: SITE_URL alone NEVER activates Google indexing. The domain
 // must have explicit, host-bound SEO approval, and branch previews stay noindex.
@@ -24,6 +24,13 @@ const publication=resolveSitePublication({
  approval:process.env.SEO_INDEX_APPROVED,pagesBranch:process.env.CF_PAGES_BRANCH
 });
 const {isProduction:IS_PRODUCTION,site:SITE}=publication;
+const numericRelease=resolveNumericPilotPublication({
+ isProduction:IS_PRODUCTION,site:SITE,mode:numericIndexMode,pilotUrls:numericPolicy.pilotIndexUrls,
+ approval:process.env.SEO_NUMERIC_INDEX_APPROVED,approvedHost:process.env.SEO_NUMERIC_PUBLIC_HOST,
+ approvedUrls:process.env.SEO_NUMERIC_APPROVED_URLS
+});
+const publishedNumeric=new Set(numericRelease.publishedUrls);
+const numericIndexable=url=>IS_PRODUCTION?publishedNumeric.has(url):numericIndexMode==='all'||launchPilot.has(url);
 if(!IS_PRODUCTION)console.warn('PREVIEW / SAFE MODE:',publication.reason,'— every page is noindex.');
 const DIM_ICONS={mass:'⚖',length:'↔',volume:'◧',temperature:'°',pressure:'◉',torque:'⟳',time:'◷',speed:'⇢',area:'▦',force:'⇧',storage:'▤',density:'◈',power:'ϟ',acceleration:'↗',fuel:'⛽',flow:'≋'};
 const titleFor=(p)=>p.title||`${units[p.from].name} to ${units[p.to].name}`;
@@ -145,5 +152,5 @@ if(/^pub-\d{16}$/.test(adsPublisher))fs.writeFileSync(path.join(dist,'ads.txt'),
 // public, non-secret deployment marker enables read-only preview freshness checks.
 const candidateCommit=(process.env.CF_PAGES_COMMIT_SHA||process.env.GITHUB_SHA||'').trim();
 const buildCommit=/^[a-f0-9]{40}$/i.test(candidateCommit)?candidateCommit.toLowerCase():null;
-fs.writeFileSync(path.join(dist,'build-info.json'),JSON.stringify({buildCommit,site:SITE,mode:IS_PRODUCTION?'production':'preview',tools:pairs.length,numericalPages:seeds.length,categories:byDim.length,indexablePages:allUrls.length,numericPilotIndexPages:launchPilot.size,numericIndexMode,numericIndexablePages:seeds.filter(s=>numericIndexable(s.url)).length,publicationReason:publication.reason,publicationApproved:publication.launchApproved,cfPagesBranch:process.env.CF_PAGES_BRANCH||null,builtAt:new Date().toISOString()},null,2));
+fs.writeFileSync(path.join(dist,'build-info.json'),JSON.stringify({buildCommit,site:SITE,mode:IS_PRODUCTION?'production':'preview',tools:pairs.length,numericalPages:seeds.length,categories:byDim.length,indexablePages:allUrls.length,numericPilotIndexPages:launchPilot.size,numericIndexMode,numericIndexablePages:IS_PRODUCTION?publishedNumeric.size:0,numericPublishedUrls:IS_PRODUCTION?numericRelease.publishedUrls:[],numericReleaseReason:numericRelease.reason,publicationReason:publication.reason,publicationApproved:publication.launchApproved,cfPagesBranch:process.env.CF_PAGES_BRANCH||null,builtAt:new Date().toISOString()},null,2));
 console.log('Built',allUrls.length,IS_PRODUCTION?'indexable pages:':'preview indexable pages:',pairs.length,'tools,',seeds.length,'specific pages,',byDim.length,'categories.');
