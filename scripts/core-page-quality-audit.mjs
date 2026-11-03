@@ -91,7 +91,7 @@ for(const pair of pairs){
 // evidence without pretending numeric long-tail volume is generic demand.
 const home=page('/');
 const featuredBlock=home.split('<div class="grid popular-grid">')[1]?.split('</section><section class="section">')[0]||'';
-const featuredUrls=[...featuredBlock.matchAll(/<a\\b[^>]*href="([^"]+)"/g)].map(x=>x[1]);
+const featuredUrls=[...featuredBlock.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map(x=>x[1]);
 const expectedFeatured=['kg-to-lbs','lbs-to-kg','ft-lbf-to-nm','celsius-to-fahrenheit','minutes-to-hours','ml-to-us-fl-oz']
  .map(slug=>pairs.find(p=>p.slug===slug)?.url);
 if(expectedFeatured.some(x=>!x)||JSON.stringify(featuredUrls)!==JSON.stringify(expectedFeatured))
