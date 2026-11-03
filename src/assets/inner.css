@@ -340,3 +340,6 @@
 @media(hover:hover) and (pointer:fine){.tile:hover .pict{transform:translateY(-2px) rotate(-4deg)}.hero-utility a:hover{transform:translateY(-2px)}}
 .btn:active,.hero-search-row button:active{transform:scale(.985)}
 @media(prefers-reduced-motion:reduce){.hero .demo,.hero .hero-intro{animation:none!important}.tile:hover .pict,.hero-utility a:hover,.btn:active{transform:none!important}}
+
+/* V37 desktop visual QA: align headline with tool, avoid a large empty top-left hero. */
+@media(min-width:901px){.home-page .hero-copy{align-self:start;margin-top:68px}}
