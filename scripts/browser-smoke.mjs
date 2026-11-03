@@ -33,6 +33,24 @@ async function smokeScenario(SCENARIO){
      finder.value='pounds';finder.dispatchEvent(new Event('input',{bubbles:true}));
      ok(!q('[data-suggestions]').hidden,'search suggestions should open');
      ok([...document.querySelectorAll('[data-quick-item]')].some(el=>!el.hidden),'suggestions should include matching tools');
+     ok(!finder.hasAttribute('aria-expanded')&&!finder.hasAttribute('aria-controls'),
+       'ordinary searchbox must not claim unsupported combobox expanded or popup-control semantics');
+     const countStatus=q('[data-suggestion-status]');
+     ok(countStatus?.getAttribute('role')==='status'&&/matching converter/.test(countStatus.textContent),
+       'suggestions must announce a matching-link count to assistive technology');
+     finder.focus();
+     finder.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true,cancelable:true}));
+     ok(document.activeElement?.hasAttribute('data-quick-item'),
+       'Down Arrow must move keyboard focus to a matching native link');
+     document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));
+     ok(q('[data-suggestions]').hidden&&document.activeElement===finder,
+       'Escape from suggestions must close the link panel and restore input focus');
+     finder.value='this-is-no-known-converter';finder.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(!q('[data-suggestions]').hidden&&countStatus.textContent.includes('No matching converters')&&
+       !q('[data-suggest-empty]').hidden,
+       'empty search results must provide visible and screen-reader feedback');
+     finder.value='';finder.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-suggestions]').hidden,'clearing search must hide the suggestions');
      break;
    }
    case 'motion-interaction':{

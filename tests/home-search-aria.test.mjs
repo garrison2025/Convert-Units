@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const build=fs.readFileSync(new URL('../scripts/build.mjs',import.meta.url),'utf8');
+const app=fs.readFileSync(new URL('../src/assets/app.mjs',import.meta.url),'utf8');
+const chrome=fs.readFileSync(new URL('../scripts/browser-smoke.mjs',import.meta.url),'utf8');
+test('homepage finder is a native search input; not an invalid pseudo-combobox',()=>{
+ const input=build.match(/<input id="home-find"[^>]+>/)?.[0]||'';
+ assert.match(input,/\btype="search"/);
+ assert.match(input,/\bname="q"/);
+ assert.match(input,/\bdata-home-find\b/);
+ assert.doesNotMatch(input,/\baria-expanded=/);
+ assert.doesNotMatch(input,/\baria-controls=/);
+ assert.doesNotMatch(input,/\brole="combobox"/);
+ assert.match(build,/<span data-suggestion-status role="status">Choose a tool to open<\/span>/);
+ assert.match(build,/<a class="suggestion" data-quick-item/);
+ assert.match(app,/status\.textContent=hits\.length\?/);
+ assert.doesNotMatch(app,/homeInput\.setAttribute\('aria-expanded'/);
+ assert.match(chrome,/Down Arrow must move keyboard focus/);
+ assert.match(chrome,/Escape from suggestions must close/);
+});

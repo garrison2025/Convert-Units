@@ -220,16 +220,15 @@ menu?.addEventListener('click',()=>setMenuOpen(!siteNav?.classList.contains('ope
 siteNav?.addEventListener('click',event=>{if(event.target.closest('a'))setMenuOpen(false);});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&siteNav?.classList.contains('open')){setMenuOpen(false);menu.focus();}});
 document.addEventListener('pointerdown',event=>{if(siteNav?.classList.contains('open')&&!siteNav.contains(event.target)&&!menu.contains(event.target))setMenuOpen(false);});
-// The homepage search is a direct tool finder; keyboard and pointer users have the same links.
 const homeInput=el('[data-home-find]'),homeSuggestions=el('[data-suggestions]');
-if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSuggestions),empty=el('[data-suggest-empty]',homeSuggestions);let hits=[];
-  function close(){homeSuggestions.hidden=true;homeInput.setAttribute('aria-expanded','false');}
-  function update(){const q=homeInput.value.trim().toLowerCase();if(!q){close();return;}const tokens=q.split(/\s+/).filter(Boolean);hits=candidates.filter(a=>tokens.every(w=>a.dataset.search.includes(w))).slice(0,6);for(const link of candidates)link.hidden=!hits.includes(link);if(empty)empty.hidden=hits.length>0;homeSuggestions.hidden=false;homeInput.setAttribute('aria-expanded','true');}
+if(homeInput&&homeSuggestions){const candidates=all('[data-quick-item]',homeSuggestions),empty=el('[data-suggest-empty]',homeSuggestions),status=el('[data-suggestion-status]',homeSuggestions);let hits=[];
+  function close(){homeSuggestions.hidden=true;}
+  function update(){const q=homeInput.value.trim().toLowerCase();if(!q){close();return;}const tokens=q.split(/\s+/).filter(Boolean);hits=candidates.filter(a=>tokens.every(w=>a.dataset.search.includes(w))).slice(0,6);for(const link of candidates)link.hidden=!hits.includes(link);if(empty)empty.hidden=hits.length>0;homeSuggestions.hidden=false;if(status)status.textContent=hits.length?hits.length+' matching converter'+(hits.length===1?'':'s')+'. Arrow Down opens links.':'No matching converters. Try Search tools.';}
   homeInput.addEventListener('input',update);
   homeInput.addEventListener('focus',update);
   homeInput.addEventListener('keydown',e=>{if(e.key==='Escape'){close();}if(e.key==='ArrowDown'&&hits.length){e.preventDefault();hits[0].focus();}});
   homeSuggestions.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){close();homeInput.focus();return;}
+    if(e.key==='Escape'){homeInput.focus();close();return;}
     if((e.key==='ArrowDown'||e.key==='ArrowUp')&&hits.length){
       const position=hits.indexOf(document.activeElement);
       if(position<0)return;
