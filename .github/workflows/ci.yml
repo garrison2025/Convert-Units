@@ -1,4 +1,4 @@
-name: ExactUnit tests and static SEO audit
+name: ConvertUnits.cc tests and Google SEO release audit
 on:
   push:
     branches: [main]
@@ -40,16 +40,16 @@ jobs:
           path: qa-lighthouse/
           if-no-files-found: error
           retention-days: 7
-      - name: Guard against accidental indexing when SITE_URL is set without launch approval
+      - name: Guard against accidental indexing on the actual domain without publication approval
         env:
-          SITE_URL: https://qa.example.test
+          SITE_URL: https://convertunits.cc
         run: |
           node scripts/build.mjs
           node --input-type=module -e 'import fs from "node:fs"; const b=JSON.parse(fs.readFileSync("dist/build-info.json")); const h=fs.readFileSync("dist/index.html","utf8"); const m=fs.readFileSync("dist/sitemap.xml","utf8"); const headers=fs.readFileSync("dist/_headers","utf8"); if(b.mode!=="preview"||b.site!==null||b.indexablePages!==0||b.publicationApproved||b.publicationReason!=="awaiting-public-indexing-approval"||!h.includes("noindex,follow")||h.includes("rel=\"canonical\"")||m.includes("<loc>")||!headers.includes("X-Robots-Tag: noindex, nofollow"))throw Error("SITE_URL unexpectedly enabled indexing"); console.log("Launch guard: custom SITE_URL alone remains noindex");'
-      - name: Validate production canonical, sitemap and full-site links with a synthetic custom origin
+      - name: Rehearse production canonical, sitemap and full-site links for the real apex (CI only; not deployed)
         env:
-          SITE_URL: https://qa.example.test
-          SEO_PUBLIC_HOST: qa.example.test
+          SITE_URL: https://convertunits.cc
+          SEO_PUBLIC_HOST: convertunits.cc
           SEO_INDEX_APPROVED: I_APPROVE_PUBLIC_INDEXING
         run: npm run build
       - name: Verify official-domain approval alone never publishes unreviewed numeric pages
@@ -57,10 +57,10 @@ jobs:
           node --input-type=module -e 'import fs from "node:fs";const x=JSON.parse(fs.readFileSync("dist/build-info.json"));if(x.mode!=="production"||x.numericPilotIndexPages!==15||x.numericIndexablePages!==0||(x.numericPublishedUrls||[]).length)throw Error("Official domain unexpectedly published numeric pages");const h=fs.readFileSync("dist/convert/ft-lbf-to-nm/400/index.html","utf8");if(!h.includes("noindex,follow")||h.includes("rel=\"canonical\""))throw Error("Unreviewed 400 torque page became indexable");console.log("NUMERIC GATE PASS: public core tools eligible, all 92 numeric pages held");'
       - name: Validate independent per-URL numeric approval using two synthetic candidates
         env:
-          SITE_URL: https://qa.example.test
-          SEO_PUBLIC_HOST: qa.example.test
+          SITE_URL: https://convertunits.cc
+          SEO_PUBLIC_HOST: convertunits.cc
           SEO_INDEX_APPROVED: I_APPROVE_PUBLIC_INDEXING
-          SEO_NUMERIC_PUBLIC_HOST: qa.example.test
+          SEO_NUMERIC_PUBLIC_HOST: convertunits.cc
           SEO_NUMERIC_INDEX_APPROVED: I_APPROVE_SELECTED_NUMERIC_URLS
           SEO_NUMERIC_APPROVED_URLS: /convert/ft-lbf-to-nm/400/,/convert/kpa-to-psi/108/
         run: |
