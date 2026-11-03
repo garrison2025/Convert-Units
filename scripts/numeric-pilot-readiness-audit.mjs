@@ -16,7 +16,7 @@ const seeds=fromJson('src/data/seeds.json');
 const policy=fromJson('src/data/numeric-seo-policy.json');
 const evidence=fromJson('research/SEO-15-SERP-EVIDENCE-20261102.json');
 const build=fromJson('dist/build-info.json');
-const selected=new Set(policy.pilotIndexUrls);
+const selected=new Set(policy.pilotIndexUrls),published=new Set(build.numericPublishedUrls||[]);
 const errors=[];
 const decode=s=>String(s??'').replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'");
 const html=url=>fs.readFileSync(path.join(root,'dist',url.replace(/^\/+/,''),'index.html'),'utf8');
@@ -65,9 +65,9 @@ for(const url of policy.pilotIndexUrls){
   alternateUnitEquivalents:numericHtml.includes('<h2>Same value in other units</h2>'),
   roundingTransparency:numericHtml.includes('data-precision-table'),
   contextualParentLink:numericHtml.includes('href="'+pair.url+'"'),
-  selectedNumericLinkedFromParent:parentHtml.includes('href="'+url+'"'),
+  selectedNumericLinkedFromParent:parentHtml.includes('href="'+url+'"')===(build.mode==='preview'||published.has(url)),
   previewNeverIndexable:build.mode!=='preview'||getRobots(numericHtml).includes('noindex'),
-  approvedProductionCandidate:build.mode!=='production'||getRobots(numericHtml).includes('index,follow'),
+  approvedProductionCandidate:build.mode!=='production'||(published.has(url)?getRobots(numericHtml).includes('index,follow'):getRobots(numericHtml).includes('noindex')),
   competitorEvidenceMapped:ev.query===seed.keyword&&ev.competitorUrl.startsWith('https://'),
   competitorDataExplicitlyUnverified:ev.rankingProven===false&&ev.independentSearchDemandProven===false&&ev.siteVsCompetitorUniqueValueProven===false
  };
@@ -104,7 +104,7 @@ const audit={
  status:errors.length?'failed':'passed',checkedAt:new Date().toISOString(),
  method:'Local HTML/keyword evidence checks, numeric source calculations and a heuristic word-trigram text overlap (NOT Google duplicate content judgement).',
  searchOutcome:'No US Google position, incremental competitive value, GSC impression or advertising revenue was verified by these project documents.',
- previewIndexability:build.mode==='preview'?'all 157 URLs remain noindex':'synthetic production test; only the curated pilot may be indexed',
+ previewIndexability:build.mode==='preview'?'all 157 URLs remain noindex':'synthetic production: only independently approved candidates may be indexed',
  pagesChecked:rows.length,observedExactValueCompetitorPages:rows.filter(r=>r.observedCompetitor.pageType==='exact-value-page').length,
  observedGenericOnlyCompetitorPages:rows.filter(r=>r.observedCompetitor.pageType!=='exact-value-page').length,
  conditionalCandidates:selected.size,excludedNumericPages:seeds.length-selected.size,
