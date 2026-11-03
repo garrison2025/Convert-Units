@@ -15,7 +15,7 @@ const provenance=Object.freeze({
  mass:{base:'kg',name:'kg',source:NIST,label:'NIST SP 811, conversion factors',limit:'Pounds here are avoirdupois mass; pound-force is not mass.'},
  length:{base:'m',name:'m',source:NIST,label:'NIST SP 811, length definitions',limit:'International inches and feet are used; historic survey-foot measurements require their own convention.'},
  volume:{base:'l',name:'L',source:NIST,label:'NIST SP 811, volume factors',limit:'US liquid gallons, cups, teaspoons and fluid ounces are not UK imperial volume measures or mass ounces.'},
- temperature:{base:null,name:'K',source:BIPM,label:'BIPM SI Brochure (temperature scale)',limit:'Absolute temperatures include an offset. Temperature differences use a different formula.'},
+ temperature:{base:null,name:'K',source:'https://www.nist.gov/pml/owm/si-units-temperature',label:'NIST SI Units — Temperature (exact conversion)',limit:'Absolute temperatures include an offset. Temperature differences use a different formula.'},
  pressure:{base:'pa',name:'Pa',source:NIST,label:'NIST SP 811, pressure factors',limit:'Gauge pressure and absolute pressure require a separate reference-point choice; converting units does not change that reference.'},
  torque:{base:'nm',name:'N·m',source:NIST,label:'NIST SP 811, moment of force',limit:'Foot-pound-force is torque, not pound mass. This tool does not supply a manufacturer tightening requirement.'},
  time:{base:'seconds',name:'s',source:BIPM,label:'BIPM SI Brochure (SI time units)',limit:'Elapsed 24-hour days are fixed durations, not calendar dates or local civil time.'},
