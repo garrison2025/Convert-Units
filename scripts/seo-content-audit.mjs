@@ -312,6 +312,8 @@ for(const seed of seeds){
  if(desc!==numericDescription(seed,pair))errors.push(seed.url+': descriptive snippet is inconsistent with the numeric answer');
  const sourceRounding=sourceRoundingScenarioHtml(seed,pair);
  if(!html.includes(sourceRounding))errors.push(seed.url+': missing numerical source rounding utility');
+ if(!html.includes('data-round-controls hidden')||!html.includes('data-source-comparison aria-live="polite"'))
+  errors.push(seed.url+': accessible, progressive input-resolution controls missing');
  const expectedInsight=numericInsight(seed,pair);
  if(expectedInsight){
   if(!html.includes(expectedInsight))errors.push(seed.url+': computed pilot cross-check panel does not match the shared engine');

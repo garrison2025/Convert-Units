@@ -278,3 +278,27 @@ el('[data-batch-example]')?.addEventListener('click',()=>{
 for(const field of [dimension,from,to,values,column,separator,rowFromColumn,rowToColumn])field.addEventListener('input',()=>{csv='';out.value='';status.textContent='Values or units changed. Click Convert values to refresh the results.';});
 el('[data-batch-file]')?.addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;if(file.size>1024*1024){status.textContent='Choose a CSV or TXT file smaller than 1 MB.';return;}try{values.value=await file.text();csv='';out.value='';status.textContent=`Loaded ${file.name} locally. Choose units and click Convert values.`;}catch{status.textContent='Could not read that local file.';}});
 el('[data-process]')?.addEventListener('click',process);el('[data-download]')?.addEventListener('click',()=>{if(!csv)process();if(csv)download('unit-conversions.csv',csv);});el('[data-print]')?.addEventListener('click',()=>window.print());process();}
+
+// Optional input-resolution explorer on already useful, pre-rendered exact-value pages.
+// There is no network request, hidden metric, auto-animation, or generated URL.
+for(const panel of all('[data-source-rounding-scenario]')){
+ const controls=el('[data-round-controls]',panel),select=el('[data-source-step]',panel);
+ const table=el('table tbody',panel),comparison=el('[data-source-comparison]',panel);
+ if(!controls||!select||!table||!comparison)continue;
+ const value=Number(panel.dataset.sourceValue),from=panel.dataset.sourceFrom,to=panel.dataset.sourceTo;
+ if(!Number.isFinite(value)||!units[from]||!units[to])continue;
+ const render=()=>{
+  const step=Number(select.value),a=value-step/2,b=value+step/2;
+  if(!Number.isFinite(step)||step<=0||!Number.isFinite(a)||a<0)return;
+  const rows=table.rows;for(const [idx,n] of [[0,a],[2,b]]){
+   const result=convert(n,from,to),shown=fmt(result,9);
+   rows[idx].cells[1].textContent=fmt(n,9)+' '+units[from].symbol;
+   rows[idx].cells[2].textContent=displayRelation(result,shown)+' '+shown+' '+units[to].symbol;
+  }
+  const low=Math.round(convert(a,from,to)),high=Math.round(convert(b,from,to));
+  comparison.textContent=low===high?'Both bounds round to '+fmt(low,0)+' '+units[to].symbol+
+   ' as a whole-unit result.':'Whole-unit results may differ: '+fmt(low,0)+' or '+fmt(high,0)+' '+units[to].symbol+'.';
+  panel.dataset.wholeResultStable=String(low===high?'yes':'no');
+ };
+ controls.hidden=false;select.addEventListener('change',render);
+}
