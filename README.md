@@ -2,6 +2,17 @@
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
 
+## V45 code-level SEO integrity (2026-11-03)
+
+Owner-approved search indexation remains fully enabled for **156 genuine site pages**, including **92 numeric answer pages**. Nothing in this release reintroduces `noindex` on these official apex routes.
+
+- **Numeric answer internal linking:** `src/seo-related-values.mjs` finds up to four closest *existing* values in the same conversion direction. Its HTML links show answers computed by the site's own engine, not keyword volume guesses. No extra generated pages, 404 targets, paid API, client-side JS or stylesheet changes. Existing responsive chip styles are reused.
+- **Tested for all 92 seeds:** `tests/seo-related-values.test.mjs` checks deterministic neighbor selection, unit direction, unique actual URLs, conversion precision and round-off symbols. The static SEO audit verifies the emitted answer text and links in each crawlable HTML page.
+- **Consistent semantic JSON-LD graph:** 38 dedicated converters plus universal and batch tools identify the actual WebApplication by stable `#application` IDs, linking to their `WebPage` (`#webpage`) and the public WebSite (`/#website`). All WebPage entities explicitly use `inLanguage: en`. No fictitious `FAQPage`, testimonials, authorship or review stars. The SEO audit cross-checks the linked IDs, exact canonical, and visible meta fields.
+- **Cross-platform previews:** `og:locale=en_US`, `twitter:card=summary`, and factual Twitter title/description fields now match each page's unique HTML metadata. No fake image assets, engagement metrics or promises of SEO benefit. The audit rejects divergence.
+- **Unchanged search safety:** `https://convertunits.cc/sitemap.xml` lists 156 canonical apex pages, all 92 numeric pages are `index,follow`; only 404 and duplicate Pages mirror/preview hosts remain excluded.
+- **Do not fake sitemap dates:** Google ignores fabricated `<lastmod>` updates, so the site intentionally does not stamp every URL with the build date. Add per-page dates only when reliable content-edit history exists. For search performance, use verified Search Console data, not lab SEO-score claims.
+
 ## V44 official Google search launch — complete (2026-11-03)
 
 **Current and authoritative.** Supersedes the older V41–V43 preparation and tentative numeric-review instructions below, which are retained only as development history.
