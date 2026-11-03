@@ -73,6 +73,30 @@ async function smokeScenario(SCENARIO){
      ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
      break;
    }
+   case 'v43-geo-standards':{
+     const block=q('#verified-conversion-facts');
+     ok(Boolean(block),'GEO source definitions should be visible in readable HTML');
+     const rows=[...block.querySelectorAll('tr[data-standard-dimension]')];
+     ok(rows.length===16,'GEO reference should contain exactly 16 unit categories');
+     const set=new Set(rows.map(r=>r.dataset.standardDimension));
+     ok(set.size===16,'all categories must be distinct');
+     const examples=rows.map(r=>r.querySelector('td:nth-child(2) a'));
+     ok(examples.every(a=>a&&a.getAttribute('href')?.startsWith('/convert/')),'every source answer must lead to an actual converter');
+     const refs=[...block.querySelectorAll('td:nth-child(4) a')];
+     ok(refs.length===16&&refs.every(a=>a.protocol==='https:'),'16 HTTPS source citations must be visible');
+     ok(refs.some(a=>a.hostname==='www.nist.gov')&&refs.some(a=>a.hostname==='www.bipm.org')&&refs.some(a=>a.hostname==='webstore.iec.ch'),
+       'NIST, BIPM and IEC must be present as explicit source references');
+     ok(block.textContent.includes('US versus UK fluid ounces')&&block.textContent.includes('Decimal versus binary storage'),
+       'GEO source text must explain two easy-to-confuse unit systems');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'source index must not silently approve indexing');
+     break;
+   }
+   case 'v43-geo-source-link':{
+     const link=q('a[href="/methodology/#verified-conversion-facts"]');
+     ok(Boolean(link),'converters and category hubs should point directly to source definitions');
+     ok(!q('main').textContent.includes('guarantees AI citations'),'do not make invented GEO ranking promises');
+     break;
+   }
    case 'v40-brand-contact':{
      const title=document.title;
      ok(title.endsWith(' | ConvertUnits.cc'),'every page title must use the selected domain brand');
@@ -900,6 +924,10 @@ const suites=[
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
  {name:'seo-v33-generic-intent',url:'/convert/kn-to-lbf/'},
  {name:'seo-v33-generic-intent',url:'/convert/kw-to-hp/'},
+ {name:'v43-geo-standards',url:'/methodology/'},
+ {name:'v43-geo-source-link',url:'/category/mass/'},
+ {name:'v43-geo-source-link',url:'/convert/lbs-to-kg/'},
+ {name:'mobile',url:'/methodology/'},
  {name:'v40-brand-contact',url:'/'},
  {name:'v40-brand-contact',url:'/contact/'},
  {name:'v40-brand-contact',url:'/privacy/'},
