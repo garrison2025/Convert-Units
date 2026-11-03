@@ -81,6 +81,10 @@ async function smokeScenario(SCENARIO){
        ok(getComputedStyle(intro).animationName.includes('fade-up'),'homepage intro entrance no longer suppressed');
      }
      ok(hero.getBoundingClientRect().height>200,'hero content occupies stable layout space even on mobile');
+     if(window.innerWidth>=901){
+       const offset=intro.getBoundingClientRect().top-demo.getBoundingClientRect().top;
+       ok(offset>=-10&&offset<160,'desktop hero headline should align near the working converter, not float in an oversized blank zone; offset '+Math.round(offset));
+     }
      break;
    }
    case 'copy-number':{
