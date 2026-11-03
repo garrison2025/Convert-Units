@@ -9,6 +9,7 @@ import {fileURLToPath} from 'node:url';
 import {numericHeading,numericTitle,numericDescription,directionMetaDescription} from '../src/seo-meta.mjs';
 import {units,convert,formatNumber,displayRelation,elapsedDurationReadout,fluidOunceComparison,pressureFourUnitComparison,torqueFourUnitComparison,speedFourUnitComparison,kgToPoundsOunces,temperatureThreeScaleReadout,feetInchesReadout} from '../src/assets/engine.mjs';
 import {roundTripPrecisionNote} from '../src/landing.mjs';
+import {homeReferenceFacts} from '../src/home-reference.mjs';
 import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from '../src/seo-guides.mjs';
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
@@ -346,6 +347,19 @@ if(!homepage.includes('data-mixed-kg')||!homepage.includes('67 kg 585 g'))
  errors.push('/: calculated kilograms-plus-grams initial homepage result missing');
 if(!/<h1>Unit converter\.<br>/.test(homepage))
  errors.push('/: principal H1 omits Unit converter task and no longer aligns with search title');
+const referenceSection=homepage.match(/<section class="section" aria-labelledby="home-quick-reference">([\\s\\S]*?)<\\/section>/)?.[1]||'';
+if(!referenceSection)errors.push('/: accurate, crawlable homepage reference section missing');
+const homeFacts=homeReferenceFacts(pairList);
+if((referenceSection.match(/<tr>/g)||[]).length!==homeFacts.length+1)
+ errors.push('/: home reference table row count differs from approved engine facts');
+for(const fact of homeFacts){
+ if(!referenceSection.includes('href="'+fact.url+'"')||
+    !referenceSection.includes('>'+fact.relation+' '+fact.output+' '+fact.to+'</td>'))
+   errors.push('/: home reference answer/link mismatch for '+fact.slug);
+}
+if(!referenceSection.includes('href="/methodology/"')||
+   !referenceSection.includes('US fluid ounces measure volume'))
+ errors.push('/: home reference content must explain units and cite methodology');
 const batchHtml=checkMarkup('/batch-converter/',true);
 for(const feature of [
  'Batch unit converter for CSV and spreadsheets',
