@@ -12,6 +12,12 @@ Production-ready, zero-dependency static website created for the [Convert-Units]
 - Pure ECMAScript modules, vanilla CSS/JS and Node's native test runner; no dependency installation.
 - Keyword evidence: `research/semrush-us-600.tsv` (original 600 rows), `research/KEYWORDS-600.xlsx` (planning workbook), and `research/SEO-PLAN-V2.md`.
 
+### V35 source-backed title and homepage navigation pass (2026-11-03)
+
+- Preserves **38** source-accurate directional tools and their H1 headings. On **nine** verbose titles only, eliminates repeated unit wording while retaining direction, unit symbols and the `ExactUnit` suffix. This is editorial concision, **not** a claim that Google imposes a 60-character title limit. Source: `src/seo-meta.mjs`; guard: `tests/seo-direction-titles.test.mjs`.
+- Homepage's six existing tool cards now link to `kg-to-lbs`, `lbs-to-kg`, `ft-lbf-to-nm`, `celsius-to-fahrenheit`, `minutes-to-hours`, and `ml-to-us-fl-oz`. The first five are supported by relatively strong **specific numeric keyword** competitor observations in existing V32 evidence; the sixth adds an important US fluid-volume direction. Do **not** represent their numeric query volumes as generic converter volumes.
+- `scripts/core-page-quality-audit.mjs` asserts title metadata and all six intended homepage links. Search metadata descriptions, 38 H1s, 157 URLs, 92 numeric pages, conditional 15/77 numeric index policy, domain deferral and preview `noindex` remain unchanged.
+
 ### V33 on-page SEO (2026-11-03)
 
 - **Implemented in existing tool pages:** `src/source-backed-examples.mjs` renders up to five exact-engine worked answers on 15 of the 38 main converter routes, using the 92 already reviewed US Semrush numeric seed inputs. The other 23 tools retain their own purpose-built explanations without unsourced examples.
