@@ -697,6 +697,31 @@ async function smokeScenario(SCENARIO){
      ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview remains noindex');
      break;
    }
+   case 'numeric-insight-pilot':{
+     const panel=q('[data-numeric-intent-check]');
+     ok(Boolean(panel),'curated numeric page must provide an actual calculated cross-check');
+     const entries=[...panel.querySelectorAll('.numeric-insight-value')];
+     ok(entries.length>=2&&entries.length<=3,'cross-check rows must fit its physical unit category');
+     ok(entries.every(x=>x.querySelector('dt')?.textContent&&x.querySelector('dd')?.textContent),
+       'static unit names and actual computed results must be present');
+     ok(panel.querySelector('a')?.getAttribute('href')===location.pathname.replace(/\\/[^/]+\\/$/,'/'),
+       'value page must return to its existing parent calculator rather than another value URL');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview pilot remains noindex');
+     if(location.pathname.includes('/37.9/'))
+       ok(panel.textContent.includes('68.22 °F')&&panel.textContent.includes('Absolute vs. change'),
+          'temperature difference must be distinguished from absolute Fahrenheit');
+     if(location.pathname.includes('/355/'))
+       ok(panel.textContent.includes('UK imperial fluid ounces'),'fluid volume must distinguish US and UK');
+     if(location.pathname.includes('/10000/'))
+       ok(panel.textContent.includes('6 days, 22 hours, 40 minutes'),'10000 minutes duration decomposes correctly');
+     break;
+   }
+   case 'numeric-insight-held':{
+     ok(!q('[data-numeric-intent-check]'),'held numeric page must not get source-unreviewed specialized content');
+     ok(Boolean(q('.direct-answer')&&q('[data-converter]')),'held page is still a useful conversion tool');
+     ok(q('meta[name="robots"]')?.content.includes('noindex'),'held numeric page is noindex');
+     break;
+   }
    case 'feet-inches-8849':{
      const panel=q('[data-feet-inches]');
      ok(Boolean(panel&&!panel.hidden),'approved existing 8849-meter page SSR reading required');
@@ -709,6 +734,11 @@ async function smokeScenario(SCENARIO){
   }
 }
 const suites=[
+ {name:'numeric-insight-pilot',url:'/convert/kg-to-lbs/240/'},
+ {name:'numeric-insight-pilot',url:'/convert/celsius-to-fahrenheit/37.9/'},
+ {name:'numeric-insight-pilot',url:'/convert/ml-to-us-fl-oz/355/'},
+ {name:'numeric-insight-pilot',url:'/convert/minutes-to-hours/10000/'},
+ {name:'numeric-insight-held',url:'/convert/lbs-to-kg/149/'},
  {name:'seo-v33-source-kg',url:'/convert/kg-to-lbs/'},
  {name:'seo-v33-source-lbs',url:'/convert/lbs-to-kg/'},
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
