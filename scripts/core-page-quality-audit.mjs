@@ -28,7 +28,7 @@ for(const pair of pairs){
  const title=unescape(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]||'');
  const h1=unescape((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]||'').replace(/<[^>]*>/g,''));
  const description=unescape(html.match(/<meta name="description" content="([^"]*)"/i)?.[1]||'');
- if(title!==directionSeoTitle(pair)+' | ExactUnit')issue.push('title differs from the source-curated direction and unit symbols');
+ if(title!==directionSeoTitle(pair)+' | ConvertUnits.cc')issue.push('title differs from the source-curated direction and unit symbols');
  if(h1!==pair.title)issue.push('H1 is not the exact descriptive direction title');
  if(description!==directionMetaDescription(pair))issue.push('meta description is stale or not source-calculated');
  if(titles.has(title))issue.push('duplicate title');titles.add(title);
