@@ -704,7 +704,7 @@ async function smokeScenario(SCENARIO){
      ok(entries.length>=2&&entries.length<=3,'cross-check rows must fit its physical unit category');
      ok(entries.every(x=>x.querySelector('dt')?.textContent&&x.querySelector('dd')?.textContent),
        'static unit names and actual computed results must be present');
-     ok(panel.querySelector('a')?.getAttribute('href')===location.pathname.replace(/\\/[^/]+\\/$/,'/'),
+     ok(panel.querySelector('a')?.getAttribute('href')===('/'+location.pathname.split('/').filter(Boolean).slice(0,-1).join('/')+'/'),
        'value page must return to its existing parent calculator rather than another value URL');
      ok(q('meta[name="robots"]')?.content.includes('noindex'),'preview pilot remains noindex');
      if(location.pathname.includes('/37.9/'))
