@@ -1,0 +1,52 @@
+{
+  "reviewedOn": "2026-11-03",
+  "scope": "Public competitor page content reviewed live; not a Google US ranking snapshot, not proof of consumer demand, not proof of ExactUnit superior value.",
+  "entries": [
+    {
+      "url": "/convert/ft-lbf-to-nm/400/",
+      "query": "400 pound feet to nm",
+      "competitorUrl": "https://0-60calc.com/lb-ft-to-nm/",
+      "observedCompetitorCapabilities": [
+        "general-purpose lb-ft to Nm calculator",
+        "400 lb-ft prefilled-value preset button",
+        "400 lb-ft conversion chart row with about 542.3 Nm",
+        "worked formula and reverse unit navigation"
+      ],
+      "siteCurrentCapabilities": [
+        "400 ft·lbf source-specific answer",
+        "four-unit torque panel N·m, ft·lbf, in·lbf, kgf·m",
+        "live inputs and clipboard copy",
+        "precision and nearby values, torque-spec safety note"
+      ],
+      "comparison": "The generic competitor directly serves a 400 lb-ft intent. Our four-unit and precision features are real, but uniqueness or incremental SERP value is NOT established.",
+      "independentDemandVerified": false,
+      "independentCompetitorRankingVerified": false,
+      "uniqueValueVerified": false,
+      "launchIndexDisposition": "HOLD_NUMERIC__PREFER_PARENT_TOOL",
+      "contentReview": "https://0-60calc.com/lb-ft-to-nm/"
+    },
+    {
+      "url": "/convert/kpa-to-psi/108/",
+      "query": "108 kpa to psi",
+      "competitorUrl": "https://kpatopsi.com/",
+      "observedCompetitorCapabilities": [
+        "bidirectional kPa ⇄ PSI converter at root URL",
+        "explicit 108 kPa to PSI example about 15.66 PSI",
+        "step-by-step conversion formula with 0.145038 as rounded factor",
+        "other pressure value examples and context"
+      ],
+      "siteCurrentCapabilities": [
+        "108 kPa source-specific answer",
+        "live pressure unit conversion with more supported units",
+        "four-unit pressure panel",
+        "copy and precision/nearby values"
+      ],
+      "comparison": "The rival generic homepage answers 108 kPa within its main content. ExactUnit offers additional output formats, but standalone indexed intent and superiority remain unproven.",
+      "independentDemandVerified": false,
+      "independentCompetitorRankingVerified": false,
+      "uniqueValueVerified": false,
+      "launchIndexDisposition": "HOLD_NUMERIC__PREFER_PARENT_TOOL",
+      "contentReview": "https://kpatopsi.com/"
+    }
+  ]
+}
