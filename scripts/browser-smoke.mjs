@@ -1039,7 +1039,8 @@ function run(url){
     '--disable-background-networking','--no-first-run','--virtual-time-budget=3500','--dump-dom',url];
   const child=spawn(chrome,args,{stdio:['ignore','pipe','pipe']});
   let html='',stderr='';
-  const timer=setTimeout(()=>child.kill('SIGKILL'),20000);
+  // More headroom when hosted CI Chromium competes for CPU with other CI runs.
+  const timer=setTimeout(()=>child.kill('SIGKILL'),35000);
   child.stdout.on('data',chunk=>html+=chunk);
   child.stderr.on('data',chunk=>stderr+=chunk);
   child.on('error',err=>{clearTimeout(timer);reject(err);});
