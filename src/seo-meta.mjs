@@ -33,7 +33,8 @@ export function directionMetaDescription(pair){
  const raw=convert(1,pair.from,pair.to);
  const rendered=formatNumber(raw,9);
  const relation=displayRelation(raw,rendered);
- return pair.title+': 1 '+from.symbol+' '+relation+' '+rendered+' '+to.symbol+
+ const alias=pair.slug==='lbs-to-kg'?' (lbs to kg)':pair.slug==='kg-to-lbs'?' (kg to lbs)':'';
+ return pair.title+alias+': 1 '+from.symbol+' '+relation+' '+rendered+' '+to.symbol+
   '. Enter any value, check the formula and use the reference table or local batch converter.';
 }
 
@@ -54,9 +55,15 @@ const conciseTitles=Object.freeze({
  'm2-to-ft2':'Square Meters to Square Feet (m² to ft²)',
  'mpg-us-to-l-100km':'US MPG to L/100 km Converter'
 });
+const massTitles=Object.freeze({
+ 'lbs-to-kg':'Pounds to Kilograms Converter (lbs to kg)',
+ 'kg-to-lbs':'Kilograms to Pounds Converter (kg to lbs)'
+});
+// The user's competitor dataset supports common *numbered* lbs/kg query phrasing.
+// Generic unnumbered phrase Volume and KD remain unverified.
 export const conciseDirectionTitleSlugs=Object.freeze(Object.keys(conciseTitles));
 export function directionSeoTitle(pair){
  const from=units[pair.from],to=units[pair.to];
  if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Incompatible SEO units');
- return conciseTitles[pair.slug]||pair.title+' Converter ('+from.symbol+' to '+to.symbol+')';
+ return massTitles[pair.slug]||conciseTitles[pair.slug]||pair.title+' Converter ('+from.symbol+' to '+to.symbol+')';
 }
