@@ -73,6 +73,37 @@ async function smokeScenario(SCENARIO){
      ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
      break;
    }
+   case 'v38-swap-copy-feedback':{
+     const tool=q('[data-converter]'),from=tool.querySelector('[data-from]'),
+       to=tool.querySelector('[data-to]'),swap=tool.querySelector('[data-swap]'),
+       copy=tool.querySelector('[data-copy]'),numberCopy=tool.querySelector('[data-copy-number]');
+     const oldFrom=from.value,oldTo=to.value;
+     swap.click();
+     ok(from.value===oldTo&&to.value===oldFrom,'swap still immediately changes units');
+     ok(tool.querySelector('[data-output-number]').textContent!=='—','swapped conversion stays live');
+     if(window.matchMedia('(prefers-reduced-motion: no-preference)').matches){
+       const motion=swap.getAnimations();
+       ok(motion.length===1&&motion[0].effect.getTiming().duration===175,
+         'unit swap has a single short touch-safe visual cue');
+       motion[0].cancel();
+     }
+     const originalMatch=window.matchMedia;
+     try{
+       window.matchMedia=()=>({matches:false});
+       swap.click();
+       ok(swap.getAnimations().length===0,'reduced-motion unit swap has no animation');
+     }finally{window.matchMedia=originalMatch;}
+     let written='';
+     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{written=value;}}});
+     copy.click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(written.includes('lb')&&written.includes('kg'),'copy text still contains both source units');
+     ok(copy.dataset.copied==='true'&&copy.textContent.includes('Copied'),
+       'success feedback is visible and styled');
+     numberCopy.click();await new Promise(resolve=>setTimeout(resolve,0));
+     ok(numberCopy.dataset.copied==='true'&&tool.querySelector('[data-action-status]').textContent.includes('without units'),
+       'unit-free copy reports its distinct accessible success');
+     break;
+   }
    case 'motion-entrance':{
      const hero=q('.home-page .hero'),demo=q('.home-page .hero .demo'),intro=q('.home-page .hero-intro');
      ok(Boolean(hero&&demo&&intro),'home layout and calculator must stay in the DOM');
@@ -416,6 +447,17 @@ async function smokeScenario(SCENARIO){
        ok(Math.abs(measured-width)<=2,'Expected iframe viewport '+width+'px, observed '+measured);
        const offenders=extra>2?[...doc.querySelectorAll('body *')].map(el=>({el,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})).filter(x=>x.right>visible+2||x.left< -2).sort((a,b)=>b.right-a.right).slice(0,8).map(x=>x.el.tagName.toLowerCase()+(x.el.className&&typeof x.el.className==='string'?'.'+x.el.className.split(/\s+/).join('.'):'' )+' right='+Math.round(x.right)).join(', '):'';
        ok(extra<=2,'Horizontal overflow '+extra+'px at width '+width+' on '+location.pathname+'; offenders: '+offenders);
+       if(location.pathname==='/convert/lbs-to-kg/'&&width<=375){
+         const tool=doc.querySelector('.inner-page [data-converter]');
+         const copy=tool?.querySelector('[data-copy]'),precision=tool?.querySelector('[data-precision]');
+         ok(Boolean(copy&&precision),'mobile converter retains copy and decimal-precision controls');
+         const copyBox=copy.getBoundingClientRect(),precisionBox=precision.getBoundingClientRect();
+         ok(copyBox.bottom<precisionBox.top,'copy result must precede optional precision setting in mobile reading order');
+         if(width===375)ok(copyBox.bottom<=870,'375px converter primary copy must fit a 870px first phone frame; bottom='+Math.round(copyBox.bottom));
+         const hint=tool.querySelector('.tool-head .small');
+         ok(parseFloat(doc.defaultView.getComputedStyle(hint).fontSize)>=11.5,
+           'small converter status text must be legible at '+width+'px');
+       }
        if(location.pathname==='/'&&width===320){
          const firstCopy=doc.querySelector('.hero [data-copy]').getBoundingClientRect();
          ok(firstCopy.bottom<=870,'320px homepage should reveal the primary copy action in the 870px first screen (actual bottom: '+Math.round(firstCopy.bottom)+'px)');
@@ -807,6 +849,7 @@ const suites=[
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
  {name:'seo-v33-generic-intent',url:'/convert/kn-to-lbf/'},
  {name:'seo-v33-generic-intent',url:'/convert/kw-to-hp/'},
+ {name:'v38-swap-copy-feedback',url:'/convert/lbs-to-kg/'},
  {name:'motion-entrance',url:'/'},
  {name:'motion-interaction',url:'/'},
  {name:'motion-interaction',url:'/convert/kg-to-lbs/'},
