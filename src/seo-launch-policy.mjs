@@ -25,10 +25,15 @@ export function resolveSitePublication({
   const token=String(approval??'').trim();
   const branch=String(pagesBranch??'').trim();
   const allowedToken='I_APPROVE_PUBLIC_INDEXING';
+  // Official apex hostname is user-confirmed; never accidentally index a test,
+  // www, mirror, misspelt, or preview domain even when approval variables leak.
+  const officialHost='convertunits.cc';
   if(token&&token!==allowedToken)
     throw new RangeError('SEO_INDEX_APPROVED requires the exact I_APPROVE_PUBLIC_INDEXING confirmation.');
   if(token&&(!origin||previewHost))
     throw new RangeError('Public indexing cannot be approved without a real HTTPS custom domain.');
+  if(token&&host!==officialHost)
+    throw new RangeError('SEO publication is locked to the official convertunits.cc apex host.');
   if(token&&approved!==host)
     throw new RangeError('SEO_PUBLIC_HOST must exactly match the SITE_URL hostname.');
   if(approved&& !token)
