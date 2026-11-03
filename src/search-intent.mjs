@@ -76,6 +76,20 @@ const contexts={
    ['Is converting torque the same as choosing a tightening specification?',()=> 'No. The calculator can restate a torque value in different units, but it cannot establish the torque required for a bolt, fastener or assembly.']
   ],
   next:'ft-lbf-to-nm',nextLabel:'convert foot-pound-force back to newton-meters'
+ },
+ // These two questions match generic direction intent in the supplied Semrush rows.
+ // Neither justifies a standalone numerical URL or inventing a Google ranking.
+ 'kw-to-hp':{
+  questions:[
+   ['How do I convert kW to mechanical horsepower?',()=>fact(1,'kw','hp',7)+'. This page uses mechanical horsepower, not metric horsepower.'],
+   ['Are mechanical, metric and electrical horsepower interchangeable?',()=> 'No. One mechanical horsepower corresponds to '+formatNumber(convert(1,'hp','kw')*1000,9)+' watts. Metric, electrical and boiler horsepower have different defined factors; check the unit standard before converting.']
+  ]
+ },
+ 'kn-to-lbf':{
+  questions:[
+   ['How many pounds of force is one kilonewton?',()=>fact(1,'kn','lbf',7)+'. The symbol lbf means pound-force, not pounds of mass.'],
+   ['Does converting kilonewtons to pounds also convert kilograms?',()=> 'No. A kilonewton is a unit of force (1,000 newtons), while a kilogram and a pound (lb) are units of mass. This converter reports pound-force (lbf) and does not assume gravity or material density.']
+  ]
  }
 };
 export const intentSlugs=Object.freeze(Object.keys(contexts));
@@ -83,13 +97,13 @@ export const intentSlugs=Object.freeze(Object.keys(contexts));
 export function intentAnswers(pair,allPairs){
  const item=contexts[pair.slug];
  if(!item)return '';
- const next=allPairs.find(p=>p.slug===item.next);
- if(!next||units[next.from]?.dimension!==units[pair.from]?.dimension)
+ const next=item.next?allPairs.find(p=>p.slug===item.next):null;
+ if(item.next&&(!next||units[next.from]?.dimension!==units[pair.from]?.dimension))
   throw new RangeError('Contextual link is missing or not in the same dimension: '+pair.slug);
  const title=units[pair.from].name.toLowerCase()+' to '+units[pair.to].name.toLowerCase();
  return '<section class="card intent-answers" data-intent-answers="'+E(pair.slug)+'" aria-label="Practical conversion questions">'+
   '<h2>Practical questions: '+E(title)+'</h2>'+
   item.questions.map(([question,makeAnswer])=>'<h3>'+E(question)+'</h3><p>'+E(makeAnswer())+'</p>').join('')+
-  '<p class="hint">Need a different measurement direction? <a href="'+E(next.url)+'">'+E(item.nextLabel)+'</a>. <a href="/methodology/">Check definitions and rounding</a>.</p>'+
+  '<p class="hint">Need another compatible unit? '+(next?'<a href="'+E(next.url)+'">'+E(item.nextLabel)+'</a>':'<a href="/universal-converter/">Open the universal converter</a>')+'. <a href="/methodology/">Check definitions and rounding</a>.</p>'+
   '</section>';
 }
