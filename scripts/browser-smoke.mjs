@@ -476,6 +476,10 @@ async function smokeScenario(SCENARIO){
          const input=doc.querySelector('[data-batch-input]').getBoundingClientRect();
          ok(Math.abs(from.top-to.top)<4,'mobile batch source and target units must sit in one compact row');
          ok(input.top<790,'mobile batch input must be visible in the first phone viewport ('+input.top+'px)');
+         if(width===375){
+           const primary=doc.querySelector('[data-process]').getBoundingClientRect();
+           ok(primary.bottom<=870,'375px batch primary Convert button must fit first phone frame; bottom='+Math.round(primary.bottom));
+         }
          ok(!doc.querySelector('[data-batch-advanced]').open,'advanced settings remain folded on mobile');
        }
        if(width<=375&&(location.pathname==='/'||location.pathname==='/convert/lbs-to-kg/')){
