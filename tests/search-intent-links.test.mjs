@@ -8,16 +8,19 @@ const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.m
 const policy=JSON.parse(fs.readFileSync(new URL('../src/data/numeric-seo-policy.json',import.meta.url),'utf8'));
 const bySlug=slug=>pairs.find(p=>p.slug===slug);
 
-test('only nine editorially selected direction pages get practical answers',()=>{
- assert.equal(intentSlugs.length,9);
- assert.equal(new Set(intentSlugs).size,9);
+test('only eleven source-reviewed direction pages get practical answers',()=>{
+ const expected=['in-to-cm','cm-to-in','in-to-mm','m-to-ft','ft-to-m','kmh-to-mph','mph-to-kmh','ft-lbf-to-nm','nm-to-ft-lbf','kw-to-hp','kn-to-lbf'];
+ assert.deepEqual([...intentSlugs].sort(),[...expected].sort());
+ assert.equal(new Set(intentSlugs).size,11);
  for(const p of pairs){
   const html=intentAnswers(p,pairs);
   if(intentSlugs.includes(p.slug)){
    assert.match(html,/class="card intent-answers"/);
    assert.match(html,/<h2>Practical questions:/);
    assert.equal([...html.matchAll(/<h3>/g)].length,2,p.slug);
-   assert.equal([...html.matchAll(/<a href="\/convert\//g)].length,1,p.slug);
+   const generic= p.slug==='kw-to-hp'||p.slug==='kn-to-lbf';
+   assert.equal([...html.matchAll(/<a href="\/convert\//g)].length,generic?0:1,p.slug);
+   if(generic)assert.match(html,/href="\/universal-converter\/"/,p.slug);
    assert.ok(!html.includes('application/ld+json'),'no invented FAQ structured data');
   }else assert.equal(html,'',p.slug);
  }
