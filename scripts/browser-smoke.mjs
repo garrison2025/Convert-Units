@@ -73,6 +73,27 @@ async function smokeScenario(SCENARIO){
      ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
      break;
    }
+   case 'v40-brand-contact':{
+     const title=document.title;
+     ok(title.endsWith(' | ConvertUnits.cc'),'every page title must use the selected domain brand');
+     ok(document.querySelector('meta[property="og:site_name"]')?.content==='ConvertUnits.cc',
+       'Open Graph site name must match the official site brand');
+     ok(document.querySelector('.topbar .brand')?.getAttribute('aria-label')==='ConvertUnits.cc home',
+       'primary wordmark must expose the new brand to assistive technology');
+     ok(document.querySelector('.topbar .brand')?.textContent.includes('ConvertUnits'),
+       'visible header wordmark must use ConvertUnits');
+     ok(document.querySelector('.footer .footnote')?.textContent.includes('ConvertUnits.cc'),
+       'footer copyright must use the official brand');
+     const mail=[...document.querySelectorAll('a[href="mailto:contact@convertunits.cc"]')];
+     ok(mail.length>=1,'site must expose the official contact email');
+     ok(document.querySelector('meta[name="robots"]')?.content==='noindex,follow',
+       'no public indexing changes until explicit approval');
+     if(location.pathname==='/contact/'||location.pathname==='/privacy/'){
+       ok([...document.querySelectorAll('main a')].some(a=>a.href==='mailto:contact@convertunits.cc'),
+         'main legal/contact content must link to the official email');
+     }
+     break;
+   }
    case 'v39-color-system':{
      const css=getComputedStyle(document.documentElement),panel=q('[data-converter] .resultbox'),
        number=q('[data-output-number]'),primary=q('[data-converter] .btn.primary');
@@ -879,6 +900,9 @@ const suites=[
  {name:'seo-v33-unsourced',url:'/convert/g-to-oz/'},
  {name:'seo-v33-generic-intent',url:'/convert/kn-to-lbf/'},
  {name:'seo-v33-generic-intent',url:'/convert/kw-to-hp/'},
+ {name:'v40-brand-contact',url:'/'},
+ {name:'v40-brand-contact',url:'/contact/'},
+ {name:'v40-brand-contact',url:'/privacy/'},
  {name:'v39-color-system',url:'/'},
  {name:'v39-color-system',url:'/convert/lbs-to-kg/'},
  {name:'v38-swap-copy-feedback',url:'/convert/lbs-to-kg/'},
