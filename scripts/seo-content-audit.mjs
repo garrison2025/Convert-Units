@@ -12,6 +12,7 @@ import {roundTripPrecisionNote} from '../src/landing.mjs';
 import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from '../src/seo-guides.mjs';
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
+import {numericInsight} from '../src/numeric-insight.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -293,6 +294,13 @@ for(const seed of seeds){
  if(h1!==numericHeading(seed,pair))errors.push(seed.url+': H1 does not name actual measurement and units');
  const desc=meta(html,'description');
  if(desc!==numericDescription(seed,pair))errors.push(seed.url+': descriptive snippet is inconsistent with the numeric answer');
+ const expectedInsight=numericInsight(seed,pair);
+ if(expectedInsight){
+  if(!html.includes(expectedInsight))errors.push(seed.url+': computed pilot cross-check panel does not match the shared engine');
+  if(!html.includes('data-numeric-intent-check="'+seed.url+'"'))errors.push(seed.url+': evidence-backed numeric page marker missing');
+ }else if(html.includes('data-numeric-intent-check=')){
+  errors.push(seed.url+': numeric cross-check panel leaked to a held, unreviewed value page');
+ }
  if(!html.includes('class="mini-card related-direction-links"'))
   errors.push(seed.url+': related converter navigation missing');
  const expectedRelated=relatedDirectionLinks(pair,pairList);
