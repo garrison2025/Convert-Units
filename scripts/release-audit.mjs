@@ -26,7 +26,8 @@ const pages=new Map(htmlFiles.map(f=>{
 const allRoutes=new Set(pages.keys());
 const publishedNumeric=new Set(info.mode==='production'?info.numericPublishedUrls||[]:info.numericIndexMode==='all'?seeds.map(s=>s.url):[...pilot]);
 const unindexableNumeric=new Set(seeds.filter(s=>!publishedNumeric.has(s.url)).map(s=>s.url));
-if(info.mode==='production'&&[...publishedNumeric].some(u=>!pilot.has(u)))fail('Production published a non-pilot numeric URL');
+if(info.mode==='production'&&info.numericIndexMode!=='all'&&[...publishedNumeric].some(u=>!pilot.has(u)))fail('Selective publication included a non-pilot numeric URL');
+if(info.mode==='production'&&info.numericIndexMode==='all'&&publishedNumeric.size!==seeds.length)fail('Owner-approved full launch did not publish all 92 numeric pages');
 const canonicalRoutes=new Set([...allRoutes].filter(p=>p!=='/404/'&&!unindexableNumeric.has(p)));
 const eligibleValuePages=seeds.filter(s=>!unindexableNumeric.has(s.url));
 const byDirection=new Map();
@@ -47,7 +48,7 @@ const extract=(html,regex)=>regex.exec(html)?.[1]??'';
 const plain=(html)=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&(?:[a-z]+|#\d+);/gi,' ').replace(/\s+/g,' ').trim();
 assert.equal(pairs.length,38);
 assert.equal(seeds.length,92);
-if(info.mode==='production'&&info.indexablePages!==canonicalRoutes.size)fail('Indexable page count differs from curated sitemap candidates');
+if(info.mode==='production'&&info.indexablePages!==canonicalRoutes.size)fail('Indexable page count differs from published sitemap candidates');
 if(allRoutes.size!==pairs.length+seeds.length+27)fail('Unexpected static route count; verify 16 categories, 38 directions, 92 numeric pages and information pages');
 for(const [route,html] of pages){
   const title=extract(html,/<title>([\s\S]*?)<\/title>/i);
