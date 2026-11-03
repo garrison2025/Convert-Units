@@ -67,7 +67,7 @@ async function smokeScenario(SCENARIO){
        ok(getComputedStyle(demo).animationName.includes('fade-pop'),'homepage calculator entrance no longer suppressed');
        ok(getComputedStyle(intro).animationName.includes('fade-up'),'homepage intro entrance no longer suppressed');
      }
-     ok(getComputedStyle(hero).minHeight!=='0px','hero retains its stable space');
+     ok(hero.getBoundingClientRect().height>200,'hero content occupies stable layout space even on mobile');
      break;
    }
    case 'copy-number':{
