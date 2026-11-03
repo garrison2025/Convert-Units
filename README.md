@@ -1,6 +1,17 @@
-# ExactUnit — free unit converter
+# ConvertUnits.cc — free unit converter
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
+
+## Official domain and contact — confirmed 2026-11-03
+
+- **Official apex:** [https://convertunits.cc](https://convertunits.cc). Owner confirmed purchase and Cloudflare zone connection; verified the hostname already serves the existing Cloudflare Pages project and shares its `build-info.json` commit with `convert-units-bwa.pages.dev`.
+- **Brand:** `ConvertUnits.cc` (formerly the temporary `ExactUnit` developer label). Brand text, titles, Open Graph and future WebSite structured data are generated from the new identity.
+- **Contact:** `contact@convertunits.cc`, linked in the footer, contact and privacy pages. Public DNS resolves Cloudflare email-routing MX and SPF records. **MX records do not prove the specific inbox destination or outbound email works**; manually test a real incoming message and reply.
+- **WWW:** `www.convertunits.cc` was not resolving in a public DNS check at the time of verification. The canonical hostname choice is the apex `https://convertunits.cc`. Add a DNS-proxied www alias and a permanent 301 redirect preserving paths and queries if a www variant is desired.
+- **Search release is NOT implied:** the domain is visible but remained `noindex,follow` at the 2026-11-03 verification. Domain purchase or adding `SITE_URL=https://convertunits.cc` alone **never** turns on Google indexing.
+- **Cloudflare Pages configuration when ready:** under the *existing* Pages project `convert-units-bwa`, set `SITE_URL=https://convertunits.cc` (Production environment) to record the official origin. Only after the owner's **separate, explicit** approval of search launch, additionally set `SEO_PUBLIC_HOST=convertunits.cc` and `SEO_INDEX_APPROVED=I_APPROVE_PUBLIC_INDEXING`. Do not set those two approval variables until authorized. The independent numeric URL release gate remains in force (77 held pages plus 15 candidates requiring specific review/approval).
+- Do not create a second Pages project, change app code to use paid APIs, or auto-enable AdSense/GSC. Historical sections below were written before the domain was purchased and are retained as a development record.
+
 
 ## Delivered
 
