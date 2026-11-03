@@ -34,9 +34,9 @@ for(const x of fetchFail)issues.push('HTTP unavailable '+x.url+': '+(x.error||x.
 const infoJson=byRoute.get('/build-info.json');
 let info=null;
 try{if(infoJson?.status===200)info=JSON.parse(infoJson.body);}catch{issues.push('Invalid live build-info.json');}
-const isNoindex=x=>/<meta\\s+name="robots"\\s+content="[^"]*noindex/i.test(x?.body||'')||/(?:^|,)\\s*noindex\\b/i.test(x?.robotsHeader||'');
-const canonicalOf=x=>x?.body?.match(/<link\\s+rel="canonical"\\s+href="([^"]+)"/i)?.[1]||null;
-const locs=[...(byRoute.get('/sitemap.xml')?.body||'').matchAll(/<loc>([^<]+)<\\/loc>/g)].map(m=>m[1]);
+const isNoindex=x=>/<meta\s+name="robots"\s+content="[^"]*noindex/i.test(x?.body||'')||/(?:^|,)\s*noindex\b/i.test(x?.robotsHeader||'');
+const canonicalOf=x=>x?.body?.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]||null;
+const locs=[...(byRoute.get('/sitemap.xml')?.body||'').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1]);
 if(info){
   observations.push('mode='+info.mode,'site='+String(info.site),'indexable='+info.indexablePages);
   if(info.mode==='preview'){
