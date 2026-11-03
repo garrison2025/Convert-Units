@@ -14,6 +14,10 @@ const dist=path.join(root,'dist');
 const pairs=JSON.parse(fs.readFileSync(path.join(root,'src/data/pairs.json'),'utf8'));
 const seeds=JSON.parse(fs.readFileSync(path.join(root,'src/data/seeds.json'),'utf8'));
 const policy=JSON.parse(fs.readFileSync(path.join(root,'src/data/numeric-seo-policy.json'),'utf8'));
+const build=JSON.parse(fs.readFileSync(path.join(dist,'build-info.json'),'utf8'));
+const openNumeric=new Set(build.mode==='production'
+ ? build.numericPublishedUrls||[]
+ : build.numericIndexMode==='all'?seeds.map(s=>s.url):policy.pilotIndexUrls);
 const results=[],errors=[],titles=new Set(),descriptions=new Set(),referenceHeadings=new Set();
 const unescape=x=>String(x).replaceAll('&amp;','&').replaceAll('&quot;','"').replaceAll('&#39;',"'");
 const page=url=>fs.readFileSync(path.join(dist,url.replace(/^\//,''),'index.html'),'utf8');
@@ -38,6 +42,23 @@ for(const pair of pairs){
   issue.push('working tool or usable reference table missing');
  if(!html.includes('class="card conversion-guide"'))issue.push('calculation verification guidance missing');
  if(!html.includes('/methodology/'))issue.push('conversion source/method link missing');
+ const specificTitle='<h2>Specific '+from.symbol+' values</h2>';
+ const specific=html.includes(specificTitle);
+ const linkedNumeric=seeds.filter(seed=>seed.slug===pair.slug&&openNumeric.has(seed.url));
+ if(specific!==(linkedNumeric.length>0))issue.push('Empty or hidden incorrectly: specific numeric results section');
+ if(specific){
+  for(const seed of linkedNumeric)
+   if(!html.includes('href="'+seed.url+'"'))
+    issue.push('Missing eligible numeric link '+seed.url);
+ }
+ const powerCompare=html.includes('data-horsepower-conventions');
+ if(pair.slug==='kw-to-hp'){
+  if(!powerCompare||!html.includes('mechanical horsepower (hp(I)) only')||
+   !html.includes('Electric horsepower, hp(E)')||
+   !html.includes('Metric horsepower, hp(M)')||
+   !html.includes('Boiler horsepower, hp(S)'))
+   issue.push('Power page lacks source-supported hp definitions and mechanical-only scope');
+ }else if(powerCompare)issue.push('Horsepower conventions leaked onto unrelated conversion');
  const reverse=pairs.find(p=>p.from===pair.to&&p.to===pair.from);
  if(reverse&&!html.includes('href="'+reverse.url+'"'))issue.push('reverse direction is not a crawlable link');
  const dimension=from.dimension,reference=engineeringReference(pair);
@@ -57,7 +78,7 @@ for(const pair of pairs){
   issue.push('torque reverse page uses wrong reference source');
  if(pair.slug==='kmh-to-mph'&&html.includes('60 mph across four speed units'))
   issue.push('road speed reference uses opposite direction');
- const row={url:pair.url,title,dimension,referenceHeading:heading||null,primaryAnswerValid:!issue.includes('source-derived one-unit answer missing'),reverseUrl:reverse?.url??null,issues:issue};
+ const row={url:pair.url,title,dimension,visibleNumericLinks:linkedNumeric.length,powerConventionReference:powerCompare,referenceHeading:heading||null,primaryAnswerValid:!issue.includes('source-derived one-unit answer missing'),reverseUrl:reverse?.url??null,issues:issue};
  results.push(row);
  for(const finding of issue)errors.push(pair.url+': '+finding);
 }
@@ -68,7 +89,7 @@ const report={
  status:errors.length?'failed':'passed',
  scope:'38 genuine directional pages; preview source HTML; not real Google rankings or GSC',
  checked:results.length,uniqueTitles:titles.size,uniqueDescriptions:descriptions.size,
- engineeringPages:engineeringCount,distinctEngineeringHeadings:referenceHeadings.size,
+ engineeringPages:engineeringCount,distinctEngineeringHeadings:referenceHeadings.size,horsepowerStandardPages:results.filter(r=>r.powerConventionReference).length,visibleNumericResultSections:results.filter(r=>r.visibleNumericLinks>0).length,
  unchangedNumericInventory:{all:seeds.length,conditionalIndex:policy.pilotIndexUrls.length,noindex:seeds.length-policy.pilotIndexUrls.length},
  failures:errors,results
 };

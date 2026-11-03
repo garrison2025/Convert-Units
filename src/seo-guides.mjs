@@ -169,6 +169,34 @@ export function engineeringReference(pair){
  return '';
 }
 
+/**
+ * Mechanical, electric, metric and boiler horsepower are different standards.
+ * These read-only comparisons do not change the live calculator's mechanical-hp unit.
+ * Conventions and names checked against the actual Inch Calculator kW-to-hp page.
+ */
+export function horsepowerConventionsReference(pair){
+ if(pair.slug!=='kw-to-hp')return '';
+ if(units[pair.from]?.dimension!=='power'||pair.from!=='kw'||pair.to!=='hp')
+  throw new RangeError('Mechanical horsepower reference must only appear on kW-to-hp');
+ const standards=[
+  ['Mechanical horsepower, hp(I)',units.hp.factor,'Live converter'],
+  ['Electric horsepower, hp(E)',746,'For comparison only'],
+  ['Metric horsepower, hp(M)',735.49875,'For comparison only'],
+  ['Boiler horsepower, hp(S)',9809.5,'For comparison only']
+ ];
+ const values=standards.map(([name,w,scope])=>'<tr><th scope="row">'+esc(name)+'</th>'+
+  [1,5].map(k=>'<td>'+esc(formatNumber(k*1000/w,6))+' hp</td>').join('')+
+  '<td>'+esc(scope)+'</td></tr>').join('');
+ return '<section class="card" data-horsepower-conventions aria-label="Horsepower standards comparison">'+
+  '<h2>Which horsepower standard?</h2>'+
+  '<p><strong>This converter uses mechanical horsepower (hp(I)) only.</strong> Other horsepower definitions produce different numerical answers for the same kilowatts. Confirm the convention on the source label before comparing ratings.</p>'+
+  '<div class="reference-scroll"><table class="number-table reference-table"><thead><tr>'+
+  '<th scope="col">Horsepower convention</th><th scope="col">1 kW in hp</th><th scope="col">5 kW in hp</th><th scope="col">Converter support</th></tr></thead>'+
+  '<tbody>'+values+'</tbody></table></div>'+
+  '<p class="hint">Mechanical hp uses approximately 745.699871582 W per hp; electric hp uses 746 W, metric hp uses 735.49875 W and boiler hp uses 9,809.5 W per hp by the conventions shown. Display results are rounded. <a href="https://www.inchcalculator.com/convert/kilowatt-to-horsepower/" rel="noopener noreferrer">Compare horsepower definitions</a>.</p>'+
+  '</section>';
+}
+
 export function directionExplanation(pair,allPairs){
  const from=units[pair.from],to=units[pair.to];
  if(!from||!to||from.dimension!==to.dimension)throw new RangeError('Unknown or incompatible conversion pair');
@@ -189,7 +217,7 @@ export function directionExplanation(pair,allPairs){
    '<p>'+esc(item.check)+'</p>'+
    (reverse?'<p>Need the other direction? <a href="'+esc(reverse.url)+'">Convert '+esc(to.symbol)+' to '+esc(from.symbol)+'</a>.</p>':'')+
    '<p class="hint">Reference: <a href="'+sourceUrl+'" rel="noopener noreferrer">NIST conversion factors</a>. Calculation and display rounding are separate. <a href="/methodology/">See how we calculate</a>.</p>'+
-   '</section>'+engineeringReference(pair);
+   '</section>'+engineeringReference(pair)+horsepowerConventionsReference(pair);
 }
 
 /**

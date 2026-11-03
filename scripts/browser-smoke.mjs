@@ -563,6 +563,21 @@ async function smokeScenario(SCENARIO){
      ok(q('[data-torque-unit="nm"]').textContent==='= 9.80665 N·m','metric source amount correct');
      break;
    }
+   case 'power-standards':{
+     const panel=q('[data-horsepower-conventions]');
+     ok(Boolean(panel),'kilowatt page has actual horsepower standard comparison');
+     ok(panel.querySelectorAll('tbody tr').length===4,'mechanical/electric/metric/boiler standards');
+     ok(panel.textContent.includes('mechanical horsepower (hp(I)) only'),'mechanical-only live converter scope stated');
+     for(const value of ['1.341022 hp','1.340483 hp','1.359622 hp','0.101942 hp'])
+      ok(panel.textContent.includes(value),'calculated 1 kW values include '+value);
+     ok(panel.textContent.includes('For comparison only'),'alternative horsepower standards are informational, not live-unit settings');
+     ok(!document.querySelector('h2')?.textContent.includes('Specific hp values'),'no empty numerical-pilot section');
+     const input=q('[data-value]');
+     input.value='5';input.dispatchEvent(new Event('input',{bubbles:true}));
+     ok(q('[data-output-number]').textContent.startsWith('6.7051'),'live mechanical horsepower remains correct');
+     ok(q('[data-from]').value==='kw','user input direction remains kilowatts');
+     break;
+   }
    case 'engineering-torque':{
      const panel=q('[data-engineering-reference="torque"]');
      ok(Boolean(panel&&panel.textContent.includes('1,200 in·lbf')),
@@ -642,6 +657,7 @@ const suites=[
  {name:'engineering-speed',url:'/convert/kmh-to-mph/'},
  {name:'speed-four-330',url:'/convert/kmh-to-mph/330/'},
  {name:'speed-four-reverse',url:'/convert/mph-to-kmh/'},
+ {name:'power-standards',url:'/convert/kw-to-hp/'},
  {name:'engineering-torque',url:'/convert/ft-lbf-to-nm/'},
  {name:'torque-four-400',url:'/convert/ft-lbf-to-nm/400/'},
  {name:'torque-four-reverse',url:'/convert/nm-to-ft-lbf/'},
@@ -651,7 +667,7 @@ const suites=[
  {name:'fuel',url:'/convert/mpg-us-to-l-100km/'},
  {name:'mobile',url:'/'},{name:'mobile',url:'/batch-converter/'},
  {name:'mobile',url:'/universal-converter/'},{name:'mobile',url:'/convert/lbs-to-kg/149/'},
- {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
+ {name:'mobile',url:'/convert/lbs-to-kg/'},{name:'mobile',url:'/convert/kg-to-lbs/'},{name:'mobile',url:'/convert/celsius-to-fahrenheit/'},{name:'mobile',url:'/convert/ml-to-us-fl-oz/'},{name:'mobile',url:'/convert/kpa-to-atm/'},{name:'mobile',url:'/convert/minutes-to-hours/'},{name:'mobile',url:'/convert/kw-to-hp/'},{name:'mobile',url:'/convert/m-to-ft/'},{name:'mobile',url:'/convert/ft-lbf-to-nm/'},{name:'mobile',url:'/convert/in-to-cm/'},{name:'mobile',url:'/convert/cm-to-in/'},{name:'mobile',url:'/convert/ft-to-m/'},{name:'mobile',url:'/convert/kmh-to-mph/'},{name:'mobile',url:'/category/volume/'}
 ];
 function injection(name){
  const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
