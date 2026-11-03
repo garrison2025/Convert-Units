@@ -15,6 +15,7 @@ import {relatedDirectionLinks,rankedRelatedDirections,engineeringReference} from
 import {intentAnswers,intentSlugs} from '../src/search-intent.mjs';
 import {sourceBackedExamples} from '../src/source-backed-examples.mjs';
 import {numericInsight} from '../src/numeric-insight.mjs';
+import {relatedNumericAnswers,relatedNumericAnswersHtml} from '../src/seo-related-values.mjs';
 import {categoryMetaDescription,categoryConversionExamples} from '../src/category-seo.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -308,6 +309,16 @@ for(const seed of seeds){
  const expectedRelated=relatedDirectionLinks(pair,pairList);
  for(const match of expectedRelated.matchAll(/<a class="chip" href="([^"]+)"/g))
   if(!html.includes('href="'+match[1]+'"'))errors.push(seed.url+': related conversion path absent '+match[1]);
+ const expectedNearby=relatedNumericAnswers(seed,pair,seeds);
+ const section=relatedNumericAnswersHtml(seed,pair,seeds);
+ if(section&&!html.includes(section))
+  errors.push(seed.url+': expected contextual numeric result navigation is missing or inconsistent');
+ if(!section&&html.includes('id="numeric-neighbors-heading"'))
+  errors.push(seed.url+': unrelated sibling values leaked into a singleton direction');
+ for(const linked of expectedNearby){
+  if(!html.includes('href="'+linked.url+'"'))
+   errors.push(seed.url+': neighboring numeric URL not discoverable: '+linked.url);
+ }
  const expectedRoundingPanel=indexedSeed(seed)?roundTripPrecisionNote(pair,seed.value):'';
  const actualRoundingPanel=html.includes('data-roundtrip-check');
  if(Boolean(expectedRoundingPanel)!==actualRoundingPanel)
