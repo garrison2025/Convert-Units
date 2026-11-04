@@ -29,15 +29,16 @@ The definitive color tokens live in `site.css`; `refresh.css` and `polish.css` m
 | result-bg | `#E8F5F6` | answer region |
 | result-ink | `#145D73` | high-contrast numeric answers |
 
-### November 4 audit correction
-
-Use the existing `--muted` token for small reference-table headings, breadcrumbs, trust-strip descriptions, equivalent-unit disclosure hints and secondary tool copy. These labels must remain readable against the existing white and canvas surfaces; do not substitute pale decorative gray for functional text. Layout, primary brand colors, typography hierarchy and motion remain unchanged. Invalid results expose no stale answer to assistive technology, associate the error with the input, and disable result-copy actions until valid input is restored.
 | line | `#DBE6EA` | quiet borders and separators |
 | focus | `#176B8A` | high-contrast keyboard focus |
 | success | `#156044` | copy-success feedback (separate from primary brand color) |
 | error | `#CC4B64` | invalid input and error messaging |
 
 Accessible color ratios against the intended surfaces: white-on-primary ≈5.99:1 and result-ink-on-result-bg ≈6.62:1 (both above 4.5:1). All styles are native CSS; no runtime palette generator, theme JS or remote dependency.
+
+### November 4 audit correction
+
+Use the existing `--muted` token for small reference-table headings, breadcrumbs, trust-strip descriptions, equivalent-unit disclosure hints and secondary tool copy. These labels must remain readable against the existing white and canvas surfaces; do not substitute pale decorative gray for functional text. Layout, primary brand colors, typography hierarchy and motion remain unchanged. Invalid results expose no stale answer to assistive technology, associate the error with the input, and disable result-copy actions until valid input is restored.
 
 ## Components and hierarchy
 1. Header: identifiable wordmark; concise navigation; distinct tool access action.
