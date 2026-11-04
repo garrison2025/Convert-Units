@@ -202,7 +202,7 @@ function isBlockedRetiredReport(c){
  if(!c||c.error)return false;
  if(c.status===403||c.status===404||c.status===410)return true;
  if([301,302,303,307,308].includes(c.status)&&c.redirectLocation){
-  try{return new URL(c.redirectLocation,c.url).pathname==='/404/';}catch{return false;}
+  try{return new URL(c.redirectLocation,c.url).pathname==='/404/'||new URL(c.redirectLocation,c.url).pathname.startsWith('/__retired-audit-export__/');}catch{return false;}
  }
  return false;
 }

@@ -1,6 +1,19 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import{convert,formatNumber,formula,dimensions,units,validateValue,parseBatchFirstCell,parseBatchLines,parseBatchTable,convertBatchToCsv,resolveUnitLabel,escapeCsvCell}from'../src/assets/engine.mjs';
+
+test('identity conversions preserve tiny inputs while enforcing physical limits',()=>{
+ assert.equal(convert('1e-20','celsius','celsius'),1e-20);
+ assert.equal(convert('1e-323','mg','mg'),1e-323);
+ assert.throws(()=>convert(-274,'celsius','celsius'),/absolute zero/);
+ assert.throws(()=>convert(0,'mpg-us','mpg-us'),/greater than zero/);
+});
+
+test('conversion underflow is an explicit error rather than a false zero',()=>{
+ assert.throws(()=>convert('1e-323','mg','kg'),/below supported numerical precision/);
+ assert.throws(()=>convert('1e-323','kg','tonne'),/below supported numerical precision/);
+ assert.equal(convert(0,'mg','kg'),0);
+});
 const pairs=JSON.parse(fs.readFileSync(new URL('../src/data/pairs.json',import.meta.url)));const seeds=JSON.parse(fs.readFileSync(new URL('../src/data/seeds.json',import.meta.url)));
 const eq=(a,b,tol=1e-8)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 test('approved full scope',()=>{assert.equal(pairs.length,38);assert.equal(seeds.length,92);assert.equal(new Set(seeds.map(s=>s.url)).size,92);assert.equal(new Set(pairs.map(p=>p.url)).size,38);});
@@ -205,7 +218,7 @@ test('spreadsheet CSV export preserves original columns, headers, quoted commas 
  assert.equal(result.headerPreserved,true);
  const lines=result.csv.split('\r\n');
  assert.equal(lines.length,3);
- assert.equal(lines[0],'item,value,notes,ExactUnit line,ExactUnit result,ExactUnit from,ExactUnit to,ExactUnit status');
+ assert.equal(lines[0],'item,value,notes,ConvertUnits.cc line,ConvertUnits.cc result,ConvertUnits.cc from,ConvertUnits.cc to,ConvertUnits.cc status');
  assert.match(lines[1],/^shirt,"1,200","red, heavy",2,544\.310844,lb,kg,OK$/);
  assert.match(lines[2],/^bag,149,ok,3,67\.58526313,lb,kg,OK$/);
 });
@@ -228,13 +241,13 @@ test('CSV output retains TSV source columns and names missing headings for heade
  const tab=parseBatchTable('sku\tvalue\tref\nx\t2.5\tAB\nz\t-1.2\tCD',{column:2,delimiter:'tab'});
  const converted=convertBatchToCsv(tab,'kg','g');
  assert.equal(converted.preservedColumns,3);
- assert.match(converted.csv,/sku,value,ref,ExactUnit line/);
+ assert.match(converted.csv,/sku,value,ref,ConvertUnits.cc line/);
  assert.match(converted.csv,/x,2\.5,AB,2,2500,kg,g,OK/);
  assert.match(converted.csv,/z,-1\.2,CD,3,-1200,kg,g,OK/);
  assert.ok(!converted.csv.includes('\"-1,200\"'),'Negative output must remain a spreadsheet number, not grouped display text');
  const plain=convertBatchToCsv(parseBatchTable('149\n126'),'lbs','kg');
  assert.equal(plain.preservedColumns,1);
- assert.match(plain.csv,/^Column 1,ExactUnit line,ExactUnit result/);
+ assert.match(plain.csv,/^Column 1,ConvertUnits.cc line,ConvertUnits.cc result/);
  assert.match(plain.csv,/149,1,67\.58526313,lb,kg,OK/);
  assert.throws(()=>convertBatchToCsv(tab,'lbs','seconds'),/compatible units/);
 });

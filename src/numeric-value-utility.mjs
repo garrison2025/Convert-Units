@@ -37,7 +37,7 @@ export function sourceRoundingScenarioHtml(seed,pair){
  const controls='<div data-round-controls hidden><label class="input-head" for="source-step-'+
   seed.id+'">Change the hypothetical source rounding increment</label>'+
   '<select class="select" id="source-step-'+seed.id+'" data-source-step>'+
-  selectOptions+'</select><p class="hint">Use this to compare rounding scenarios. No accuracy is inferred.</p></div>';
+  selectOptions+'</select><p class="hint">Changing the increment explores a centered interval of half that increment on either side of the stated value; it does not assert that this value was rounded to that increment.</p></div>';
  const comparison=s.stable
   ?'Both boundaries round to '+esc(formatNumber(s.roundedLower,0))+' '+esc(to.symbol)+
     ' when reported to the nearest whole target unit.'
@@ -51,8 +51,8 @@ export function sourceRoundingScenarioHtml(seed,pair){
   '<h2>If '+esc(seed.valueText)+' '+esc(from.symbol)+' was rounded at the source</h2>'+
   '<p class="reference-caption">The stated input converts to '+rel(s.central)+' <strong>'+
    esc(fmtOut(s.central))+' '+esc(to.symbol)+'</strong>. If the source reading had first been '+
-   'rounded to the nearest <strong>'+step+' '+esc(from.symbol)+'</strong>, its underlying value '+
-   'could be roughly between '+esc(fmtSource(s.below))+' and '+esc(fmtSource(s.above))+
+   'rounded to the nearest <strong data-source-step-text>'+step+' '+esc(from.symbol)+'</strong>, its underlying value '+
+   'could be roughly between <span data-source-lower>'+esc(fmtSource(s.below))+'</span> and <span data-source-upper>'+esc(fmtSource(s.above))+'</span>'+
    ' '+esc(from.symbol)+'. Here is how that hypothetical range converts:</p>'+
   '<div class="reference-scroll"><table class="number-table reference-table"><thead>'+
    '<tr><th>Scenario</th><th>Source reading</th><th>Converted result</th></tr></thead><tbody>'+

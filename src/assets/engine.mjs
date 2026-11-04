@@ -126,10 +126,13 @@ export function convert(value,from,to){
  if(!a||!b)throw new RangeError('Unknown unit.');
  if(a.dimension!==b.dimension)throw new RangeError('Choose two units of the same physical dimension.');
  if(a.dimension==='fuel' && n<=0)throw new RangeError('Fuel economy must be greater than zero.');
- const result=fromBase(toBase(n,from),to);
- if(!Number.isFinite(result) || Math.abs(result)>1e24)throw new RangeError('Result is outside the supported numerical range.');
- // Temperature below 0 K is not physically valid for absolute thermodynamic temperature.
+ // Validate physical limits before the identity shortcut.
  if(a.dimension==='temperature' && toBase(n,from)<-1e-9)throw new RangeError('Temperature cannot be below absolute zero (0 K).');
+ if(from===to)return n;
+ const base=toBase(n,from),result=fromBase(base,to);
+ if(n!==0&&a.dimension!=='temperature'&&(base===0||result===0))throw new RangeError('Result is below supported numerical precision.');
+ if(!Number.isFinite(result) || Math.abs(result)>1e24)throw new RangeError('Result is outside the supported numerical range.');
+
  return result;
 }
 export function formatNumber(value,digits=6){
@@ -359,7 +362,7 @@ export function resolveUnitLabel(input){
       throw new RangeError('Ambiguous unit "'+raw+'": use "knot" for speed (knots) or "kN" for kilonewtons (force).');
     throw new RangeError('Ambiguous unit "'+raw+'": use an exact, unambiguous unit ID or symbol.');
   }
-  throw new RangeError('Unknown unit "'+raw+'". Use an ExactUnit unit ID or its exact symbol.');
+  throw new RangeError('Unknown unit "'+raw+'". Use a ConvertUnits.cc unit ID or its exact symbol.');
 }
 
 /**
@@ -382,7 +385,7 @@ export function convertBatchToCsv(table,fromUnit,toUnit,{fromColumn=null,toColum
   const headers=table.headerCells
     ?Array.from({length:sourceColumns},(_,i)=>table.headerCells[i]||'Column '+(i+1))
     :Array.from({length:sourceColumns},(_,i)=>'Column '+(i+1));
-  const suffix=['ExactUnit line','ExactUnit result','ExactUnit from','ExactUnit to','ExactUnit status'];
+  const suffix=['ConvertUnits.cc line','ConvertUnits.cc result','ConvertUnits.cc from','ConvertUnits.cc to','ConvertUnits.cc status'];
   const csvRows=[[...headers,...suffix]];
   const results=[];
   let converted=0;
