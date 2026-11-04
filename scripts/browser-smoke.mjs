@@ -85,8 +85,14 @@ async function smokeScenario(SCENARIO){
      ok(input.getAttribute('aria-invalid')==='true'&&
        [...tool.querySelectorAll('[data-preset]')].every(b=>b.getAttribute('aria-pressed')==='false'),
        'empty value exposes accessible invalid state and clears active preset');
+     ok(q('[data-output]').getAttribute('aria-label')==='No conversion result'&&
+        q('[data-copy]').disabled&&q('[data-copy-number]').disabled,
+        'invalid input must not expose or copy a stale result');
+     ok(input.getAttribute('aria-describedby')===q('[data-error]').id,
+        'input errors must be associated with the input');
      input.value='11';input.dispatchEvent(new Event('input',{bubbles:true}));
      ok(input.getAttribute('aria-invalid')==='false','input correction clears invalid styling');
+     ok(!q('[data-copy]').disabled,'valid input restores copying');
      input.focus();
      ok(tool.matches(':focus-within'),'input focus still reaches calculator surface');
      break;
@@ -906,6 +912,10 @@ async function smokeScenario(SCENARIO){
      if(location.pathname.includes('/149/')){
        select.value='0.1';select.dispatchEvent(new Event('change',{bubbles:true}));
        ok(rows[0].cells[1].textContent.includes('148.95 lb'),'source sensitivity uses selected tenth-pound increment');
+       ok(panel.querySelector('[data-source-step-text]').textContent==='0.1 lb'&&
+          panel.querySelector('[data-source-lower]').textContent==='148.95'&&
+          panel.querySelector('[data-source-upper]').textContent==='149.05',
+          'source explanation must match the selected increment and table endpoints');
        ok(panel.querySelector('[data-source-comparison]').textContent.includes('Both bounds round to 68 kg'),
           'changed interval now has stable 68 kg whole-unit result');
        select.value='1';select.dispatchEvent(new Event('change',{bubbles:true}));
@@ -1027,7 +1037,7 @@ const suites=[
  {name:'mobile',url:'/convert/ml-to-us-fl-oz/355/'}
 ];
 function injection(name){
- const code='import("/assets/app.mjs").then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
+ const code='import(document.querySelector("script[type=module][src]").src).then(async()=>{let result="PASS";try{await ('+smokeScenario.toString()+')('+JSON.stringify(name)+')}catch(e){result="FAIL: "+(e?.stack||e?.message||String(e));}const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent=result;document.body.append(el);}).catch(e=>{const el=document.createElement("pre");el.id="browser-smoke-marker";el.textContent="FAIL: module "+e;document.body.append(el);});';
  return '<script type="module">'+code+'</script>';
 }
 const server=http.createServer((req,res)=>{

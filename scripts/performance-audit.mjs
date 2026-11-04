@@ -39,7 +39,7 @@ const htmlSizes=htmlFiles.map(file=>{
  const html=buffer.toString('utf8');
  // Prevent accidental introduction of third-party runtime scripts or trackers.
  if(/<script[^>]+src\s*=\s*["']https?:\/\//i.test(html))failures.push(route+': external runtime script introduced');
- if(!html.includes('href="/assets/styles.css"'))failures.push(route+': consolidated stylesheet missing');
+ if(!/href="\/assets\/styles\.[a-f0-9]{12}\.css"/.test(html))failures.push(route+': consolidated stylesheet missing');
  return {route,bytes:buffer.length};
 }).sort((a,b)=>b.bytes-a.bytes);
 const largest=htmlSizes[0];

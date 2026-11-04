@@ -2,6 +2,16 @@
 
 Production-ready, zero-dependency static website created for the [Convert-Units](https://github.com/garrison2025/Convert-Units) project according to the user-approved V2.0 build plan.
 
+## Current configuration — November 4, 2026
+
+This section is the operational reference; dated V3–V51 entries below are historical. The official origin is `https://convertunits.cc`, with 38 directional tools, 16 categories, 92 numeric pages and 156 index-eligible URLs. The previous 15-page numeric pilot is historical. The version-controlled owner approval applies to verified Cloudflare `main` builds; local and branch previews remain noindex. Do not change publication variables or numeric policy to fix an unrelated UI issue.
+
+The audit-fix branch adds content-fingerprinted CSS and module URLs (including the engine import), synchronized source-interval explanations, accurate invalid-result accessibility, readable secondary text, current Cloudflare analytics disclosure and consistently branded CSV headers. CSV appended headers now use `ConvertUnits.cc` instead of the former `ExactUnit` prefix; original imported columns remain unchanged. Spreadsheet integrations using the old appended headings must select the new names.
+
+Build output normalizes LF line endings, with repository text conventions in `.gitattributes`. Stable asset aliases remain for diagnostics, while generated pages and module imports use fingerprinted filenames. Retired internal-report URLs redirect to an absent reserved path ending in a real 404 rather than a successful `/404/` document. The private reports themselves stay outside `dist/`.
+
+Validation and deployment evidence for this change are recorded in `UI-RELEASE-EVIDENCE.md`. A successful local build or branch review does not establish production publication, Google indexing or income.
+
 ## V51 homepage search accessibility (2026-11-04)
 
 Remove unsupported `aria-expanded` and unnecessary popup-control semantics from the native `type=search` homepage finder. Search suggestions remain ordinary keyboard-focusable links, not an ARIA combobox/listbox. Add a polite status line announcing result counts; retain input label, ArrowDown navigation, Escape/focus return, and form fallback. Regression tests include static HTML semantics and browser focus interaction; no design changes, JS dependency, API or new SEO URLs.

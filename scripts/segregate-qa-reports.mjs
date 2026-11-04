@@ -36,7 +36,7 @@ for(const name of reportNames)fs.renameSync(path.join(dist,name),path.join(qa,na
  * CSV/JSON asset still exists, and prevents serving historical QA exports.
  * 302 avoids permanently caching any intermediate route choice.
  */
-const denyRules=reportNames.map(name=>'/'+name+' /404/ 302');
+const denyRules=reportNames.map(name=>'/'+name+' /__retired-audit-export__/'+name+' 302');
 fs.writeFileSync(path.join(dist,'_redirects'),[
  '# Retired audit-export paths. Cloudflare Pages redirects apply even to assets.',
  ...denyRules,''
@@ -49,7 +49,7 @@ const exposed=fs.readdirSync(dist).filter(name=>
 if(exposed.length)throw Error('Sensitive internal QA files remain in deployment output: '+exposed.join(', '));
 const redirectFile=fs.readFileSync(path.join(dist,'_redirects'),'utf8');
 for(const name of reportNames)
- if(!redirectFile.includes('/'+name+' /404/ 302'))
+ if(!redirectFile.includes('/'+name+' /__retired-audit-export__/'+name+' 302'))
   throw Error('Historical QA file not blocked by Pages redirect: '+name);
 if(!fs.existsSync(path.join(dist,'sitemap.xml'))||
  !fs.existsSync(path.join(dist,'robots.txt'))||

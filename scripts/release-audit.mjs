@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {createHash} from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
@@ -43,6 +44,19 @@ const titleSeen=new Map(), descriptionSeen=new Map(), inbound=new Map([...allRou
 const seedPaths=new Set(seeds.map(s=>s.url));
 const bundledStyle=path.join(dist,'assets','styles.css');
 if(!fs.existsSync(bundledStyle)||fs.statSync(bundledStyle).size<10000)fail('Required combined CSS is absent or unexpectedly small');
+
+// Validate the delivered graph as well as the HTML entry: an unchanged engine
+// import would otherwise let old browser caches bypass a new entry fingerprint.
+for(const file of fs.readdirSync(path.join(dist,'assets'))){
+ const match=/^(app|engine|styles)\.([a-f0-9]{12})\.(mjs|css)$/.exec(file);
+ if(!match)continue;
+ const bytes=fs.readFileSync(path.join(dist,'assets',file));
+ if(createHash('sha256').update(bytes).digest('hex').slice(0,12)!==match[2])fail('Asset fingerprint mismatch: '+file);
+ if(!bytes.equals(fs.readFileSync(path.join(dist,'assets',match[1]+'.'+match[3]))))fail('Diagnostic alias differs: '+file);
+}
+const entry=fs.readFileSync(path.join(dist,'assets','app.mjs'),'utf8');
+const importedEngine=entry.match(/from '\.\/(engine\.[a-f0-9]{12}\.mjs)'/)?.[1];
+if(!importedEngine||!fs.existsSync(path.join(dist,'assets',importedEngine)))fail('Entry must import an existing fingerprinted engine');
 
 const extract=(html,regex)=>regex.exec(html)?.[1]??'';
 const plain=(html)=>html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&(?:[a-z]+|#\d+);/gi,' ').replace(/\s+/g,' ').trim();
@@ -95,9 +109,10 @@ for(const [route,html] of pages){
     }
   }
   for(const match of html.matchAll(/<(?:script|link)\b[^>]*?(?:src|href)="(\/assets\/[^"]+)"/gi)){
-    if(!fs.existsSync(path.join(dist,match[1].slice(1))))fail(route+': missing asset '+match[1]);
+    if(!fs.existsSync(path.join(dist,new URL(match[1],'https://internal.invalid').pathname.slice(1))))fail(route+': missing asset '+match[1]);
   }
-  if(!html.includes('<link rel="stylesheet" href="/assets/styles.css">'))fail(route+': missing optimized single CSS bundle');
+  if(!/<link rel="stylesheet" href="\/assets\/styles\.[a-f0-9]{12}\.css">/.test(html))fail(route+': missing optimized single CSS bundle');
+  if(!/<script type="module" src="\/assets\/app\.[a-f0-9]{12}\.mjs" defer>/.test(html))fail(route+': missing fingerprinted browser entry');
   if(route==='/universal-converter/'&&(!html.includes('data-unit-find')||!html.includes('data-unit-results')))fail('Universal converter missing alias search');
   if(route==='/all-converters/'&&!html.includes('data-search='))fail('Converter directory missing alias search data');
   if(route==='/batch-converter/'&&(!html.includes('data-batch-column')||!html.includes('data-batch-delimiter')))fail('Batch converter missing selected-column or delimiter controls');

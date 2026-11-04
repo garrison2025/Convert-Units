@@ -28,6 +28,10 @@ The definitive color tokens live in `site.css`; `refresh.css` and `polish.css` m
 | primary-hover | `#125874` | visible hover and active states |
 | result-bg | `#E8F5F6` | answer region |
 | result-ink | `#145D73` | high-contrast numeric answers |
+
+### November 4 audit correction
+
+Use the existing `--muted` token for small reference-table headings, breadcrumbs, trust-strip descriptions, equivalent-unit disclosure hints and secondary tool copy. These labels must remain readable against the existing white and canvas surfaces; do not substitute pale decorative gray for functional text. Layout, primary brand colors, typography hierarchy and motion remain unchanged. Invalid results expose no stale answer to assistive technology, associate the error with the input, and disable result-copy actions until valid input is restored.
 | line | `#DBE6EA` | quiet borders and separators |
 | focus | `#176B8A` | high-contrast keyboard focus |
 | success | `#156044` | copy-success feedback (separate from primary brand color) |

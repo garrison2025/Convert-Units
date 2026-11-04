@@ -38,7 +38,7 @@ test('149 lb to kg source interval can change whole target unit',()=>{
 test('133.8 lb uses tenths and does not assume pounds-scale precision',()=>{
  const [seed,pair]=find('lbs-to-kg','133.8'),s=sourceRoundingScenario(seed,pair);
  assert.deepEqual([s.step,s.below,s.above],[0.1,133.75,133.85]);
- assert.match(sourceRoundingScenarioHtml(seed,pair),/nearest <strong>0.1 lb<\/strong>/);
+ assert.match(sourceRoundingScenarioHtml(seed,pair),/nearest <strong data-source-step-text>0.1 lb<\/strong>/);
 });
 test('37.9 C uses affine temperature conversion not a simple multiplication',()=>{
  const [seed,pair]=find('celsius-to-fahrenheit','37.9'),s=sourceRoundingScenario(seed,pair);
